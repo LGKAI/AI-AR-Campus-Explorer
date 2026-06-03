@@ -1,0 +1,20 @@
+# Bỏ qua môi trường ảo độc lập
+.venv/
+venv/
+env/
+ENV/
+
+# Bỏ qua các file đệm biên dịch của Python
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Bỏ qua cấu hình riêng của hệ điều hành Mac
+.DS_Store
+
+# Bỏ qua cấu hình cá nhân của VS Code
+.vscode/
+
+# Khóa muối cục bộ để ẩn danh session, không đưa lên git
+engine/.privacy_salt

@@ -1,0 +1,4583 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>AI AR Campus Navigator v5</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600;700&display=swap');
+  
+  :root {
+    --bg: #030712;
+    --surface-opaque: #0f172a;
+    --surface: rgba(15, 23, 42, 0.65);
+    --border: rgba(255, 255, 255, 0.08);
+    --primary: #00d2ff;
+    --primary-glow: rgba(0, 210, 255, 0.3);
+    --accent: #10b981;
+    --accent-glow: rgba(16, 185, 129, 0.25);
+    --danger: #ef4444;
+    --text: #f3f4f6;
+    --muted: #94a3b8;
+    --font-title: 'Outfit', sans-serif;
+    --font-body: 'Inter', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  
+  body {
+    font-family: var(--font-body);
+    background: var(--bg);
+    color: var(--text);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* HEADER */
+  header {
+    background: rgba(10, 15, 30, 0.8);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    z-index: 10;
+  }
+
+  header h1 {
+    font-family: var(--font-title);
+    font-size: 1.2rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    background: linear-gradient(135deg, var(--primary), #00f2fe);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .header-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 10px var(--accent);
+    animation: pulse-glow 2s infinite;
+  }
+
+  @keyframes pulse-glow {
+    0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { transform: scale(1); box-shadow: 0 0 0 8px rgba(16, 185, 129, 0); }
+    100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+
+  /* LAYOUT */
+  .main-container {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+
+  /* TOP TASK BAR & TABS */
+  .sidebar {
+    width: 100%;
+    max-height: 42vh;
+    background: var(--surface);
+    backdrop-filter: blur(20px);
+    border-right: none;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    z-index: 7;
+    transition: max-height 0.28s ease, transform 0.28s ease;
+  }
+
+  .sidebar.collapsed {
+    max-height: 0 !important;
+    min-height: 0 !important;
+    border-bottom: none;
+    transform: translateY(-100%);
+  }
+
+  .taskbar-row {
+    display: flex;
+    align-items: center;
+    background: rgba(10, 15, 28, 0.9);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .tab-bar {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .taskbar-hide-btn {
+    width: 88px;
+    min-width: 88px;
+    height: 46px;
+    background: rgba(0,210,255,0.08);
+    border: none;
+    border-left: 1px solid var(--border);
+    color: var(--primary);
+    cursor: pointer;
+    font-family: var(--font-title);
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .taskbar-hide-btn:hover {
+    color: var(--primary);
+    background: rgba(0,210,255,0.08);
+  }
+
+  #taskbar-show-btn {
+    position: absolute;
+    top: 14px;
+    left: 78px;
+    z-index: 12;
+    width: 96px;
+    height: 58px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(0,210,255,0.32);
+    border-radius: 10px;
+    background: rgba(0, 210, 255, 0.14);
+    color: var(--primary);
+    cursor: pointer;
+    font-family: var(--font-title);
+    font-size: 0.78rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.35);
+    transition: all 0.2s ease;
+    gap: 6px;
+  }
+
+  #taskbar-show-btn:hover {
+    background: var(--primary);
+    color: #030712;
+    border-color: var(--primary);
+  }
+
+  .tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-btn {
+    flex: 0 0 auto;
+    background: transparent;
+    border: none;
+    color: var(--muted);
+    padding: 12px 10px;
+    font-family: var(--font-title);
+    font-size: 0.74rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 2px solid transparent;
+    text-align: center;
+  }
+
+  .tab-btn:hover {
+    color: var(--text);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .tab-btn.active {
+    color: var(--primary);
+    border-bottom: 2px solid var(--primary);
+    background: rgba(0, 210, 255, 0.04);
+  }
+
+  .tab-content {
+    flex: 0 1 auto;
+    overflow-y: auto;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    max-height: calc(42vh - 43px);
+  }
+
+  .tab-pane {
+    display: none;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .tab-pane.active {
+    display: flex;
+  }
+
+  .tab-pane.active > .card {
+    width: min(1180px, 100%);
+  }
+
+  /* CARD & INPUTS */
+  .card {
+    background: rgba(30, 41, 59, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .card h3 {
+    font-family: var(--font-title);
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--primary);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  label {
+    font-size: 0.72rem;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 500;
+  }
+
+  select, input[type=text], input[type=number] {
+    width: 100%;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 9px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    margin-bottom: 10px;
+    transition: all 0.2s ease;
+    font-family: var(--font-body);
+  }
+
+  select:focus, input:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 8px var(--primary-glow);
+  }
+
+  .btn {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-family: var(--font-title);
+    font-weight: 700;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+
+  .btn-primary {
+    background: linear-gradient(135deg, var(--primary), #00f2fe);
+    color: #060913;
+    box-shadow: 0 4px 14px var(--primary-glow);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px var(--primary-glow);
+  }
+
+  .btn-ghost {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text);
+    border: 1px solid var(--border);
+  }
+
+  .btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
+
+  .btn-danger {
+    background: rgba(239, 68, 68, 0.15);
+    color: #f87171;
+    border: 1px solid rgba(239, 68, 68, 0.25);
+  }
+
+  .btn-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+  }
+
+  /* STATUS LOG */
+  #status {
+    font-size: 0.76rem;
+    color: var(--muted);
+    line-height: 1.5;
+    padding: 12px;
+    background: rgba(10, 15, 28, 0.6);
+    border-radius: 8px;
+    border: 1px solid var(--border);
+  }
+
+  /* MAP VIEWPORT */
+  #map-wrap {
+    flex: 1;
+    position: relative;
+    background: #020617;
+    min-height: 0;
+  }
+
+  canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* GPS HUD OVERLAY */
+  .gps-hud {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 280px;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(16px);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 14px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    z-index: 4;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .hud-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    margin-bottom: 4px;
+  }
+
+  .hud-title {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--primary);
+  }
+
+  .hud-status-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #475569;
+  }
+
+  .hud-status-dot.active {
+    background: var(--accent);
+    box-shadow: 0 0 8px var(--accent);
+  }
+
+  .hud-status-dot.simulating {
+    background: #eab308;
+    box-shadow: 0 0 8px #eab308;
+    animation: flash 1s infinite alternate;
+  }
+
+  @keyframes flash {
+    from { opacity: 0.4; } to { opacity: 1; }
+  }
+
+  .hud-row {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.72rem;
+  }
+
+  .hud-label { color: var(--muted); }
+  .hud-val { font-weight: 600; color: var(--text); }
+
+  .hud-controls {
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .hud-btn-group {
+    display: flex;
+    gap: 6px;
+  }
+
+  .hud-btn-group button {
+    flex: 1;
+  }
+
+  /* ALERT BOX */
+  .alert-box {
+    display: none;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .alert-item {
+    background: rgba(239, 68, 68, 0.15);
+    border: 1px solid rgba(239, 68, 68, 0.25);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 0.7rem;
+    color: #f87171;
+    line-height: 1.4;
+  }
+
+  /* LEGEND */
+  .legend {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+    z-index: 4;
+    display: flex;
+    gap: 14px;
+    font-size: 0.68rem;
+    color: var(--muted);
+  }
+
+  .leg { display: flex; align-items: center; gap: 6px; }
+  .leg-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+
+  /* BADGES & FEEDS */
+  .rec-card {
+    background: rgba(30, 41, 59, 0.25);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .rec-card:hover {
+    border-color: rgba(0, 210, 255, 0.2);
+    background: rgba(30, 41, 59, 0.35);
+  }
+
+  .rec-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+  }
+
+  .rec-name {
+    font-family: var(--font-title);
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .rec-name:hover {
+    color: var(--primary);
+    text-decoration: underline;
+  }
+
+  .rec-reason {
+    font-size: 0.74rem;
+    color: var(--muted);
+    line-height: 1.4;
+  }
+
+  .rec-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+
+  .badge {
+    font-size: 0.6rem;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 4px;
+    text-transform: uppercase;
+  }
+
+  .b-green  { background: rgba(16, 185, 129, 0.15); color: #34d399; }
+  .b-blue   { background: rgba(0, 210, 255, 0.15); color: #38bdf8; }
+  .b-purple { background: rgba(168, 85, 247, 0.15); color: #c084fc; }
+  .b-yellow { background: rgba(234, 179, 8, 0.15); color: #facc15; }
+
+  /* EXPLAINABLE AI BUTTON & PANEL */
+  .btn-explain {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-family: var(--font-title);
+    font-size: 0.68rem;
+    font-weight: 600;
+    cursor: pointer;
+    text-align: left;
+    margin-top: 2px;
+    align-self: flex-start;
+  }
+
+  .btn-explain:hover {
+    text-decoration: underline;
+  }
+
+  .explain-panel {
+    background: rgba(15, 23, 42, 0.5);
+    border-radius: 6px;
+    padding: 10px;
+    margin-top: 6px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    border: 1px solid rgba(255,255,255,0.03);
+  }
+
+  .explain-row {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .explain-label-box {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.64rem;
+    color: var(--muted);
+  }
+
+  .explain-bar {
+    background: rgba(255,255,255,0.06);
+    height: 5px;
+    border-radius: 3px;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .explain-fill {
+    height: 100%;
+    border-radius: 3px;
+    width: 0;
+    transition: width 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* TOAST */
+  #toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: rgba(15, 23, 42, 0.9);
+    backdrop-filter: blur(8px);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 50px;
+    padding: 10px 24px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+    pointer-events: none;
+    z-index: 999;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+
+  #toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+
+  /* GEOFENCE AUTOMATED POP-UP MODAL styles (RELOADED AS TOP BANNER) */
+  .geofence-popup-overlay {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 480px;
+    height: auto;
+    background: transparent;
+    backdrop-filter: none;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    z-index: 1000;
+    pointer-events: none; /* Let clicks pass through overlay to map */
+  }
+
+  .geofence-popup-card {
+    pointer-events: auto; /* Clicks are captured on card */
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(25px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 16px;
+    width: 100%;
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 14px 16px;
+    transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    cursor: pointer;
+    overflow: hidden;
+    animation: slideDownIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .geofence-popup-card:hover {
+    border-color: rgba(0, 210, 255, 0.4);
+    box-shadow: 0 14px 35px rgba(0, 210, 255, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+
+  .geofence-popup-header-compact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+  }
+
+  .geofence-popup-icon-compact {
+    font-size: 1.6rem;
+    background: rgba(0, 210, 255, 0.15);
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.2);
+  }
+
+  .geofence-popup-title-box-compact {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    overflow: hidden;
+  }
+
+  .geofence-popup-alert-text {
+    font-size: 0.88rem;
+    color: #f1f5f9;
+    font-weight: 500;
+  }
+
+  .geofence-popup-tagline-compact {
+    font-size: 0.72rem;
+    color: #94a3b8;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .geofence-popup-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .geofence-popup-expand-indicator {
+    font-size: 0.72rem;
+    color: #38bdf8;
+    font-weight: 600;
+    background: rgba(56, 189, 248, 0.1);
+    padding: 4px 8px;
+    border-radius: 6px;
+    transition: all 0.2s ease;
+  }
+
+  .geofence-popup-card.expanded .geofence-popup-expand-indicator {
+    background: rgba(244, 63, 94, 0.1);
+    color: #fb7185;
+  }
+
+  .geofence-popup-close {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #cbd5e1;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+  }
+
+  .geofence-popup-close:hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: rgba(239, 68, 68, 0.4);
+    color: #ef4444;
+  }
+
+  .geofence-popup-divider {
+    height: 1px;
+    background: rgba(255, 255, 255, 0.08);
+    margin: 12px 0;
+  }
+
+  .geofence-popup-grid-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .geofence-popup-body-expanded {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-top: 4px;
+    animation: fadeIn 0.25s ease;
+  }
+
+  .geofence-popup-section {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .geofence-popup-section-title {
+    font-family: var(--font-title);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--primary);
+    font-weight: 700;
+  }
+
+  .geofence-popup-services-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
+  .geofence-popup-service-item {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 6px 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.76rem;
+    color: var(--text);
+  }
+
+  .geofence-popup-departments-list, .geofence-popup-events-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .geofence-popup-dept-item {
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(255, 255, 255, 0.02);
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.04);
+  }
+
+  .geofence-popup-event-item {
+    font-size: 0.76rem;
+    color: #cbd5e1;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    padding: 6px 10px;
+    border-radius: 8px;
+  }
+
+  .geofence-popup-no-events {
+    font-size: 0.74rem;
+    color: #64748b;
+    font-style: italic;
+    padding: 4px;
+  }
+
+  .geofence-popup-crowd-box {
+    background: rgba(255, 255, 255, 0.02);
+    border: 1px solid rgba(255, 255, 255, 0.04);
+    border-radius: 8px;
+    padding: 8px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .geofence-popup-crowd-bar-container {
+    background: rgba(255, 255, 255, 0.08);
+    height: 6px;
+    border-radius: 3px;
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .geofence-popup-crowd-fill {
+    height: 100%;
+    border-radius: 3px;
+    transition: width 0.5s ease;
+  }
+
+  .geofence-popup-crowd-status-text {
+    font-size: 0.78rem;
+    font-weight: 500;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideDownIn {
+    from { transform: translateY(-30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+  }
+  /* QUERY CHIPS */
+  .qchip {
+    background: rgba(0, 210, 255, 0.08);
+    border: 1px solid rgba(0, 210, 255, 0.2);
+    color: #38bdf8;
+    border-radius: 20px;
+    padding: 4px 10px;
+    font-size: 0.7rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+  .qchip:hover {
+    background: rgba(0, 210, 255, 0.18);
+    border-color: rgba(0, 210, 255, 0.4);
+    transform: translateY(-1px);
+  }
+  .qchip.active {
+    background: rgba(0, 210, 255, 0.22);
+    border-color: var(--primary);
+    color: var(--primary);
+    font-weight: 600;
+  }
+  .b-cf { background: rgba(16,185,129,0.12); color: #34d399; }
+  /* GPS-not-set prompt */
+  .gps-prompt {
+    background: rgba(234,179,8,0.1);
+    border: 1px solid rgba(234,179,8,0.25);
+    border-radius: 8px;
+    padding: 10px 12px;
+    font-size: 0.74rem;
+    color: #fbbf24;
+    line-height: 1.5;
+  }
+
+  /* CAMPUS LENS TAB LAYOUT */
+  #ar-ui-wrap {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    background: #020617;
+    height: 100%;
+  }
+
+  .ar-split-left {
+    display: none;
+  }
+
+  .ar-split-left {
+    flex: 1.1;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    border-right: 1px solid var(--border);
+    background: linear-gradient(180deg, rgba(15, 23, 42, 0.4) 0%, rgba(3, 7, 18, 0.9) 100%);
+  }
+
+  .ar-split-right {
+    flex: 1;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    overflow-y: auto;
+    background: linear-gradient(135deg, rgba(15, 23, 42, 0.2) 0%, rgba(2, 6, 23, 0.9) 100%);
+  }
+
+  /* SYSTEM ARCHITECTURE DIAGRAM */
+  .ar-header {
+    margin-bottom: 20px;
+  }
+  .ar-header h2 {
+    font-family: var(--font-title);
+    font-size: 1.4rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--primary), #38bdf8);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .ar-header p {
+    font-size: 0.8rem;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  .arch-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background: rgba(15, 23, 42, 0.3);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 20px;
+  }
+
+  .arch-layer {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .arch-layer-title {
+    font-family: var(--font-title);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--muted);
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    padding-bottom: 4px;
+    margin-bottom: 4px;
+  }
+  .arch-nodes {
+    display: flex;
+    gap: 12px;
+  }
+
+  .arch-card {
+    flex: 1;
+    background: rgba(30, 41, 59, 0.4);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    cursor: help;
+  }
+  .arch-card:hover {
+    border-color: var(--primary);
+    box-shadow: 0 0 15px var(--primary-glow);
+    transform: translateY(-2px);
+    background: rgba(30, 41, 59, 0.6);
+  }
+  .arch-card h4 {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    color: #fff;
+    margin-bottom: 6px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .arch-card p {
+    font-size: 0.68rem;
+    color: var(--muted);
+    line-height: 1.35;
+  }
+
+  /* Connection paths */
+  .arch-connect-arrow {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 20px;
+    color: var(--primary-glow);
+  }
+  .arch-connect-arrow svg {
+    filter: drop-shadow(0 0 4px var(--primary-glow));
+    animation: pulse-arrow 1.5s infinite alternate;
+  }
+  @keyframes pulse-arrow {
+    from { opacity: 0.5; transform: scale(0.9); }
+    to { opacity: 1; transform: scale(1.1); }
+  }
+
+  /* Feedback loop tag */
+  .arch-feedback-loop {
+    margin-top: 10px;
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px dashed var(--accent);
+    border-radius: 10px;
+    padding: 10px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.72rem;
+    color: #34d399;
+  }
+  .arch-feedback-loop-badge {
+    background: var(--accent);
+    color: #030712;
+    font-weight: 700;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 0.6rem;
+    text-transform: uppercase;
+  }
+
+  /* Tooltips styling */
+  .arch-card .tooltip-text {
+    visibility: hidden;
+    width: 260px;
+    background-color: rgba(15, 23, 42, 0.95);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--primary);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    position: absolute;
+    z-index: 20;
+    bottom: 105%;
+    left: 50%;
+    transform: translateX(-50%);
+    opacity: 0;
+    transition: opacity 0.3s;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    font-size: 0.7rem;
+    line-height: 1.35;
+    pointer-events: none;
+  }
+  .arch-card:hover .tooltip-text {
+    visibility: visible;
+    opacity: 1;
+  }
+
+  /* WEB SHOWCASE OVERLAY & SLIDES */
+  .web-showcase-container {
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+    scroll-snap-type: y mandatory;
+    scrollbar-width: none; /* Hide scrollbar for clean web view */
+  }
+  .web-showcase-container::-webkit-scrollbar {
+    display: none;
+  }
+
+  .web-slide {
+    height: 100%;
+    width: 100%;
+    scroll-snap-align: start;
+    position: relative;
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    align-items: flex-end;
+    padding: 32px;
+    box-shadow: inset 0 0 150px rgba(0,0,0,0.85); /* Deep shadow overlay for text readability */
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+  }
+
+  /* Full screen WebAR Floating Markers directly overlaying slides */
+  .webar-viewport {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 2;
+  }
+  .webar-marker {
+    position: absolute;
+    background: rgba(15, 23, 42, 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(0, 210, 255, 0.4);
+    border-radius: 14px;
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: #fff;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 15px rgba(0,210,255,0.15);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+    pointer-events: auto; /* enable click on marker */
+    max-width: 180px;
+    animation: float-marker 4s ease-in-out infinite alternate;
+  }
+  .webar-marker.glow-pulse {
+    animation: flash-green-large 1.2s ease-out 2;
+  }
+  @keyframes flash-green-large {
+    0% { border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    50% { border-color: var(--accent); box-shadow: 0 0 20px 8px rgba(16, 185, 129, 0.5); }
+    100% { border-color: rgba(0, 210, 255, 0.4); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+  }
+  .webar-marker-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 8px;
+  }
+  .webar-marker-name {
+    font-family: var(--font-title);
+    font-size: 0.8rem;
+    font-weight: 700;
+  }
+  .webar-marker-match {
+    background: var(--accent);
+    color: #030712;
+    font-size: 0.65rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 4px;
+  }
+  .webar-marker-desc {
+    font-size: 0.65rem;
+    color: #cbd5e1;
+  }
+
+  /* Glassmorphism content overlay card (sidebar-like or floating on slide) */
+  .web-slide-card {
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 24px;
+    width: 380px;
+    max-width: 90%;
+    z-index: 5;
+    margin-bottom: 20px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255,255,255,0.1);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    transform: translateY(0);
+    transition: transform 0.3s ease;
+  }
+  .web-slide-card:hover {
+    transform: translateY(-4px);
+    border-color: rgba(0, 210, 255, 0.3);
+  }
+  .web-slide-title-box {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .web-slide-title {
+    font-family: var(--font-title);
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: #fff;
+  }
+  .web-slide-desc {
+    font-size: 0.8rem;
+    color: #cbd5e1;
+    line-height: 1.4;
+  }
+  .web-slide-tags {
+    font-size: 0.75rem;
+    color: var(--primary);
+    font-weight: 600;
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  /* Interaction and rating star block */
+  .web-slide-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    padding-top: 14px;
+    margin-top: 4px;
+  }
+  .web-like-save-row {
+    display: flex;
+    gap: 12px;
+  }
+  .web-btn-action {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .web-btn-action:hover {
+    background: rgba(255, 255, 255, 0.12);
+  }
+  .web-btn-action.liked {
+    background: rgba(239, 68, 68, 0.15);
+    border-color: rgba(239, 68, 68, 0.3);
+    color: #f87171;
+  }
+  .web-btn-action.saved {
+    background: rgba(234, 179, 8, 0.15);
+    border-color: rgba(234, 179, 8, 0.3);
+    color: #facc15;
+  }
+
+  /* Rating Block */
+  .web-rating-box {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-end;
+  }
+  .web-rating-label {
+    font-size: 0.62rem;
+    color: var(--muted);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .web-rating-stars {
+    display: flex;
+    gap: 4px;
+  }
+  .web-star {
+    font-size: 1.25rem;
+    cursor: pointer;
+    color: #475569;
+    transition: color 0.15s ease, transform 0.1s ease;
+  }
+  .web-star:hover {
+    transform: scale(1.2);
+  }
+  .web-star.rated {
+    color: #facc15;
+    text-shadow: 0 0 6px rgba(250, 204, 21, 0.5);
+  }
+
+  /* Navigation UI inside web showcase */
+  .web-scroll-indicator {
+    position: absolute;
+    right: 24px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    z-index: 10;
+  }
+  .web-scroll-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(0,0,0,0.5);
+    cursor: pointer;
+    transition: all 0.25s ease;
+  }
+  .web-scroll-dot:hover, .web-scroll-dot.active {
+    background: var(--primary);
+    transform: scale(1.3);
+    box-shadow: 0 0 8px var(--primary);
+  }
+
+  /* Filter Switch bar for WebAR */
+  .webar-filter-bar {
+    position: absolute;
+    top: 24px;
+    right: 56px;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 12px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 10;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+  }
+  .webar-filter-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #fff;
+  }
+
+  .webar-location-toggle {
+    position: absolute;
+    top: 24px;
+    left: 24px;
+    z-index: 11;
+    width: 46px;
+    height: 46px;
+    border: 1px solid rgba(250,204,21,0.32);
+    border-radius: 50%;
+    background: rgba(250, 204, 21, 0.14);
+    color: #facc15;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.28);
+    transition: all 0.2s ease;
+  }
+
+  .webar-location-toggle:hover {
+    background: #facc15;
+    color: #030712;
+    border-color: #facc15;
+  }
+
+  /* Carousel for quick jumping */
+  .webar-bottom-carousel {
+    position: absolute;
+    top: 66px;
+    left: 24px;
+    z-index: 10;
+    background: rgba(15, 23, 42, 0.75);
+    backdrop-filter: blur(12px);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 8px;
+    padding: 8px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    width: 168px;
+    max-height: min(58vh, 420px);
+    overflow-y: auto;
+    scrollbar-width: thin;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+    transition: transform 0.22s ease, opacity 0.2s ease, width 0.22s ease, padding 0.22s ease;
+  }
+  .webar-bottom-carousel.collapsed {
+    opacity: 0;
+    transform: translateX(-12px);
+    pointer-events: none;
+  }
+  .webar-carousel-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    padding: 6px 8px;
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .webar-carousel-card:hover, .webar-carousel-card.active {
+    background: var(--primary);
+    color: #030712;
+    border-color: var(--primary);
+  }
+
+  /* COLLAPSIBLE SIDEBAR */
+  .sidebar {
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1), margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .sidebar.collapsed {
+    width: 0px !important;
+    min-width: 0px !important;
+    border-right: none;
+  }
+  
+  /* Sidebar Toggle Button */
+  #sidebar-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 6;
+    background: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #fff;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  }
+
+  #map-wrap #sidebar-toggle {
+    display: none;
+  }
+  #sidebar-toggle:hover {
+    background: var(--primary);
+    color: #000;
+    border-color: var(--primary);
+    box-shadow: 0 0 12px rgba(0, 210, 255, 0.5);
+  }
+
+  /* COMMENTS SECTION IN WEB SHOWCASE CARD */
+  .web-comments-section {
+    margin-top: 14px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    padding-top: 10px;
+    width: 100%;
+  }
+  .web-comments-toggle-btn {
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0;
+  }
+  .web-comments-toggle-btn:hover {
+    color: #38bdf8;
+    text-shadow: 0 0 8px rgba(56,189,248,0.5);
+  }
+  .web-comments-box {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 8px;
+    padding: 8px;
+    border: 1px solid rgba(255,255,255,0.05);
+  }
+  .web-comments-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .web-comment-item {
+    font-size: 0.72rem;
+    color: rgba(255,255,255,0.85);
+    line-height: 1.35;
+    background: rgba(255,255,255,0.06);
+    padding: 8px 10px;
+    border-radius: 12px 12px 12px 4px;
+    border-left: 2px solid var(--primary);
+    text-align: left;
+    max-width: 92%;
+  }
+  .web-comment-author {
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 2px;
+    font-size: 0.68rem;
+  }
+  .web-comment-content {
+    word-break: break-all;
+  }
+  .web-comment-form {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+  .web-comment-form input {
+    flex: 1;
+    background: rgba(15,23,42,0.6);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 6px 10px;
+    color: #fff;
+    font-size: 0.75rem;
+  }
+  .web-comment-form button {
+    background: var(--primary);
+    color: #000;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .web-comment-form button:hover {
+    background: #38bdf8;
+    box-shadow: 0 0 10px rgba(0, 210, 255, 0.4);
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="header-dot"></div>
+  <h1>🗺️ AI AR Campus Navigator — Pathfinding &amp; Smart Recommender <span style="font-size:0.6rem;background:rgba(16,185,129,0.15);color:#34d399;padding:2px 7px;border-radius:4px;margin-left:8px;font-family:monospace">v5</span></h1>
+  <span id="clock" style="margin-left:auto;font-family: monospace;font-size:0.75rem;color:var(--muted)"></span>
+</header>
+
+<div class="main-container">
+  <button id="taskbar-show-btn" onclick="toggleTaskbar()" title="Mở thanh tab">TAB <span>▼</span></button>
+  
+  <!-- FLOATING GPS HUD -->
+  <div class="gps-hud">
+    <div class="hud-header">
+      <div class="hud-title">
+        <span>📍 Định vị GPS thời gian thực</span>
+      </div>
+      <div id="hud-status-indicator" class="hud-status-dot"></div>
+    </div>
+    <div class="hud-row">
+      <span class="hud-label">Tọa độ GPS:</span>
+      <span id="hud-coords" class="hud-val">Chưa xác định</span>
+    </div>
+    <div class="hud-row">
+      <span class="hud-label">Tòa gần nhất:</span>
+      <span id="hud-snapped" class="hud-val">Chưa Snap</span>
+    </div>
+    <div class="hud-row">
+      <span class="hud-label">Độ dài còn lại:</span>
+      <span id="hud-dist" class="hud-val">N/A</span>
+    </div>
+    <div class="hud-row">
+      <span class="hud-label">Thời gian ước lượng:</span>
+      <span id="hud-time" class="hud-val">N/A</span>
+    </div>
+    
+    <div class="alert-box" id="hud-alerts"></div>
+
+    <div class="hud-controls">
+      <button id="btn-real-gps" class="btn btn-ghost" onclick="toggleRealGPS()">📍 Bật GPS thiết bị thực tế</button>
+      <div class="hud-btn-group">
+        <button id="btn-sim-walk" class="btn btn-primary" onclick="startSimulatedWalk()">🚶 Chạy mô phỏng</button>
+        <button id="btn-stop-sim" class="btn btn-danger" onclick="stopSimulatedWalk()" style="display:none;">⏹️ Dừng</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="sidebar">
+    <!-- TABS NAVIGATION -->
+    <div class="taskbar-row">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('tab-route')">🧭 Lộ trình</button>
+        <button class="tab-btn" onclick="switchTab('tab-profile')">👤 Cá nhân hóa</button>
+        <button class="tab-btn" onclick="switchTab('tab-recommend')">✨ Đề xuất AI</button>
+        <button class="tab-btn" onclick="switchTab('tab-cf')">🤝 Khám phá</button>
+        <button class="tab-btn" onclick="switchTab('tab-ar-ui')">📱 Campus Lens</button>
+        <button class="tab-btn" onclick="switchTab('tab-favorites')">❤️ Tim/Lưu</button>
+      </div>
+      <button class="taskbar-hide-btn" onclick="toggleTaskbar()" title="Ẩn thanh tab">TAB <span>▲</span></button>
+    </div>
+
+    <div class="tab-content">
+      
+      <!-- TAB 1: WAYPOINTS & PATHFINDING -->
+      <div id="tab-route" class="tab-pane active">
+        <div class="card">
+          <h3>🧭 Tìm đường lộ trình</h3>
+          <label>Điểm xuất phát</label>
+          <select id="start">__OPTS__</select>
+          <label>Điểm dừng (tuỳ chọn)</label>
+          <select id="stop"><option value="">-- Không ghé --</option>__OPTS__</select>
+          <label>Điểm đích</label>
+          <select id="end">__OPTS__</select>
+          <label>Ưu tiên lộ trình</label>
+          <select id="pref">
+            <option value="fastest">⚡ Nhanh nhất (A* + GNN)</option>
+            <option value="covered">☔ Có mái che (tránh nắng/mưa)</option>
+            <option value="wheelchair">♿ Xe lăn / Thang máy</option>
+          </select>
+          <label>Thời tiết hiện tại</label>
+          <select id="weather">
+            <option value="normal">🌤 Bình thường</option>
+            <option value="sunny">☀️ Nắng gắt</option>
+            <option value="rainy">🌧 Mưa giông</option>
+          </select>
+          <button class="btn btn-primary" onclick="findRoute()">🔍 Tìm đường tối ưu</button>
+        </div>
+      </div>
+
+      <!-- TAB 2: AUTOMATIC USER PROFILE -->
+      <div id="tab-profile" class="tab-pane">
+        <div class="card">
+          <h3>👤 Hồ sơ cá nhân hóa (AI tự động)</h3>
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Hệ thống đang tự động nhận diện và cập nhật hồ sơ của bạn dựa trên lịch sử di chuyển và các địa điểm đã ghé thăm.
+          </p>
+          <div style="font-size: 0.8rem; display: flex; flex-direction: column; gap: 10px; background: rgba(0,0,0,0.2); padding: 12px; border-radius: 8px; border: 1px solid var(--border);">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Vai trò nhận diện:</span>
+              <span id="display-role" style="font-weight: 600; color: var(--primary)">🎓 Đang nhận diện...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Phong cách học tập:</span>
+              <span id="display-style" style="font-weight: 600; color: var(--accent)">🤫 Đang nhận diện...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; flex-direction: column; gap: 4px;">
+              <span style="color: var(--muted)">Sở thích hành vi:</span>
+              <div id="display-interests" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 2px;">
+                <span style="color:var(--muted);font-size:0.75rem">Không có</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>🕒 Lịch sử di chuyển / Ghé thăm</h3>
+          <div id="history-box" style="display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; min-height: 30px;">
+            <span style="color: var(--muted); font-size: 0.72rem;">Chưa ghé thăm nơi nào.</span>
+          </div>
+          <button class="btn btn-danger" onclick="resetHistory()" style="margin-top: 10px;">🗑️ Xoá lịch sử</button>
+        </div>
+        
+        <!-- CONTEXT SIMULATOR CARD -->
+        <div class="card" style="margin-top: 16px;">
+          <h3>⚙️ Ngữ cảnh Động Đa nguồn</h3>
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Giả lập các nguồn dữ liệu bổ sung để kiểm chứng cơ chế đề xuất thông minh.
+          </p>
+          
+          <label id="battery-label">🔋 Pin thiết bị: 100%</label>
+          <input type="range" id="battery-slider" min="0" max="100" value="100" style="width: 100%; margin-bottom: 12px;" oninput="updateBatterySlider(this.value)"/>
+          
+          <label id="temp-label">🌡️ Nhiệt độ môi trường: 28°C</label>
+          <input type="range" id="temp-slider" min="15" max="45" value="28" style="width: 100%; margin-bottom: 12px;" oninput="updateTempSlider(this.value)"/>
+          
+          <label id="uv-label">☀️ Chỉ số UV: 2.0 (Thấp)</label>
+          <input type="range" id="uv-slider" min="0" max="12" value="2" style="width: 100%; margin-bottom: 12px;" oninput="updateUvSlider(this.value)"/>
+          
+          <label>📚 Lớp học tiếp theo tại:</label>
+          <select id="schedule-class-select" style="margin-bottom: 4px;" onchange="updateScheduleClass(this.value)">
+            <option value="Tòa B">Tòa B (Học nhóm & tự học)</option>
+            <option value="Tòa A">Tòa A (Lab thực nghiệm)</option>
+            <option value="Tòa C">Tòa C (Lab máy tính)</option>
+            <option value="Tòa D">Tòa D (Thư viện & Canteen)</option>
+            <option value="Tòa E">Tòa E (Học lý thuyết)</option>
+            <option value="Tòa F">Tòa F (Học tự chọn)</option>
+            <option value="">-- Không có lớp học --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- TAB 3: AI SMART RECOMMEND FEED -->
+      <div id="tab-recommend" class="tab-pane">
+        <div class="card">
+          <h3>✨ Tìm kiếm &amp; Gợi ý AI</h3>
+
+          <!-- Smart Input: Nhu cầu / Hành động -->
+          <label>🗣️ Bạn cần gì? (nhập tự do)</label>
+          <input type="text" id="query"
+            placeholder="ăn trưa, tự học yên tĩnh, sạc pin, tập thể dục..."
+            oninput="handleQueryInput()"
+            onkeydown="if(event.key==='Enter') fetchRecommend()"
+            autocomplete="off"
+          />
+          <!-- Suggestion chips -->
+          <div id="query-chips" style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px;">
+            <span class="qchip" onclick="setQuery('ăn trưa')">🍜 Ăn trưa</span>
+            <span class="qchip" onclick="setQuery('tự học yên tĩnh')">📖 Tự học</span>
+            <span class="qchip" onclick="setQuery('sạc pin')">🔌 Sạc pin</span>
+            <span class="qchip" onclick="setQuery('tập thể dục')">🏋️ Thể dục</span>
+            <span class="qchip" onclick="setQuery('học nhóm')">👥 Học nhóm</span>
+            <span class="qchip" onclick="setQuery('in tài liệu')">🖨️ In ấn</span>
+          </div>
+
+          <!-- Điểm đến mong muốn (tuỳ chọn) -->
+          <label>📍 Hoặc chọn trực tiếp địa điểm muốn đến</label>
+          <select id="dest-suggest" onchange="onDestSuggestChange(this.value)">
+            <option value="">-- Tất cả địa điểm --</option>
+            __OPTS__
+          </select>
+
+          <button class="btn btn-primary" onclick="fetchRecommend()">✨ Gợi ý AI thông minh</button>
+        </div>
+
+        <div id="rec-feed-header" style="font-family: var(--font-title); font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-top: 4px; display: none;">Gợi ý phù hợp nhất:</div>
+        <div id="rec-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+      </div>
+
+      <!-- TAB 4: COLLABORATIVE FILTERING & DISCOVERY -->
+      <div id="tab-cf" class="tab-pane">
+        <div class="card">
+          <h3>🤝 Khám phá bằng AI Cộng tác</h3>
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Gợi ý địa điểm dựa trên <b style="color:var(--primary)">hành vi thực tế</b> của những người dùng có sở thích tương tự bạn — không phải tìm kiếm.
+          </p>
+          <div id="cf-status-box" style="font-size: 0.74rem; background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.15); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted)">Trạng thái CF model:</span>
+              <span id="cf-mode-label" style="color:var(--accent); font-weight:600">Đang tải...</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted)">Số session đã học:</span>
+              <span id="cf-sessions-label" style="font-weight:600">—</span>
+            </div>
+          </div>
+          <button class="btn btn-primary" onclick="fetchCF()">🔍 Xem gợi ý Cộng tác (CF)</button>
+        </div>
+
+        <div id="cf-feed-header" style="font-family: var(--font-title); font-size: 0.75rem; text-transform: uppercase; color: var(--muted); margin-top: 4px; display: none;">Địa điểm từ CF / Khám phá:</div>
+        <div id="cf-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+        <!-- AI Engine Info -->
+        <div class="card" style="margin-top: 8px;">
+          <h3>🔬 Trạng thái AI Engine</h3>
+          <div style="font-size: 0.74rem; display: flex; flex-direction: column; gap: 8px;">
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Crowd Model:</span>
+              <span style="color: var(--primary)">MLP · Input 19 features</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Pathfinding:</span>
+              <span style="color: var(--accent)">A* + GNN-GAT attention</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Geofence radius:</span>
+              <span style="color: var(--accent)">25m active</span>
+            </div>
+            <div style="display: flex; justify-content: space-between;">
+              <span style="color: var(--muted)">Storage:</span>
+              <span style="color: var(--primary)">SQLite persistent · TTL 48h</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TAB 5: CAMPUS LENS CONTROLS -->
+      <div id="tab-ar-ui" class="tab-pane">
+        <div class="card">
+          <h3>📱 Campus Lens</h3>
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Khám phá khuôn viên trường bằng kính ngắm AR và bảng tin địa điểm dạng lướt nhanh. Đánh giá sao sẽ phản hồi trực tiếp làm mới Match % qua Collaborative Filtering lai.
+          </p>
+          <div id="ar-stats-box" style="font-size: 0.74rem; background: rgba(0,210,255,0.05); border: 1px solid rgba(0,210,255,0.15); border-radius: 8px; padding: 10px 12px; margin-bottom: 12px; display: flex; flex-direction: column; gap: 5px;">
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted)">Đánh giá của bạn:</span>
+              <span id="ar-ratings-count" style="color:var(--primary); font-weight:600">0 địa điểm</span>
+            </div>
+            <div style="display:flex; justify-content:space-between;">
+              <span style="color:var(--muted)">Thuật toán phản hồi:</span>
+              <span style="color:var(--accent); font-weight:600">Hybrid CF Loop</span>
+            </div>
+          </div>
+          <button class="btn btn-ghost" onclick="resetAllRatings()" style="margin-top: 5px;">🗑️ Xoá mọi đánh giá</button>
+        </div>
+      </div>
+
+      <!-- TAB 6: FAVORITES / SAVED LOCATIONS -->
+      <div id="tab-favorites" class="tab-pane">
+        <div class="card">
+          <h3>❤️ Địa điểm Yêu thích &amp; Đã lưu</h3>
+          <p style="font-size: 0.72rem; color: var(--muted); margin-bottom: 12px; line-height: 1.4;">
+            Danh sách các địa điểm bạn đã thả tim hoặc bấm lưu trong Campus Lens.
+          </p>
+          
+          <div style="margin-bottom: 16px;">
+            <h4 style="font-size: 0.8rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              ❤️ Đã thích (<span id="liked-count">0</span>)
+            </h4>
+            <div id="liked-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+          
+          <div>
+            <h4 style="font-size: 0.8rem; color: #fff; margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+              🔖 Đã lưu (<span id="saved-count">0</span>)
+            </h4>
+            <div id="saved-list" style="display: flex; flex-direction: column; gap: 8px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- BOTTOM LOG -->
+      <div id="status">Nhấp lên bản đồ để đặt vị trí GPS, hoặc nhấn Tìm đường để bắt đầu mô phỏng.</div>
+
+    </div>
+  </div>
+
+  <div id="map-wrap">
+    <button id="sidebar-toggle" onclick="toggleSidebar()" title="Thu gọn/Mở rộng danh sách">
+      <span id="sidebar-toggle-icon">◀</span>
+    </button>
+    <canvas id="canvas"></canvas>
+    
+    <!-- LEGEND -->
+    <div class="legend">
+      <div class="leg"><span class="leg-dot" style="background:#0f766e; box-shadow: 0 0 6px #0f766e"></span>Mở cửa</div>
+      <div class="leg"><span class="leg-dot" style="background:#7f1d1d; box-shadow: 0 0 6px #7f1d1d"></span>Đóng cửa</div>
+      <div class="leg"><span class="leg-dot" style="background:#10b981; box-shadow: 0 0 8px #10b981"></span>Lộ trình</div>
+      <div class="leg"><span style="border-top:2px solid #38bdf8; width:18px; display:inline-block"></span>Mái che</div>
+      <div class="leg"><span style="border-top:2px dashed #ef4444; width:18px; display:inline-block"></span>Sửa chữa</div>
+      <div class="leg"><span class="leg-dot" style="background:#00d2ff; border:2px solid #fff; box-shadow: 0 0 8px #00d2ff"></span>GPS Khớp (Snapped)</div>
+      <div class="leg" id="legend-kalman" style="display: none;"><span class="leg-dot" style="background:#eab308; border:1px solid #fff; box-shadow: 0 0 6px #eab308"></span>GPS Kalman</div>
+      <div class="leg" id="legend-raw" style="display: none;"><span class="leg-dot" style="background:#ef4444; border:1px solid #fff; box-shadow: 0 0 6px #ef4444"></span>GPS Thô</div>
+    </div>
+  </div>
+
+  <!-- CAMPUS LENS MULTI-MOCKUP CONTAINER -->
+  <div id="ar-ui-wrap" style="display: none;">
+    <div class="ar-split-right" style="position: relative; padding: 0;">
+      
+      <!-- Top filter switch (Web version) -->
+      <div class="webar-filter-bar">
+        <span class="webar-filter-title">Bộ lọc hiển thị:</span>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:0.7rem; color:var(--muted);" id="ar-filter-label">Tất cả</span>
+          <label class="ar-toggle-switch">
+            <input type="checkbox" id="ar-filter-toggle" onchange="toggleArFilter(this.checked)">
+            <span class="ar-toggle-slider"></span>
+          </label>
+        </div>
+      </div>
+
+      <button id="webar-location-toggle" class="webar-location-toggle" onclick="toggleWebarLocationList()" title="Thu gọn/Mở danh sách tòa">
+        <span id="webar-location-toggle-icon">⌖</span>
+      </button>
+
+      <!-- Quick jumps bar at top-left of showcase -->
+      <div class="webar-bottom-carousel">
+        <div class="webar-carousel-card active" onclick="focusWebSlide(0)" id="ar-car-0">🍲 Căn tin</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(1)" id="ar-car-1">📖 Thư viện Tòa D</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(2)" id="ar-car-2">🏋️ Nhà thể dục</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(3)" id="ar-car-3">🏫 Tòa B</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(4)" id="ar-car-4">🏫 Tòa A</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(5)" id="ar-car-5">🏫 Tòa C</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(6)" id="ar-car-6">🏫 Tòa E</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(7)" id="ar-car-7">🏫 Tòa F</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(8)" id="ar-car-8">🏫 Tòa G</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(9)" id="ar-car-9">🏍️ Nhà xe</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(10)" id="ar-car-10">🏧 ATM</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(11)" id="ar-car-11">🏢 Nhà điều hành</div>
+        <div class="webar-carousel-card" onclick="focusWebSlide(12)" id="ar-car-12">🚪 Cổng trường</div>
+      </div>
+
+      <!-- Side dots indicator -->
+      <div class="web-scroll-indicator">
+        <div class="web-scroll-dot active" onclick="focusWebSlide(0)" id="web-dot-0" title="Căn tin"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(1)" id="web-dot-1" title="Thư viện Tòa D"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(2)" id="web-dot-2" title="Nhà thể dục"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(3)" id="web-dot-3" title="Tòa B"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(4)" id="web-dot-4" title="Tòa A"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(5)" id="web-dot-5" title="Tòa C"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(6)" id="web-dot-6" title="Tòa E"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(7)" id="web-dot-7" title="Tòa F"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(8)" id="web-dot-8" title="Tòa G"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(9)" id="web-dot-9" title="Nhà xe"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(10)" id="web-dot-10" title="ATM"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(11)" id="web-dot-11" title="Nhà điều hành"></div>
+        <div class="web-scroll-dot" onclick="focusWebSlide(12)" id="web-dot-12" title="Cổng trường"></div>
+      </div>
+
+      <!-- Web Showcase Container -->
+      <div class="web-showcase-container" id="web-showcase-container" onscroll="handleWebScroll()">
+        
+        <!-- Slide 1: Căn tin -->
+        <div class="web-slide" style="background-image: url('/static/canteen.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-canteen" class="webar-marker" style="top: 25%; left: 35%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🍲 Căn tin</span>
+                <span id="ar-match-canteen" class="webar-marker-match">92%</span>
+              </div>
+              <div class="webar-marker-desc">Phù hợp ăn uống, nghỉ ngơi</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🍲 Căn tin Trường ULSA</span>
+            </div>
+            <p class="web-slide-desc">Căn tin trường ULSA có không gian rộng rãi, thoáng mát, phục vụ nhiều món ăn trưa đa dạng, đồ uống thơm ngon bổ rẻ. Nơi lý tưởng để nghỉ ngơi giữa các ca học.</p>
+            <div class="web-slide-tags">
+              <span>#Canteen</span>
+              <span>#AnTrua</span>
+              <span>#NghiTrua</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-canteen" onclick="toggleLike('canteen')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-canteen">1.2k</span>
+                </button>
+                <button class="web-btn-action" id="save-canteen" onclick="toggleSave('canteen')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-canteen">192</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Căn tin">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Căn tin', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Căn tin', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Căn tin', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Căn tin', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Căn tin', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 2: Thư viện Tòa D -->
+        <div class="web-slide" style="background-image: url('/static/library.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-library" class="webar-marker" style="top: 30%; left: 40%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">📖 Thư viện Tòa D</span>
+                <span id="ar-match-library" class="webar-marker-match">88%</span>
+              </div>
+              <div class="webar-marker-desc">Thư viện &amp; Quầy giáo trình</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">📖 Thư viện Tòa D</span>
+            </div>
+            <p class="web-slide-desc">Thư viện trường nằm tại Tòa D, là không gian tự học yên tĩnh tuyệt đối, mát mẻ với điều hòa, trang bị hàng ngàn đầu sách tham khảo chất lượng cùng quầy giáo trình học tập.</p>
+            <div class="web-slide-tags">
+              <span>#Library</span>
+              <span>#Study</span>
+              <span>#Silence</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-library" onclick="toggleLike('library')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-library">850</span>
+                </button>
+                <button class="web-btn-action" id="save-library" onclick="toggleSave('library')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-library">340</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Thư viện Tòa D">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Thư viện Tòa D', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Thư viện Tòa D', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Thư viện Tòa D', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Thư viện Tòa D', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Thư viện Tòa D', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 3: Nhà thể dục -->
+        <div class="web-slide" style="background-image: url('/static/gym.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-gym" class="webar-marker" style="top: 35%; left: 30%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏋️ Nhà thể dục</span>
+                <span id="ar-match-gym" class="webar-marker-match">70%</span>
+              </div>
+              <div class="webar-marker-desc">Thể dục thể thao</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏋️ Nhà Thể Dục ULSA</span>
+            </div>
+            <p class="web-slide-desc">Nhà thể dục đa năng phục vụ cho các hoạt động giáo dục thể chất, bóng đá, bóng chuyền, cầu lông. Điểm đến rèn luyện sức khỏe tuyệt vời của sinh viên sau giờ học.</p>
+            <div class="web-slide-tags">
+              <span>#Gymnasium</span>
+              <span>#Sport</span>
+              <span>#Health</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-gym" onclick="toggleLike('gym')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-gym">620</span>
+                </button>
+                <button class="web-btn-action" id="save-gym" onclick="toggleSave('gym')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-gym">115</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Nhà thể dục">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Nhà thể dục', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Nhà thể dục', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Nhà thể dục', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Nhà thể dục', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Nhà thể dục', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 4: Tòa B -->
+        <div class="web-slide" style="background-image: url('/static/toa_b.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_b" class="webar-marker" style="top: 28%; left: 45%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa B (Tự Học)</span>
+                <span id="ar-match-toa_b" class="webar-marker-match">84%</span>
+              </div>
+              <div class="webar-marker-desc">Phòng tự học &amp; làm việc nhóm</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa B (Không Gian Tự Học)</span>
+            </div>
+            <p class="web-slide-desc">Khu vực tự học lý tưởng tại Tòa B, trang bị đầy đủ ổ cắm điện, bàn học nhóm rộng rãi, hệ thống chiếu sáng và wifi tốc độ cao hỗ trợ tối đa việc collab làm bài tập lớn.</p>
+            <div class="web-slide-tags">
+              <span>#ToaB</span>
+              <span>#CoWorking</span>
+              <span>#Collab</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_b" onclick="toggleLike('toa_b')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_b">930</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_b" onclick="toggleSave('toa_b')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_b">280</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa B">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa B', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa B', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa B', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa B', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa B', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 5: Tòa A -->
+        <div class="web-slide" style="background-image: url('/static/toa_a.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_a" class="webar-marker" style="top: 25%; left: 35%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa A</span>
+                <span id="ar-match-toa_a" class="webar-marker-match">80%</span>
+              </div>
+              <div class="webar-marker-desc">Khu thực nghiệm &amp; phòng lab kỹ thuật</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa A (Giảng đường &amp; Lab)</span>
+            </div>
+            <p class="web-slide-desc">Tòa A là trung tâm giảng đường chính và phòng thí nghiệm thực nghiệm khoa học công nghệ của trường, hỗ trợ sinh viên trong nghiên cứu và thực hành chuyên sâu.</p>
+            <div class="web-slide-tags">
+              <span>#ToaA</span>
+              <span>#Lab</span>
+              <span>#Research</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_a" onclick="toggleLike('toa_a')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_a">540</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_a" onclick="toggleSave('toa_a')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_a">120</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa A">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa A', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa A', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa A', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa A', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa A', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 6: Tòa C -->
+        <div class="web-slide" style="background-image: url('/static/toa_c.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_c" class="webar-marker" style="top: 30%; left: 45%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa C</span>
+                <span id="ar-match-toa_c" class="webar-marker-match">75%</span>
+              </div>
+              <div class="webar-marker-desc">Lab máy tính &amp; Văn phòng khoa</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa C (Khoa CNTT)</span>
+            </div>
+            <p class="web-slide-desc">Tòa C trang bị hệ thống phòng máy tính thực hành CNTT hiện đại, đồng thời là văn phòng các khoa chuyên môn và phòng quản lý đào tạo hỗ trợ sinh viên.</p>
+            <div class="web-slide-tags">
+              <span>#ToaC</span>
+              <span>#LabIT</span>
+              <span>#Administration</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_c" onclick="toggleLike('toa_c')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_c">410</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_c" onclick="toggleSave('toa_c')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_c">95</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa C">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa C', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa C', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa C', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa C', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa C', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 7: Tòa E -->
+        <div class="web-slide" style="background-image: url('/static/toa_e.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_e" class="webar-marker" style="top: 35%; left: 40%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa E</span>
+                <span id="ar-match-toa_e" class="webar-marker-match">82%</span>
+              </div>
+              <div class="webar-marker-desc">Giảng đường lý thuyết &amp; Nghỉ trưa</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa E (Khu học tập lý thuyết)</span>
+            </div>
+            <p class="web-slide-desc">Tòa E sở hữu nhiều phòng học lý thuyết lớn thoáng mát, trang bị đầy đủ điều hòa nhiệt độ và là không gian nghỉ trưa, sinh hoạt tự do của sinh viên.</p>
+            <div class="web-slide-tags">
+              <span>#ToaE</span>
+              <span>#Lecture</span>
+              <span>#Rest</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_e" onclick="toggleLike('toa_e')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_e">320</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_e" onclick="toggleSave('toa_e')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_e">74</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa E">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa E', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa E', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa E', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa E', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa E', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 8: Tòa F -->
+        <div class="web-slide" style="background-image: url('/static/toa_f.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_f" class="webar-marker" style="top: 28%; left: 32%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa F</span>
+                <span id="ar-match-toa_f" class="webar-marker-match">78%</span>
+              </div>
+              <div class="webar-marker-desc">Phòng tự học &amp; nghỉ ngơi yên tĩnh</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa F (Không gian tự học)</span>
+            </div>
+            <p class="web-slide-desc">Tòa F là không gian học tập yên tĩnh, phù hợp cho ôn thi, học nhóm hoặc nghỉ ngơi thư giãn giữa các ca học vất vả.</p>
+            <div class="web-slide-tags">
+              <span>#ToaF</span>
+              <span>#Quiet</span>
+              <span>#Study</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_f" onclick="toggleLike('toa_f')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_f">280</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_f" onclick="toggleSave('toa_f')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_f">60</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa F">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa F', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa F', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa F', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa F', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa F', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 9: Tòa G -->
+        <div class="web-slide" style="background-image: url('/static/toa_g.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-toa_g" class="webar-marker" style="top: 40%; left: 38%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏫 Tòa G</span>
+                <span id="ar-match-toa_g" class="webar-marker-match">65%</span>
+              </div>
+              <div class="webar-marker-desc">Khu giảng đường &amp; Sân hoạt động</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏫 Tòa G (Sân Sinh Hoạt)</span>
+            </div>
+            <p class="web-slide-desc">Tòa G sở hữu một khoảng sân trước rộng rãi, thoáng đãng, là nơi diễn ra các buổi sinh hoạt câu lạc bộ và các hoạt động thể thao ngoài trời.</p>
+            <div class="web-slide-tags">
+              <span>#ToaG</span>
+              <span>#Club</span>
+              <span>#Outdoor</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-toa_g" onclick="toggleLike('toa_g')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-toa_g">210</span>
+                </button>
+                <button class="web-btn-action" id="save-toa_g" onclick="toggleSave('toa_g')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-toa_g">45</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Tòa G">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Tòa G', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Tòa G', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Tòa G', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Tòa G', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Tòa G', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 10: Nhà xe -->
+        <div class="web-slide" style="background-image: url('/static/parking.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-parking" class="webar-marker" style="top: 50%; left: 25%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏍️ Nhà xe</span>
+                <span id="ar-match-parking" class="webar-marker-match">60%</span>
+              </div>
+              <div class="webar-marker-desc">Bãi giữ xe máy &amp; xe đạp</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏍️ Nhà xe Trường ULSA</span>
+            </div>
+            <p class="web-slide-desc">Nhà xe rộng rãi với mái che nắng che mưa, hệ thống kiểm soát xe ra vào thông minh mang lại sự an tâm tuyệt đối cho sinh viên.</p>
+            <div class="web-slide-tags">
+              <span>#Parking</span>
+              <span>#Security</span>
+              <span>#Bikes</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-parking" onclick="toggleLike('parking')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-parking">890</span>
+                </button>
+                <button class="web-btn-action" id="save-parking" onclick="toggleSave('parking')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-parking">150</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Nhà xe">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Nhà xe', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Nhà xe', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Nhà xe', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Nhà xe', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Nhà xe', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 11: ATM -->
+        <div class="web-slide" style="background-image: url('/static/atm.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-atm" class="webar-marker" style="top: 42%; left: 48%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏧 ATM</span>
+                <span id="ar-match-atm" class="webar-marker-match">85%</span>
+              </div>
+              <div class="webar-marker-desc">Rút tiền mặt tiện lợi 24/7</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏧 Trạm ATM Tiện Ích</span>
+            </div>
+            <p class="web-slide-desc">Cây rút tiền tự động đặt ngay trong khuôn viên trường, hỗ trợ nhanh chóng các giao dịch rút tiền mặt và thanh toán hóa đơn của sinh viên.</p>
+            <div class="web-slide-tags">
+              <span>#ATM</span>
+              <span>#Finance</span>
+              <span>#Utility</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-atm" onclick="toggleLike('atm')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-atm">150</span>
+                </button>
+                <button class="web-btn-action" id="save-atm" onclick="toggleSave('atm')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-atm">45</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="ATM">
+                  <span class="web-star" data-value="1" onclick="rateLocation('ATM', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('ATM', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('ATM', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('ATM', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('ATM', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 12: Nhà điều hành -->
+        <div class="web-slide" style="background-image: url('/static/admin.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-admin" class="webar-marker" style="top: 20%; left: 50%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🏢 Nhà điều hành</span>
+                <span id="ar-match-admin" class="webar-marker-match">90%</span>
+              </div>
+              <div class="webar-marker-desc">Phòng ban hành chính &amp; Quản lý</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🏢 Nhà Điều Hành Trung Tâm</span>
+            </div>
+            <p class="web-slide-desc">Nơi tập trung các phòng ban quản lý đào tạo, phòng kế hoạch tài chính, văn phòng hỗ trợ sinh viên giải quyết các thủ tục học tập.</p>
+            <div class="web-slide-tags">
+              <span>#Admin</span>
+              <span>#Office</span>
+              <span>#Services</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-admin" onclick="toggleLike('admin')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-admin">310</span>
+                </button>
+                <button class="web-btn-action" id="save-admin" onclick="toggleSave('admin')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-admin">85</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Nhà điều hành">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Nhà điều hành', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Nhà điều hành', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Nhà điều hành', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Nhà điều hành', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Nhà điều hành', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Slide 13: Cổng trường -->
+        <div class="web-slide" style="background-image: url('/static/gate.jpg')">
+          
+          <!-- WebAR Floating Markers overlay -->
+          <div class="webar-viewport">
+            <div id="ar-marker-gate" class="webar-marker" style="top: 60%; left: 50%;">
+              <div class="webar-marker-header">
+                <span class="webar-marker-name">🚪 Cổng trường</span>
+                <span id="ar-match-gate" class="webar-marker-match">95%</span>
+              </div>
+              <div class="webar-marker-desc">Cổng chính &amp; Lối ra vào</div>
+            </div>
+          </div>
+
+          <!-- Glassmorphic Info Card -->
+          <div class="web-slide-card">
+            <div class="web-slide-title-box">
+              <span class="web-slide-title">🚪 Cổng Chính ULSA</span>
+            </div>
+            <p class="web-slide-desc">Lối vào chính khang trang của trường, có khu vực đón trả sinh viên rộng rãi và chốt kiểm soát an ninh ra vào nghiêm ngặt.</p>
+            <div class="web-slide-tags">
+              <span>#MainGate</span>
+              <span>#ULSA</span>
+              <span>#Entrance</span>
+            </div>
+            
+            <!-- Actions and Rating Star Widget -->
+            <div class="web-slide-actions">
+              <div class="web-like-save-row">
+                <button class="web-btn-action" id="like-gate" onclick="toggleLike('gate')">
+                  <span class="web-action-icon">🤍</span> Like <span id="count-like-gate">1.8k</span>
+                </button>
+                <button class="web-btn-action" id="save-gate" onclick="toggleSave('gate')">
+                  <span class="web-action-icon">🔖</span> Save <span id="count-save-gate">310</span>
+                </button>
+              </div>
+              
+              <div class="web-rating-box">
+                <span class="web-rating-label">Đánh giá địa điểm:</span>
+                <div class="web-rating-stars" data-node="Cổng trường">
+                  <span class="web-star" data-value="1" onclick="rateLocation('Cổng trường', 1, event)">★</span>
+                  <span class="web-star" data-value="2" onclick="rateLocation('Cổng trường', 2, event)">★</span>
+                  <span class="web-star" data-value="3" onclick="rateLocation('Cổng trường', 3, event)">★</span>
+                  <span class="web-star" data-value="4" onclick="rateLocation('Cổng trường', 4, event)">★</span>
+                  <span class="web-star" data-value="5" onclick="rateLocation('Cổng trường', 5, event)">★</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTOMATIC GEOFENCE POPUP MODAL (RELOADED AS TOP BANNER) -->
+<div id="geofence-popup-modal" class="geofence-popup-overlay" style="display: none;">
+  <div class="geofence-popup-card" id="geofence-popup-card" onclick="toggleGeofenceExpand(event)">
+    
+    <!-- Collapsed Header: Always visible, compact and clickable -->
+    <div class="geofence-popup-header-compact">
+      <span class="geofence-popup-icon-compact">📍</span>
+      <div class="geofence-popup-title-box-compact">
+        <div class="geofence-popup-alert-text">Bạn đang ở gần <strong id="geofence-popup-title">Tòa A</strong></div>
+        <span id="geofence-popup-tagline" class="geofence-popup-tagline-compact">Khu thực nghiệm & phòng lab kỹ thuật</span>
+      </div>
+      <div class="geofence-popup-actions">
+        <span class="geofence-popup-expand-indicator">▼ Chi tiết</span>
+        <button class="geofence-popup-close" onclick="closeGeofencePopup(event)">✕</button>
+      </div>
+    </div>
+    
+    <!-- Expanded Body: Visible only when expanded -->
+    <div class="geofence-popup-body-expanded" id="geofence-popup-body-expanded" style="display: none;">
+      <div class="geofence-popup-divider"></div>
+      
+      <div class="geofence-popup-grid-layout">
+        <!-- Chức năng & Dịch vụ -->
+        <div class="geofence-popup-section">
+          <div class="geofence-popup-section-title">🛠️ Chức năng & Dịch vụ</div>
+          <div id="geofence-popup-services" class="geofence-popup-services-grid">
+            <!-- Dynamically populated services -->
+          </div>
+        </div>
+        
+        <!-- Phòng ban & Tiện ích -->
+        <div class="geofence-popup-section">
+          <div class="geofence-popup-section-title">🏛️ Phòng ban & Tiện ích</div>
+          <div id="geofence-popup-departments" class="geofence-popup-departments-list">
+            <!-- Dynamically populated departments -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Sự kiện đang diễn ra -->
+      <div class="geofence-popup-section" style="margin-top: 10px;">
+        <div class="geofence-popup-section-title">🎪 Sự kiện đang diễn ra</div>
+        <div id="geofence-popup-events" class="geofence-popup-events-list">
+          <!-- Dynamically populated events -->
+        </div>
+      </div>
+      
+      <!-- Mật độ đám đông -->
+      <div class="geofence-popup-section" style="margin-top: 10px;">
+        <div class="geofence-popup-section-title">👥 Mật độ đám đông (Dự báo AI)</div>
+        <div class="geofence-popup-crowd-box">
+          <div class="geofence-popup-crowd-bar-container">
+            <div id="geofence-popup-crowd-fill" class="geofence-popup-crowd-fill" style="width: 50%;"></div>
+          </div>
+          <span id="geofence-popup-crowd-status" class="geofence-popup-crowd-status-text">Bình thường (50%)</span>
+        </div>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+const BOUNDS = {minX:__MIN_X__,maxX:__MAX_X__,minY:__MIN_Y__,maxY:__MAX_Y__};
+const MARGIN = 60;
+let G = null, currentPath = [], gpsPos = null;
+const canvas = document.getElementById('canvas');
+const ctx    = canvas.getContext('2d');
+
+// --- HỆ THỐNG ĐỊNH VỊ GPS & MAP-MATCHING ---
+class KalmanFilter {
+  constructor(processNoise = 0.000005, measurementNoise = 0.00005, estimatedError = 0.0001) {
+    this.q = processNoise;       // Nhiễu hệ thống (Q)
+    this.r = measurementNoise;   // Nhiễu đo đạc (R)
+    this.p = estimatedError;     // Hiệp biến sai số ước lượng (P)
+    this.x = null;               // Giá trị trạng thái ước lượng
+  }
+
+  filter(measurement) {
+    if (this.x === null) {
+      this.x = measurement;
+      return measurement;
+    }
+    // Cập nhật trạng thái dự báo
+    this.p = this.p + this.q;
+    // Tính toán hệ số tăng Kalman (Kalman Gain)
+    const k = this.p / (this.p + this.r);
+    // Cập nhật trạng thái ước lượng mới
+    this.x = this.x + k * (measurement - this.x);
+    // Cập nhật hiệp biến sai số
+    this.p = (1 - k) * this.p;
+    return this.x;
+  }
+
+  reset() {
+    this.x = null;
+  }
+}
+
+const kalmanLat = new KalmanFilter();
+const kalmanLon = new KalmanFilter();
+
+// Biến quản lý trạng thái giả lập và định vị
+let actualGpsPos = null;       // Tọa độ thực tế (không nhiễu)
+let rawGpsPos = null;          // Tọa độ thô đo được (có nhiễu)
+let filteredGpsPos = null;     // Tọa độ sau bộ lọc Kalman
+let snappedGpsPos = null;      // Tọa độ sau khi Map-matching
+let currentSnappedNode = null; // Node gần nhất được snap
+let isGpsNoiseEnabled = false; // Bật/Tắt giả lập nhiễu GPS (3m - 10m)
+let isKalmanEnabled = true;    // Bật/Tắt lọc Kalman
+let isMapMatchingEnabled = true; // Bật/Tắt Map-matching
+let gpsSimulationInterval = null; // Vòng lặp giả lập GPS drift khi đứng yên
+
+// Hàm tạo số ngẫu nhiên phân phối chuẩn (Gaussian Noise) bằng thuật toán Box-Muller
+function randomGaussian(mean = 0, stddev = 1) {
+  let u = 0, v = 0;
+  while(u === 0) u = Math.random();
+  while(v === 0) v = Math.random();
+  return mean + stddev * Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
+}
+
+// Hàm chiếu điểm vuông góc lên đoạn thẳng AB (phục vụ Snap-to-Road)
+function projectPointOnSegment(p, a, b) {
+  const ap = [p.lon - a.x, p.lat - a.y];
+  const ab = [b.x - a.x, b.y - a.y];
+  const ab2 = ab[0]*ab[0] + ab[1]*ab[1];
+  if (ab2 === 0) return { lat: a.y, lon: a.x };
+  
+  const ap_dot_ab = ap[0]*ab[0] + ap[1]*ab[1];
+  let t = ap_dot_ab / ab2;
+  t = Math.max(0, Math.min(1, t)); // Giới hạn chiếu trong đoạn AB
+  
+  return {
+    lat: a.y + t * ab[1],
+    lon: a.x + t * ab[0]
+  };
+}
+
+// Hàm tính khoảng cách Haversine giữa hai điểm tọa độ (mét)
+function haversine(lat1, lon1, lat2, lon2) {
+  const R = 6371000;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+// Tìm node gần nhất
+function findNearestNode(lat, lon) {
+  if (!G || !G.nodes) return { node: null, dist: Infinity };
+  let minNode = null;
+  let minDist = Infinity;
+  G.nodes.forEach(n => {
+    const dist = haversine(lat, lon, n.gps[0], n.gps[1]);
+    if (dist < minDist) {
+      minDist = dist;
+      minNode = n.id;
+    }
+  });
+  return { node: minNode, dist: minDist };
+}
+
+// Thuật toán Map-matching (Snap-to-Road/Node)
+function performMapMatching(lat, lon) {
+  if (!G) return { lat, lon };
+  
+  // 1. Snap-to-Node: Nếu gần tâm một Tòa nhà nào đó <= 25m, snap thẳng vào Tòa nhà đó
+  const nearest = findNearestNode(lat, lon);
+  if (nearest.dist <= 25.0) {
+    currentSnappedNode = nearest.node;
+    const nodeData = G.nodes.find(n => n.id === nearest.node);
+    return { lat: nodeData.gps[0], lon: nodeData.gps[1] };
+  }
+  
+  // 2. Snap-to-Road: Nếu không gần Tòa nhà nào, tìm đường đi (Cạnh) gần nhất trong bán kính <= 20m
+  let minEdgePoint = null;
+  let minEdgeDist = Infinity;
+  let nearestEdgeNode = nearest.node;
+  const nm = Object.fromEntries(G.nodes.map(n=>[n.id,n]));
+  
+  G.edges.forEach(e => {
+    const n1 = nm[e.source];
+    const n2 = nm[e.target];
+    if (!n1 || !n2) return;
+    
+    const projected = projectPointOnSegment(
+      { lat, lon },
+      { x: n1.gps[1], y: n1.gps[0] },
+      { x: n2.gps[1], y: n2.gps[0] }
+    );
+    
+    const dist = haversine(lat, lon, projected.lat, projected.lon);
+    if (dist < minEdgeDist) {
+      minEdgeDist = dist;
+      minEdgePoint = projected;
+      const d1 = haversine(projected.lat, projected.lon, n1.gps[0], n1.gps[1]);
+      const d2 = haversine(projected.lat, projected.lon, n2.gps[0], n2.gps[1]);
+      nearestEdgeNode = d1 < d2 ? e.source : e.target;
+    }
+  });
+  
+  if (minEdgeDist <= 20.0) {
+    currentSnappedNode = nearestEdgeNode;
+    return minEdgePoint;
+  }
+  
+  // 3. Giữ nguyên nếu khoảng cách lệch quá lớn (ngoài tầm snap)
+  currentSnappedNode = nearest.node;
+  return { lat, lon };
+}
+
+// Cập nhật danh sách điểm xuất phát động
+function updateDropdowns() {
+  const startSelect = document.getElementById('start');
+  if (!startSelect) return;
+  let currentGpsOpt = startSelect.querySelector('option[value="CURRENT_GPS"]');
+  
+  if (gpsPos && currentSnappedNode) {
+    if (!currentGpsOpt) {
+      currentGpsOpt = document.createElement('option');
+      currentGpsOpt.value = 'CURRENT_GPS';
+      startSelect.insertBefore(currentGpsOpt, startSelect.firstChild);
+    }
+    currentGpsOpt.textContent = `📍 Vị trí hiện tại (Đã khớp: ${currentSnappedNode})`;
+  } else {
+    if (currentGpsOpt) {
+      currentGpsOpt.remove();
+    }
+  }
+}
+
+// Cập nhật hiển thị Legend động cho GPS
+function updateLegendVisibility() {
+  const rawLeg = document.getElementById('legend-raw');
+  const kalmanLeg = document.getElementById('legend-kalman');
+  if (rawLeg) {
+    rawLeg.style.display = isGpsNoiseEnabled ? 'flex' : 'none';
+  }
+  if (kalmanLeg) {
+    kalmanLeg.style.display = isKalmanEnabled ? 'flex' : 'none';
+  }
+}
+
+let pulseRadius = 0;
+let hudStatus = 'OFFLINE'; // OFFLINE, ONLINE, SIMULATING, TRACKING
+let activePopupBuilding = null;
+
+// Session ID cá nhân hóa cho từng user
+let sessionId = localStorage.getItem('campus_navigator_session_id');
+if (!sessionId) {
+  sessionId = 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  localStorage.setItem('campus_navigator_session_id', sessionId);
+}
+
+function switchTab(tabId) {
+  switchToTab(tabId);
+}
+
+function updateHudUI() {
+  const dot = document.getElementById('hud-status-indicator');
+  dot.className = 'hud-status-dot';
+  if (hudStatus === 'ONLINE') dot.classList.add('active');
+  else if (hudStatus === 'SIMULATING') dot.classList.add('simulating');
+  else if (hudStatus === 'TRACKING') dot.classList.add('active');
+
+  const coordsText = gpsPos ? `${gpsPos.lat.toFixed(6)}, ${gpsPos.lon.toFixed(6)}` : 'Chưa xác định';
+  document.getElementById('hud-coords').textContent = coordsText;
+}
+
+async function fetchWithSession(url, options = {}) {
+  const separator = url.includes('?') ? '&' : '?';
+  const fullUrl = `${url}${separator}session_id=${sessionId}`;
+  return fetch(fullUrl, options);
+}
+
+function resizeCanvas(){
+  const wrap = document.getElementById('map-wrap');
+  canvas.width  = wrap.clientWidth;
+  canvas.height = wrap.clientHeight;
+}
+window.addEventListener('resize', resizeCanvas);
+
+function toCanvas(lon, lat){
+  const W = canvas.width - MARGIN*2, H = canvas.height - MARGIN*2;
+  const rx = BOUNDS.maxX - BOUNDS.minX || 1, ry = BOUNDS.maxY - BOUNDS.minY || 1;
+  return {
+    cx: MARGIN + (lon - BOUNDS.minX)/rx * W,
+    cy: canvas.height - MARGIN - (lat - BOUNDS.minY)/ry * H
+  };
+}
+
+function drawGraph(path=[]){
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!G) return;
+  const nm = Object.fromEntries(G.nodes.map(n=>[n.id,n]));
+  const ps = new Set();
+  for(let i=0;i<path.length-1;i++){ps.add(path[i]+'|'+path[i+1]);ps.add(path[i+1]+'|'+path[i]);}
+
+  // Vẽ các đường nối (Edges)
+  G.edges.forEach(e=>{
+    const n1=nm[e.source],n2=nm[e.target];
+    if(!n1||!n2) return;
+    const p1=toCanvas(n1.x,n1.y),p2=toCanvas(n2.x,n2.y);
+    const inPath=ps.has(e.source+'|'+e.target);
+    ctx.beginPath(); ctx.moveTo(p1.cx,p1.cy); ctx.lineTo(p2.cx,p2.cy);
+    
+    if(inPath){
+      ctx.strokeStyle='#10b981';
+      ctx.lineWidth=5;
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 8;
+      ctx.shadowColor = 'rgba(16, 185, 129, 0.6)';
+    }
+    else if(e.status==='repairing'){
+      ctx.strokeStyle='#ef4444';
+      ctx.lineWidth=2.5;
+      ctx.setLineDash([6,5]);
+      ctx.shadowBlur = 0;
+    }
+    else{
+      ctx.strokeStyle=e.has_roof?'rgba(0, 210, 255, 0.45)':'#1e293b';
+      ctx.lineWidth=e.has_roof?2:1.5;
+      ctx.setLineDash([]);
+      ctx.shadowBlur = 0;
+    }
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+  });
+
+  ctx.setLineDash([]);
+
+  // Vẽ các nút địa điểm (Nodes)
+  G.nodes.forEach(n=>{
+    const p=toCanvas(n.x,n.y);
+    const active=path.includes(n.id);
+    
+    if (active) {
+      ctx.beginPath();
+      ctx.arc(p.cx, p.cy, 14 + pulseRadius * 0.15, 0, 2*Math.PI);
+      ctx.fillStyle = 'rgba(16, 185, 129, 0.18)';
+      ctx.fill();
+    }
+
+    ctx.beginPath(); ctx.arc(p.cx,p.cy,11,0,2*Math.PI);
+    ctx.fillStyle=active?'#10b981':(n.is_open?'#0f766e':'#7f1d1d');
+    ctx.fill(); 
+    
+    ctx.strokeStyle=active?'#34d399':'#475569'; 
+    ctx.lineWidth=active?2.5:1.5; 
+    ctx.stroke();
+    
+    ctx.fillStyle=active?'#fff':'#cbd5e1'; 
+    ctx.font=(active?'bold ':'')+'9px Outfit, sans-serif';
+    ctx.textAlign='center'; 
+    ctx.fillText(n.id,p.cx,p.cy-16);
+  });
+
+  // Vẽ vị trí GPS phụ trợ (Raw & Kalman) nếu đang giả lập/định vị và bật nhiễu
+  if (rawGpsPos && isGpsNoiseEnabled) {
+    const pRaw = toCanvas(rawGpsPos.lon, rawGpsPos.lat);
+    
+    // Vòng tròn sai số nét đứt (bán kính ~8m)
+    const pRawOffset = toCanvas(rawGpsPos.lon + 8 * 9e-6, rawGpsPos.lat);
+    const errRadius = Math.max(8, Math.abs(pRawOffset.cx - pRaw.cx));
+    
+    ctx.beginPath();
+    ctx.arc(pRaw.cx, pRaw.cy, errRadius, 0, 2*Math.PI);
+    ctx.strokeStyle = 'rgba(239, 68, 68, 0.3)';
+    ctx.lineWidth = 1.5;
+    ctx.setLineDash([4, 4]);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
+    // Điểm GPS thô màu đỏ
+    ctx.beginPath();
+    ctx.arc(pRaw.cx, pRaw.cy, 5, 0, 2*Math.PI);
+    ctx.fillStyle = '#ef4444';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Vẽ vector nối đến Kalman-filtered
+    if (filteredGpsPos && isKalmanEnabled) {
+      const pFilter = toCanvas(filteredGpsPos.lon, filteredGpsPos.lat);
+      ctx.beginPath();
+      ctx.moveTo(pRaw.cx, pRaw.cy);
+      ctx.lineTo(pFilter.cx, pFilter.cy);
+      ctx.strokeStyle = 'rgba(234, 179, 8, 0.6)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+  }
+
+  if (filteredGpsPos && isKalmanEnabled && isGpsNoiseEnabled) {
+    const pFilter = toCanvas(filteredGpsPos.lon, filteredGpsPos.lat);
+    
+    // Điểm Kalman màu vàng
+    ctx.beginPath();
+    ctx.arc(pFilter.cx, pFilter.cy, 6, 0, 2*Math.PI);
+    ctx.fillStyle = '#eab308';
+    ctx.fill();
+    ctx.strokeStyle = '#fff';
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Vẽ vector nối đến Snapped
+    if (gpsPos) {
+      const pSnap = toCanvas(gpsPos.lon, gpsPos.lat);
+      ctx.beginPath();
+      ctx.moveTo(pFilter.cx, pFilter.cy);
+      ctx.lineTo(pSnap.cx, pSnap.cy);
+      ctx.strokeStyle = 'rgba(0, 210, 255, 0.6)';
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+  }
+
+  // Vẽ vị trí GPS hiện tại của người dùng (Pulsing blue dot)
+  if(gpsPos){
+    const p=toCanvas(gpsPos.lon, gpsPos.lat);
+    
+    ctx.beginPath();
+    ctx.arc(p.cx, p.cy, 10 + pulseRadius, 0, 2*Math.PI);
+    ctx.strokeStyle = 'rgba(0, 210, 255, ' + (1 - pulseRadius / 25) + ')';
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    ctx.beginPath(); ctx.arc(p.cx,p.cy,9,0,2*Math.PI);
+    ctx.fillStyle='#00d2ff'; ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=2.5; ctx.stroke();
+  }
+}
+
+async function loadGraph(){
+  const r=await fetch('/api_get_graph'); G=await r.json();
+  document.getElementById('clock').textContent='🕒 '+G.current_time;
+  resizeCanvas();
+}
+
+function startMapAnimationLoop() {
+  function step() {
+    pulseRadius = (pulseRadius + 0.35) % 25;
+    if (G) {
+      drawGraph(currentPath);
+    }
+    requestAnimationFrame(step);
+  }
+  requestAnimationFrame(step);
+}
+
+async function findRoute(){
+  let s=document.getElementById('start').value;
+  const isCurrentGpsSelected = (s === 'CURRENT_GPS');
+  if (isCurrentGpsSelected) {
+    if (!currentSnappedNode) {
+      toast('Chưa xác định được vị trí GPS đã khớp!');
+      return;
+    }
+    s = currentSnappedNode;
+  }
+  
+  const st=document.getElementById('stop').value;
+  const e=document.getElementById('end').value;
+  const w=document.getElementById('weather').value;
+  const p=document.getElementById('pref').value;
+  const pts=[s,...(st?[st]:[]),e];
+  document.getElementById('status').textContent='⏳ Đang tính lộ trình...';
+  const r=await fetch(`/api_get_route?waypoints=${pts.join(',')}&weather=${w}&preference=${p}`);
+  const d=await r.json();
+  if(r.ok){
+    currentPath=d.path;
+    document.getElementById('status').innerHTML=
+      `✅ Lộ trình: <b>${d.path.join(' → ')}</b><br>📏 ${d.total_distance_m}m (~${d.estimated_mins} phút) | ${d.routing_engine}`;
+    toast('Tìm đường thành công! Có thể chạy mô phỏng di chuyển.');
+    
+    const nm = Object.fromEntries(G.nodes.map(n=>[n.id,n]));
+    const startNode = nm[s];
+    if(startNode && !isCurrentGpsSelected) {
+      gpsPos = {
+        lat: startNode.gps[0],
+        lon: startNode.gps[1]
+      };
+      actualGpsPos = { ...gpsPos };
+      kalmanLat.reset();
+      kalmanLon.reset();
+      hudStatus = 'ONLINE';
+      updateHudUI();
+      
+      await sendTrackingUpdate(gpsPos.lat, gpsPos.lon);
+    }
+  } else {
+    document.getElementById('status').innerHTML=`❌ ${d.detail}`;
+  }
+}
+
+canvas.addEventListener('mousedown', async e=>{
+  if (watchId) {
+    toast('Đang bật GPS thiết bị thực tế, vui lòng tắt trước khi click bản đồ!');
+    return;
+  }
+  stopSimulatedWalk();
+  if (gpsSimulationInterval) {
+    clearInterval(gpsSimulationInterval);
+    gpsSimulationInterval = null;
+  }
+  
+  const r=canvas.getBoundingClientRect();
+  const cx=e.clientX-r.left, cy=e.clientY-r.top;
+  const W=canvas.width-MARGIN*2, H=canvas.height-MARGIN*2;
+  const lon=BOUNDS.minX+(cx-MARGIN)/W*(BOUNDS.maxX-BOUNDS.minX);
+  const lat=BOUNDS.minY+(canvas.height-MARGIN-cy)/H*(BOUNDS.maxY-BOUNDS.minY);
+  
+  actualGpsPos = { lat, lon };
+  
+  // Reset bộ lọc Kalman
+  kalmanLat.reset();
+  kalmanLon.reset();
+  
+  // Cập nhật vị trí trực tiếp một lần duy nhất (không nhiễu, không lặp lại)
+  await processLocationUpdate(lat, lon);
+  await sendTrackingUpdate(gpsPos.lat, gpsPos.lon);
+});
+
+// Hiển thị popup geofence (dạng Top Banner)
+function showGeofencePopup(alertData) {
+  document.getElementById('geofence-popup-title').textContent = alertData.node;
+  document.getElementById('geofence-popup-tagline').textContent = alertData.tagline || '';
+  
+  // Reset trạng thái thu gọn ban đầu
+  const card = document.getElementById('geofence-popup-card');
+  const body = document.getElementById('geofence-popup-body-expanded');
+  const indicator = card.querySelector('.geofence-popup-expand-indicator');
+  card.classList.remove('expanded');
+  body.style.display = 'none';
+  indicator.textContent = '▼ Chi tiết';
+
+  // Render Services
+  const svcsGrid = document.getElementById('geofence-popup-services');
+  if (alertData.services && alertData.services.length > 0) {
+    svcsGrid.innerHTML = alertData.services.map(s => `
+      <div class="geofence-popup-service-item">
+        <span>${s.icon || '📌'}</span>
+        <span>${s.name}</span>
+      </div>
+    `).join('');
+  } else {
+    svcsGrid.innerHTML = `<div style="grid-column: span 2; font-size: 0.76rem; color: var(--muted)">Không có dịch vụ nổi bật.</div>`;
+  }
+  
+  // Render Departments (phòng ban nội khu)
+  const deptsGrid = document.getElementById('geofence-popup-departments');
+  if (alertData.departments && alertData.departments.length > 0) {
+    deptsGrid.innerHTML = alertData.departments.map(d => `
+      <div class="geofence-popup-dept-item">
+        <span>🏢</span>
+        <span>${d}</span>
+      </div>
+    `).join('');
+  } else {
+    deptsGrid.innerHTML = `<div style="font-size: 0.74rem; color: var(--muted); padding: 4px;">Không có thông tin phòng ban.</div>`;
+  }
+  
+  // Render Events (sự kiện)
+  const eventsGrid = document.getElementById('geofence-popup-events');
+  if (alertData.events && alertData.events.length > 0) {
+    eventsGrid.innerHTML = alertData.events.map(e => `
+      <div class="geofence-popup-event-item">
+        <span>🎪</span>
+        <span>${e}</span>
+      </div>
+    `).join('');
+  } else {
+    eventsGrid.innerHTML = `<div class="geofence-popup-no-events">Không có sự kiện diễn ra lúc này.</div>`;
+  }
+  
+  // Render Crowd
+  const crowdFill = document.getElementById('geofence-popup-crowd-fill');
+  const crowdText = document.getElementById('geofence-popup-crowd-status');
+  const pct = Math.round(alertData.crowd_level * 100);
+  
+  crowdFill.style.width = pct + '%';
+  if (alertData.crowd_level >= 0.85) {
+    crowdFill.style.background = '#ef4444';
+    crowdText.style.color = '#f87171';
+  } else if (alertData.crowd_level >= 0.6) {
+    crowdFill.style.background = '#f59e0b';
+    crowdText.style.color = '#fbbf24';
+  } else {
+    crowdFill.style.background = '#10b981';
+    crowdText.style.color = '#34d399';
+  }
+  crowdText.textContent = `${alertData.crowd_status} (${pct}%)`;
+  
+  document.getElementById('geofence-popup-modal').style.display = 'flex';
+}
+
+function closeGeofencePopup(event) {
+  if (event) {
+    event.stopPropagation(); // Ngăn kích hoạt click card mở rộng
+  }
+  document.getElementById('geofence-popup-modal').style.display = 'none';
+}
+
+function toggleGeofenceExpand(event) {
+  if (event.target.classList.contains('geofence-popup-close') || event.target.closest('.geofence-popup-close')) {
+    return;
+  }
+  const card = document.getElementById('geofence-popup-card');
+  const body = document.getElementById('geofence-popup-body-expanded');
+  const indicator = card.querySelector('.geofence-popup-expand-indicator');
+  
+  const isExpanded = card.classList.toggle('expanded');
+  if (isExpanded) {
+    body.style.display = 'block';
+    indicator.textContent = '▲ Thu gọn';
+  } else {
+    body.style.display = 'none';
+    indicator.textContent = '▼ Chi tiết';
+  }
+}
+
+// --- LƯỒNG XỬ LÝ ĐỊNH VỊ (LOCALIZATION PIPELINE) ---
+async function processLocationUpdate(lat, lon) {
+  rawGpsPos = { lat, lon };
+  
+  // 1. Bộ lọc Kalman làm mịn
+  if (isKalmanEnabled) {
+    const f = {
+      lat: kalmanLat.filter(lat),
+      lon: kalmanLon.filter(lon)
+    };
+    filteredGpsPos = f;
+  } else {
+    filteredGpsPos = { lat, lon };
+  }
+  
+  // 2. Map-Matching (Snap-to-Road/Node)
+  if (isMapMatchingEnabled && G) {
+    snappedGpsPos = performMapMatching(filteredGpsPos.lat, filteredGpsPos.lon);
+  } else {
+    snappedGpsPos = { ...filteredGpsPos };
+    const nearest = findNearestNode(filteredGpsPos.lat, filteredGpsPos.lon);
+    currentSnappedNode = nearest.node;
+  }
+  
+  // Cập nhật tọa độ chính thức của hệ thống
+  gpsPos = snappedGpsPos;
+  hudStatus = 'ONLINE';
+  
+  // Cập nhật dropdown xuất phát và HUD
+  updateDropdowns();
+  updateHudUI();
+}
+
+
+
+async function sendTrackingUpdate(lat, lon) {
+  const end=document.getElementById('end').value;
+  const w=document.getElementById('weather').value;
+  const p=document.getElementById('pref').value;
+  const q=document.getElementById('query').value.trim();
+  
+  const url = `/api_realtime_tracking?current_lat=${lat}&current_lon=${lon}&end=${end}&weather=${w}&preference=${p}`
+    + (q ? `&query=${encodeURIComponent(q)}` : '')
+    + `&battery_level=${currentBatteryLevel}`
+    + `&temperature=${currentTemperature}`
+    + `&uv_index=${currentUvIndex}`
+    + `&schedule_class=${encodeURIComponent(currentScheduleClass)}`;
+    
+  const res=await fetchWithSession(url);
+  const d=await res.json();
+  
+  if(d.status==='tracking'){
+    currentPath=d.path;
+    document.getElementById('status').innerHTML=
+      `📍 GPS Snap: <b>${d.snapped_node}</b> (${d.dist_to_node_m}m)<br>`+
+      `📏 Lộ trình còn lại: ${d.total_remaining_meters}m (~${d.estimated_mins} phút)`;
+      
+    document.getElementById('hud-snapped').textContent = d.snapped_node;
+    document.getElementById('hud-dist').textContent = d.total_remaining_meters + 'm';
+    document.getElementById('hud-time').textContent = d.estimated_mins + ' phút';
+    
+    // Geofencing warnings and auto popup
+    const alertsBox = document.getElementById('hud-alerts');
+    let popupAlert = null;
+    let standardAlerts = [];
+    
+    if (d.geofence_alerts && d.geofence_alerts.length > 0) {
+      d.geofence_alerts.forEach(a => {
+        if (a.type === 'popup') {
+          popupAlert = a;
+        } else {
+          standardAlerts.push(a.msg || a);
+        }
+      });
+      
+      if (standardAlerts.length > 0) {
+        alertsBox.innerHTML = standardAlerts.map(a => `<div class="alert-item">⚠️ ${a}</div>`).join('');
+        alertsBox.style.display = 'flex';
+      } else {
+        alertsBox.style.display = 'none';
+      }
+      
+      if (popupAlert) {
+        if (activePopupBuilding !== popupAlert.node) {
+          activePopupBuilding = popupAlert.node;
+          showGeofencePopup(popupAlert);
+        }
+      } else {
+        activePopupBuilding = null;
+      }
+    } else {
+      alertsBox.style.display = 'none';
+      activePopupBuilding = null;
+    }
+    
+    renderRecs(d.route_suggestions||[]);
+    loadProfile();
+  } else if(d.status==='arrived'){
+    document.getElementById('status').innerHTML='🎉 <b>Bạn đã đến đích!</b>';
+    document.getElementById('hud-snapped').textContent = end;
+    document.getElementById('hud-dist').textContent = '0m';
+    document.getElementById('hud-time').textContent = '0 phút';
+    document.getElementById('hud-alerts').style.display = 'none';
+    
+    toast('Chúc mừng! Bạn đã tới đích.');
+    stopSimulatedWalk();
+    loadProfile();
+  }
+}
+
+// MÔ PHỎNG DI CHUYỂN
+let simInterval = null;
+let simPath = [];
+let simIndex = 0;
+
+function startSimulatedWalk() {
+  if (!currentPath || currentPath.length < 2) {
+    toast('Hãy tìm đường trước khi chạy mô phỏng!');
+    return;
+  }
+  stopSimulatedWalk();
+  
+  simPath = [];
+  const nm = Object.fromEntries(G.nodes.map(n=>[n.id,n]));
+  
+  for (let i = 0; i < currentPath.length - 1; i++) {
+    const n1 = nm[currentPath[i]];
+    const n2 = nm[currentPath[i+1]];
+    if (!n1 || !n2) continue;
+    
+    const [lat1, lon1] = n1.gps;
+    const [lat2, lon2] = n2.gps;
+    
+    const steps = 12;
+    for (let s = 0; s < steps; s++) {
+      const t = s / steps;
+      simPath.push({
+        lat: lat1 + (lat2 - lat1) * t,
+        lon: lon1 + (lon2 - lon1) * t
+      });
+    }
+  }
+  
+  const lastNode = nm[currentPath[currentPath.length - 1]];
+  if (lastNode) {
+    simPath.push({
+      lat: lastNode.gps[0],
+      lon: lastNode.gps[1]
+    });
+  }
+  
+  simIndex = 0;
+  hudStatus = 'SIMULATING';
+  updateHudUI();
+  
+  document.getElementById('btn-sim-walk').style.display = 'none';
+  document.getElementById('btn-stop-sim').style.display = 'flex';
+  
+  if (gpsSimulationInterval) {
+    clearInterval(gpsSimulationInterval);
+    gpsSimulationInterval = null;
+  }
+  
+  simInterval = setInterval(async () => {
+    if (simIndex >= simPath.length) {
+      stopSimulatedWalk();
+      toast('Đã hoàn thành lộ trình mô phỏng!');
+      return;
+    }
+    
+    const pos = simPath[simIndex];
+    actualGpsPos = { lat: pos.lat, lon: pos.lon };
+    
+    let targetLat = pos.lat;
+    let targetLon = pos.lon;
+    if (isGpsNoiseEnabled) {
+      const stddevDeg = 5e-5;
+      targetLat += randomGaussian(0, stddevDeg);
+      targetLon += randomGaussian(0, stddevDeg);
+    }
+    
+    await processLocationUpdate(targetLat, targetLon);
+    
+    if (simIndex % 3 === 0 || simIndex === simPath.length - 1) {
+      await sendTrackingUpdate(gpsPos.lat, gpsPos.lon);
+    }
+    
+    simIndex++;
+  }, 400);
+}
+
+function stopSimulatedWalk() {
+  if (simInterval) {
+    clearInterval(simInterval);
+    simInterval = null;
+  }
+  document.getElementById('btn-sim-walk').style.display = 'flex';
+  document.getElementById('btn-stop-sim').style.display = 'none';
+  if (hudStatus === 'SIMULATING') {
+    hudStatus = 'ONLINE';
+  }
+  updateHudUI();
+}
+
+// GPS THỰC TẾ
+let watchId = null;
+
+function toggleRealGPS() {
+  const btn = document.getElementById('btn-real-gps');
+  if (watchId) {
+    navigator.geolocation.clearWatch(watchId);
+    watchId = null;
+    btn.classList.remove('active');
+    btn.textContent = '📍 Bật GPS thiết bị thực tế';
+    btn.className = 'btn btn-ghost';
+    hudStatus = 'ONLINE';
+    updateHudUI();
+    toast('Đã tắt định vị GPS thực tế');
+  } else {
+    if (!navigator.geolocation) {
+      toast('Trình duyệt không hỗ trợ Geolocation!');
+      return;
+    }
+    
+    // Kiểm tra Secure Context để cảnh báo người dùng điện thoại
+    if (window.location.protocol !== 'https:' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+      toast('⚠️ Cảnh báo: Trình duyệt chặn định vị GPS trên HTTP thường. Vui lòng dùng localhost hoặc HTTPS!');
+    }
+    
+    stopSimulatedWalk();
+    if (gpsSimulationInterval) {
+      clearInterval(gpsSimulationInterval);
+      gpsSimulationInterval = null;
+    }
+    
+    btn.textContent = '⏳ Đang kết nối GPS...';
+    btn.className = 'btn btn-primary';
+    
+    let isHighAccuracy = true;
+    let localWatchId = null;
+    
+    function success(position) {
+      const lat = position.coords.latitude;
+      const lon = position.coords.longitude;
+      
+      actualGpsPos = { lat, lon };
+      let targetLat = lat;
+      let targetLon = lon;
+      if (isGpsNoiseEnabled) {
+        const stddevDeg = 5e-5;
+        targetLat += randomGaussian(0, stddevDeg);
+        targetLon += randomGaussian(0, stddevDeg);
+      }
+      
+      processLocationUpdate(targetLat, targetLon);
+      hudStatus = 'TRACKING';
+      updateHudUI();
+      
+      btn.textContent = '🔴 Tắt GPS thực tế';
+      btn.className = 'btn btn-danger';
+      
+      sendTrackingUpdate(gpsPos.lat, gpsPos.lon);
+    }
+    
+    function handleGPSInitError(err) {
+      console.warn('GPS error, retrying with low accuracy...', err);
+      if (isHighAccuracy) {
+        isHighAccuracy = false;
+        // Hủy watch hiện tại bằng cách dùng localWatchId tạm thời
+        if (localWatchId !== null) {
+          navigator.geolocation.clearWatch(localWatchId);
+        }
+        
+        let retryOptions = { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 };
+        localWatchId = navigator.geolocation.watchPosition(success, finalError, retryOptions);
+        watchId = localWatchId; // Đồng bộ sang biến toàn cục
+      } else {
+        finalError(err);
+      }
+    }
+    
+    function finalError(err) {
+      toast('Lỗi GPS: ' + err.message + ' (Mã: ' + err.code + ')');
+      if (watchId) {
+        navigator.geolocation.clearWatch(watchId);
+        watchId = null;
+      } else if (localWatchId) {
+        navigator.geolocation.clearWatch(localWatchId);
+        localWatchId = null;
+      }
+      btn.classList.remove('active');
+      btn.textContent = '📍 Bật GPS thiết bị thực tế';
+      btn.className = 'btn btn-ghost';
+      hudStatus = 'ONLINE';
+      updateHudUI();
+    }
+    
+    let initOptions = { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 };
+    localWatchId = navigator.geolocation.watchPosition(success, handleGPSInitError, initOptions);
+    watchId = localWatchId; // Đồng bộ sang biến toàn cục ngay lập tức
+  }
+}
+
+// --- CHIP QUERY HELPERS ---
+function setQuery(text) {
+  const inp = document.getElementById('query');
+  inp.value = text;
+  document.querySelectorAll('.qchip').forEach(c => {
+    c.classList.toggle('active', c.textContent.trim().slice(2) === text || c.textContent.trim() === text);
+  });
+  fetchRecommend();
+}
+
+function handleQueryInput() {
+  // Deactivate chips when user types freely
+  document.querySelectorAll('.qchip').forEach(c => c.classList.remove('active'));
+}
+
+function onDestSuggestChange(val) {
+  if (!val) return;
+  // Chọn trực tiếp → đặt vào dropdown đích rồi tìm đường
+  document.getElementById('end').value = val;
+  switchToTab('tab-route');
+  findRoute();
+}
+
+function switchToTab(tabId) {
+  const targets = ['tab-route','tab-profile','tab-recommend','tab-cf','tab-ar-ui','tab-favorites'];
+  document.querySelectorAll('.tab-btn').forEach((btn, i) => {
+    btn.classList.toggle('active', targets[i] === tabId);
+  });
+  document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
+  const pane = document.getElementById(tabId);
+  if (pane) pane.classList.add('active');
+
+  const mapWrap = document.getElementById('map-wrap');
+  const gpsHud = document.querySelector('.gps-hud');
+  const arWrap = document.getElementById('ar-ui-wrap');
+
+  if (tabId === 'tab-ar-ui') {
+    if (mapWrap) mapWrap.style.display = 'none';
+    if (gpsHud) gpsHud.style.display = 'none';
+    if (arWrap) arWrap.style.display = 'flex';
+    // Trigger rating counts and match score update
+    updateArTikTokMatchScores();
+  } else {
+    if (mapWrap) mapWrap.style.display = 'block';
+    if (gpsHud) gpsHud.style.display = 'flex';
+    if (arWrap) arWrap.style.display = 'none';
+    if (G) drawGraph(currentPath);
+  }
+  updateFloatingOffsets();
+}
+
+// --- SMART RECOMMEND (v5) ---
+async function fetchRecommend() {
+  const q   = document.getElementById('query').value.trim();
+  const w   = document.getElementById('weather').value;
+  const dest = document.getElementById('dest-suggest').value;
+
+  document.getElementById('rec-feed-header').style.display = 'block';
+  document.getElementById('rec-list').innerHTML =
+    `<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:20px">⏳ Đang phân tích ngữ nghĩa &amp; tính toán CF...</div>`;
+
+  // Nếu không có GPS nhưng có query → gọi /api_search thuần NLP
+  if (!gpsPos && !dest) {
+    if (!q) {
+      document.getElementById('rec-list').innerHTML =
+        `<div class="gps-prompt">⚠️ Nhấp lên bản đồ để đặt vị trí GPS, hoặc nhập từ khoá ở trên để tìm kiếm địa điểm.</div>`;
+      return;
+    }
+    // Text-only search fallback
+    const res = await fetchWithSession(`/api_search?query=${encodeURIComponent(q)}&weather=${w}`);
+    const d   = await res.json();
+    if (d.status === 'success') {
+      const recs = d.recommendations || (d.matched_node ? [{
+        node: d.matched_node, score: d.score || 80, reason: `Khớp từ khoá: "${q}"`,
+        distance_m: null, personal_tags: [], score_breakdown: {}
+      }] : []);
+      renderRecs(recs);
+      toast(d.matched_node ? `Tìm thấy: ${d.matched_node} (${d.method})` : 'Không tìm thấy phù hợp');
+    } else {
+      document.getElementById('rec-list').innerHTML =
+        `<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:10px">❌ Không tìm thấy địa điểm phù hợp.</div>`;
+    }
+    return;
+  }
+
+  // Có GPS → gọi /api_recommend đầy đủ
+  const lat = gpsPos ? gpsPos.lat : 0;
+  const lon = gpsPos ? gpsPos.lon : 0;
+
+  let url = `/api_recommend?current_lat=${lat}&current_lon=${lon}&weather=${w}&limit=8`
+    + (q    ? `&query=${encodeURIComponent(q)}`    : '')
+    + (dest ? `&destination=${encodeURIComponent(dest)}` : '')
+    + `&battery_level=${currentBatteryLevel}`
+    + `&temperature=${currentTemperature}`
+    + `&uv_index=${currentUvIndex}`
+    + `&schedule_class=${encodeURIComponent(currentScheduleClass)}`;
+
+  const r = await fetchWithSession(url);
+  const d = await r.json();
+
+  const allRecs = d.recommendations || [];
+  renderRecs(allRecs);
+
+  const famCount  = (d.familiar_recommendations  || []).length;
+  const discCount = (d.discovery_recommendations || []).length;
+  toast(`${allRecs.length} gợi ý (${famCount} quen · ${discCount} khám phá)`);
+}
+
+function toggleExplain(nodeId) {
+  const panel = document.getElementById(`explain-${nodeId}`);
+  const isHidden = panel.style.display === 'none';
+  panel.style.display = isHidden ? 'flex' : 'none';
+  
+  if (isHidden) {
+    const fills = panel.querySelectorAll('.explain-fill');
+    fills.forEach(fill => {
+      const targetW = fill.getAttribute('data-width');
+      setTimeout(() => fill.style.width = targetW + '%', 50);
+    });
+  }
+}
+
+function renderRecs(recs){
+  const feedHeader = document.getElementById('rec-feed-header');
+  const box=document.getElementById('rec-list');
+  
+  if(!recs.length){
+    feedHeader.style.display = 'none';
+    box.innerHTML='<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:10px">Không tìm thấy địa điểm phù hợp trong bán kính.</div>';
+    return;
+  }
+  
+  feedHeader.style.display = 'block';
+  box.innerHTML=recs.map((r,i)=>{
+    const score = r.score || 0;
+    const isCF  = r.source === 'item_item_cf' || r.source === 'content_based_cold_start';
+    const bucket = r.bucket || '';
+
+    // Badges
+    let badges = '';
+    if (r.distance_m) badges += `<span class="badge b-blue">~${Math.round(r.distance_m)}m</span>`;
+    if (isCF)         badges += `<span class="badge b-cf">🤝 CF</span>`;
+    if (r.has_class)  badges += `<span class="badge b-green">📚 Lớp học</span>`;
+    if (r.battery_warning)     badges += `<span class="badge b-purple">🔌 Sạc pin</span>`;
+    if (r.temperature_warning) badges += `<span class="badge b-yellow">☀️ Tránh nắng</span>`;
+    if (r.uv_warning)          badges += `<span class="badge b-purple">🛡️ Chống UV</span>`;
+    if (bucket === 'discovery') badges += `<span class="badge b-yellow">🔭 Khám phá</span>`;
+    (r.personal_tags||[]).forEach(t => { badges += `<span class="badge b-blue">#${t}</span>`; });
+
+    const domId = `explain-${r.node.replace(/[^a-zA-Z0-9]/g,'-')}-${i}`;
+    const bd = r.score_breakdown || { personalization:50, proximity:50, context:50, crowd:50 };
+    const cfScore = r.cf_score ? `<div style="font-size:0.68rem;color:#34d399;margin-top:2px">🤝 CF similarity: ${(r.cf_score*100).toFixed(1)}%</div>` : '';
+
+    return `<div class="rec-card">
+      <div class="rec-header" onclick="setDest('${r.node.replace(/'/g,"\\'")}')">
+        <div class="rec-name">${i+1}. ${r.node}</div>
+        <span class="badge b-green" style="font-size:0.75rem">${score.toFixed(1)}/100</span>
+      </div>
+      <div class="rec-reason">${r.reason||''}</div>
+      ${cfScore}
+      <div class="rec-meta">${badges}</div>
+      <button class="btn-explain" onclick="toggleExplain('${domId}')">🔍 Phân tích AI</button>
+      <div class="explain-panel" id="explain-${domId}" style="display:none">
+        <div class="explain-row">
+          <div class="explain-label-box">
+            <span>👤 Cá nhân hóa (Hồ sơ hành vi):</span>
+            <span>${bd.personalization}%</span>
+          </div>
+          <div class="explain-bar">
+            <div class="explain-fill" style="width: 0%; background: #c084fc" data-width="${bd.personalization}"></div>
+          </div>
+        </div>
+        
+        <div class="explain-row">
+          <div class="explain-label-box">
+            <span>📍 Khoảng cách & Lộ trình:</span>
+            <span>${bd.proximity}%</span>
+          </div>
+          <div class="explain-bar">
+            <div class="explain-fill" style="width: 0%; background: #38bdf8" data-width="${bd.proximity}"></div>
+          </div>
+        </div>
+
+        <div class="explain-row">
+          <div class="explain-label-box">
+            <span>🌤 Khung giờ & Thời tiết:</span>
+            <span>${bd.context}%</span>
+          </div>
+          <div class="explain-bar">
+            <div class="explain-fill" style="width: 0%; background: #fbbf24" data-width="${bd.context}"></div>
+          </div>
+        </div>
+
+        <div class="explain-row">
+          <div class="explain-label-box">
+            <span>👥 Tránh tập trung đông người:</span>
+            <span>${bd.crowd}%</span>
+          </div>
+          <div class="explain-bar">
+            <div class="explain-fill" style="width: 0%; background: #34d399" data-width="${bd.crowd}"></div>
+          </div>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function setDest(node){
+  document.getElementById('end').value=node.trim();
+  findRoute();
+}
+
+async function loadProfile(){
+  const r = await fetchWithSession('/api_user_profile');
+  const d = await r.json();
+  if(d.status === 'success') {
+    const p = d.user_profile;
+    
+    // Inferred profile display labels
+    const roleLabels = { student: '🎓 Sinh viên (Hệ đại học)', lecturer: '👨‍🏫 Giảng viên / Nhân viên', visitor: '🚶 Khách tham quan' };
+    const styleLabels = { silent: '🤫 Cần yên tĩnh tuyệt đối', group: '👥 Thảo luận / Học nhóm' };
+    
+    document.getElementById('display-role').textContent = roleLabels[p.role] || p.role;
+    document.getElementById('display-style').textContent = styleLabels[p.study_style] || p.study_style;
+    
+    const intsBox = document.getElementById('display-interests');
+    intsBox.innerHTML = (p.interests || []).map(i => `<span class="badge b-blue">#${i}</span>`).join('');
+    
+    renderHistory(p.visited_history || {});
+  }
+}
+
+function renderHistory(hist){
+  const histBox = document.getElementById('history-box');
+  const keys = Object.keys(hist);
+  if(keys.length === 0) {
+    histBox.innerHTML = '<span style="color: var(--muted); font-size: 0.72rem;">Chưa ghé thăm nơi nào.</span>';
+    return;
+  }
+  histBox.innerHTML = keys.map(k => 
+    `<span class="badge b-blue" style="cursor: pointer;" onclick="setDest('${k.replace(/'/g,"\\\\")}')">${k} (${hist[k]})</span>`
+  ).join('');
+}
+
+async function resetHistory(){
+  const r = await fetchWithSession(`/api_user_profile?reset_history=true`,{method:'POST'});
+  const d = await r.json();
+  if(d.status === 'success') {
+    renderHistory({});
+    toast('Đã xoá lịch sử di chuyển & reset hồ sơ AI.');
+    loadProfile();
+  }
+}
+
+// --- COLLABORATIVE FILTERING TAB ---
+async function fetchCF() {
+  const cfList = document.getElementById('cf-list');
+  const cfHeader = document.getElementById('cf-feed-header');
+  cfList.innerHTML = `<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:20px">⏳ Đang truy vấn CF model...</div>`;
+  cfHeader.style.display = 'block';
+
+  const latParam = gpsPos ? `&current_lat=${gpsPos.lat}&current_lon=${gpsPos.lon}` : '';
+  const res  = await fetchWithSession(`/api_collaborative_filtering?top_k=8${latParam}`);
+  const data = await res.json();
+
+  // Update status
+  const modeMap = {
+    'item_item_cf':           '✅ CF thực (co-visitation)',
+    'content_based_cold_start': '⏳ Cold start (content-based)'
+  };
+  document.getElementById('cf-mode-label').textContent    = modeMap[data.cf_mode] || data.cf_mode;
+  document.getElementById('cf-sessions-label').textContent = `${data.cf_sessions || 0} sessions`;
+
+  const recs = data.recommendations || [];
+  if (!recs.length) {
+    cfList.innerHTML = `<div style="font-size:.72rem;color:var(--muted);text-align:center;padding:12px">Chưa đủ dữ liệu CF. Hãy di chuyển nhiều hơn để hệ thống học hành vi của bạn.</div>`;
+    return;
+  }
+
+  cfList.innerHTML = recs.map((r,i) => {
+    const score = r.cf_score ? `${(r.cf_score*100).toFixed(1)}%` : `${(r.match_score||0).toFixed(1)}%`;
+    const dist  = r.distance_m ? `<span class="badge b-blue">~${Math.round(r.distance_m)}m</span>` : '';
+    const src   = r.source === 'item_item_cf'
+      ? `<span class="badge b-cf">🤝 CF</span>`
+      : `<span class="badge b-yellow">📝 Content</span>`;
+    return `<div class="rec-card">
+      <div class="rec-header" onclick="setDest('${r.node.replace(/'/g,"\\'")}')">
+        <div class="rec-name">${i+1}. ${r.node}</div>
+        <span class="badge b-cf">${score}</span>
+      </div>
+      <div class="rec-reason">${r.reason||''}</div>
+      <div class="rec-meta">${dist}${src}</div>
+    </div>`;
+  }).join('');
+
+  toast(`${recs.length} gợi ý từ CF (${data.cf_mode})`);
+}
+
+// --- NGỮ CẢNH ĐA NGUỒN (MULTI-SOURCE CONTEXT) ---
+let currentBatteryLevel = 1.0;
+let currentTemperature = 28.0;
+let currentUvIndex = 2.0;
+let currentScheduleClass = "Tòa B";
+
+function updateBatterySlider(val) {
+  currentBatteryLevel = parseFloat(val) / 100;
+  const slider = document.getElementById('battery-slider');
+  if (slider) slider.value = val;
+  const label = document.getElementById('battery-label');
+  if (label) {
+    label.textContent = `🔋 Pin thiết bị: ${val}% ${val < 20 ? ' ⚠️ (Pin yếu)' : ''}`;
+  }
+  triggerRecUpdate();
+}
+
+function updateTempSlider(val) {
+  currentTemperature = parseFloat(val);
+  const slider = document.getElementById('temp-slider');
+  if (slider) slider.value = val;
+  const label = document.getElementById('temp-label');
+  if (label) {
+    label.textContent = `🌡️ Nhiệt độ môi trường: ${val}°C ${val > 33 ? ' 🔥 (Nắng gắt)' : ''}`;
+  }
+  triggerRecUpdate();
+}
+
+function updateUvSlider(val) {
+  currentUvIndex = parseFloat(val);
+  const slider = document.getElementById('uv-slider');
+  if (slider) slider.value = val;
+  const label = document.getElementById('uv-label');
+  if (label) {
+    let uvText = 'Thấp';
+    if (val > 8) uvText = 'Rất cao ⚠️';
+    else if (val > 5) uvText = 'Trung bình/Cao';
+    label.textContent = `☀️ Chỉ số UV: ${val} (${uvText})`;
+  }
+  triggerRecUpdate();
+}
+
+function updateScheduleClass(val) {
+  currentScheduleClass = val;
+  triggerRecUpdate();
+}
+
+function triggerRecUpdate() {
+  if (G) {
+    fetchRecommendPassive();
+  }
+  if (gpsPos) {
+    sendTrackingUpdate(gpsPos.lat, gpsPos.lon);
+  }
+}
+
+// Hàm fetchRecommend thụ động không toast thông báo
+async function fetchRecommendPassive() {
+  if (!gpsPos) return;
+  const q = document.getElementById('query').value;
+  const w = document.getElementById('weather').value;
+  const url = `/api_recommend?current_lat=${gpsPos.lat}&current_lon=${gpsPos.lon}&weather=${w}`
+    + (q ? `&query=${encodeURIComponent(q)}` : '')
+    + `&battery_level=${currentBatteryLevel}`
+    + `&temperature=${currentTemperature}`
+    + `&uv_index=${currentUvIndex}`
+    + `&schedule_class=${encodeURIComponent(currentScheduleClass)}`;
+  
+  const r = await fetchWithSession(url);
+  const d = await r.json();
+  renderRecs(d.recommendations || []);
+}
+
+// Calibration removed (admin-only feature)
+
+function toast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2800);
+}
+
+setInterval(()=>{
+  if(G) document.getElementById('clock').textContent='🕒 '+new Date().toLocaleTimeString('vi-VN');
+},1000);
+
+loadGraph().then(async () => {
+  startMapAnimationLoop();
+  loadProfile();
+  updateLegendVisibility();
+  updateFloatingOffsets();
+
+  injectCommentSections();
+  syncLikedSavedUI();
+  renderFavoritesTab();
+  await applyTrendingOrdering();
+  await updateArTikTokMatchScores();
+  await loadAllCommentCounts();
+
+  // Nạp trạng thái CF model
+  try {
+    const cfRes = await fetch('/api_cf_stats');
+    const cfData = await cfRes.json();
+    if (cfData.status === 'success') {
+      const s = cfData.cf_stats;
+      const modeEl = document.getElementById('cf-mode-label');
+      const sessEl = document.getElementById('cf-sessions-label');
+      if (modeEl) modeEl.textContent = s.has_data ? '✅ CF sẵn sàng' : '⏳ Cold start (chưa đủ data)';
+      if (sessEl) sessEl.textContent = `${s.n_sessions} sessions · ${s.unique_items} địa điểm`;
+    }
+  } catch(e) { console.warn('CF stats error', e); }
+
+  // Battery API
+  if (navigator.getBattery) {
+    navigator.getBattery().then(battery => {
+      updateBatterySlider(Math.round(battery.level * 100));
+      battery.addEventListener('levelchange', () => {
+        updateBatterySlider(Math.round(battery.level * 100));
+      });
+    });
+  }
+});
+
+// --- JAVASCRIPT LOGIC FOR CAMPUS LENS VIEW ---
+let activeWebSlideIndex = 0;
+let isWebarLocationListCollapsed = false;
+let showcaseNodes = [
+  { id: 'Căn tin', key: 'canteen', defaultScore: 92 },
+  { id: 'Thư viện Tòa D', key: 'library', defaultScore: 88 },
+  { id: 'Nhà thể dục', key: 'gym', defaultScore: 70 },
+  { id: 'Tòa B', key: 'toa_b', defaultScore: 84 },
+  { id: 'Tòa A', key: 'toa_a', defaultScore: 80 },
+  { id: 'Tòa C', key: 'toa_c', defaultScore: 75 },
+  { id: 'Tòa E', key: 'toa_e', defaultScore: 82 },
+  { id: 'Tòa F', key: 'toa_f', defaultScore: 78 },
+  { id: 'Tòa G', key: 'toa_g', defaultScore: 65 },
+  { id: 'Nhà xe', key: 'parking', defaultScore: 60 },
+  { id: 'ATM', key: 'atm', defaultScore: 85 },
+  { id: 'Nhà điều hành', key: 'admin', defaultScore: 90 },
+  { id: 'Cổng trường', key: 'gate', defaultScore: 95 }
+];
+
+const locationKeyInfo = Object.fromEntries(showcaseNodes.map((node, index) => [
+  node.key,
+  {
+    name: node.id,
+    index,
+    icon: node.id === 'Căn tin' ? '🍲'
+      : node.id === 'Thư viện Tòa D' ? '📖'
+      : node.id === 'Nhà thể dục' ? '🏋️'
+      : node.id === 'Nhà xe' ? '🏍️'
+      : node.id === 'ATM' ? '🏧'
+      : node.id === 'Nhà điều hành' ? '🏢'
+      : node.id === 'Cổng trường' ? '🚪'
+      : '🏫'
+  }
+]));
+
+let userFavorites = { liked: [], saved: [] };
+try {
+  const storedFavorites = JSON.parse(localStorage.getItem('campus_user_favorites') || '{}');
+  userFavorites = {
+    liked: Array.isArray(storedFavorites.liked) ? storedFavorites.liked : [],
+    saved: Array.isArray(storedFavorites.saved) ? storedFavorites.saved : []
+  };
+} catch (e) {
+  userFavorites = { liked: [], saved: [] };
+}
+
+async function updateArTikTokMatchScores() {
+  let lat = gpsPos ? gpsPos.lat : 21.0062;
+  let lon = gpsPos ? gpsPos.lon : 105.8080;
+  
+  let u = `/api_recommend?current_lat=${lat}&current_lon=${lon}&weather=${document.getElementById('weather').value}&limit=12`;
+  let recs = [];
+  try {
+    let r = await fetchWithSession(u);
+    let d = await r.json();
+    recs = d.recommendations || [];
+  } catch (e) {
+    console.warn("Failed to fetch recommendations for AR View", e);
+  }
+  
+  let ratings = {};
+  try {
+    let r2 = await fetchWithSession('/api_user_profile');
+    let d2 = await r2.json();
+    if (d2.status === 'success') {
+      ratings = d2.user_profile.ratings || {};
+    }
+  } catch (e) {
+    console.warn("Failed to fetch user ratings", e);
+  }
+  
+  const rCountEl = document.getElementById('ar-ratings-count');
+  if (rCountEl) {
+    rCountEl.textContent = `${Object.keys(ratings).length} địa điểm`;
+  }
+  
+  showcaseNodes.forEach(node => {
+    let finalScore = node.defaultScore;
+    
+    let serverItem = recs.find(item => item.node === node.id);
+    if (serverItem) {
+      finalScore = Math.round(serverItem.score);
+    } else {
+      let rating = ratings[node.id];
+      if (rating !== undefined) {
+        if (rating >= 5) finalScore = 98;
+        else if (rating >= 4) finalScore = 88;
+        else if (rating >= 3) finalScore = 70;
+        else if (rating >= 2) finalScore = 45;
+        else finalScore = 15;
+      }
+    }
+    
+    finalScore = Math.max(5, Math.min(100, finalScore));
+    
+    const matchEl = document.getElementById(`ar-match-${node.key}`);
+    if (matchEl) matchEl.textContent = `${finalScore}%`;
+  });
+  
+  showcaseNodes.forEach(node => {
+    let userRating = ratings[node.id] || 0;
+    const starsContainer = document.querySelector(`.web-rating-stars[data-node="${node.id}"]`);
+    if (starsContainer) {
+      const stars = starsContainer.querySelectorAll('.web-star');
+      stars.forEach(star => {
+        const val = parseInt(star.getAttribute('data-value'));
+        star.classList.toggle('rated', val <= userRating);
+      });
+    }
+  });
+
+  const filterToggle = document.getElementById('ar-filter-toggle');
+  if (filterToggle) {
+    toggleArFilter(filterToggle.checked);
+  }
+}
+
+async function rateLocation(nodeId, val, event) {
+  if (event) event.stopPropagation();
+  
+  const starsContainer = document.querySelector(`.web-rating-stars[data-node="${nodeId}"]`);
+  if (starsContainer) {
+    const stars = starsContainer.querySelectorAll('.web-star');
+    stars.forEach(star => {
+      const sVal = parseInt(star.getAttribute('data-value'));
+      star.classList.toggle('rated', sVal <= val);
+    });
+  }
+  
+  try {
+    let res = await fetchWithSession(`/api_submit_rating?node_id=${encodeURIComponent(nodeId)}&rating=${val}`, { method: 'POST' });
+    let d = await res.json();
+    if (d.status === 'success') {
+      toast(`Đã ghi nhận ${val} sao cho ${nodeId}!`);
+      
+      const keyMap = { 
+        'Căn tin': 'canteen', 
+        'Thư viện Tòa D': 'library', 
+        'Nhà thể dục': 'gym', 
+        'Tòa B': 'toa_b',
+        'Tòa A': 'toa_a',
+        'Tòa C': 'toa_c',
+        'Tòa E': 'toa_e',
+        'Tòa F': 'toa_f',
+        'Tòa G': 'toa_g',
+        'Nhà xe': 'parking',
+        'ATM': 'atm',
+        'Nhà điều hành': 'admin',
+        'Cổng trường': 'gate'
+      };
+      const key = keyMap[nodeId];
+      if (key) {
+        const marker = document.getElementById(`ar-marker-${key}`);
+        if (marker) {
+          marker.classList.remove('glow-pulse');
+          void marker.offsetWidth;
+          marker.classList.add('glow-pulse');
+        }
+      }
+      
+      await updateArTikTokMatchScores();
+      await applyTrendingOrdering();
+      triggerRecUpdate();
+    } else {
+      toast(`Lỗi: ${d.detail || 'Không thể gửi đánh giá'}`);
+    }
+  } catch (e) {
+    console.error(e);
+    toast("Lỗi kết nối gửi đánh giá.");
+  }
+}
+
+async function resetAllRatings() {
+  if (!confirm("Bạn có chắc chắn muốn đặt lại tất cả đánh giá?")) return;
+  let r = await fetchWithSession(`/api_user_profile?reset_history=true`, { method: 'POST' });
+  let d = await r.json();
+  if (d.status === 'success') {
+    toast("Đã đặt lại mọi đánh giá sao!");
+    document.querySelectorAll('.web-star').forEach(star => star.classList.remove('rated'));
+    await updateArTikTokMatchScores();
+    triggerRecUpdate();
+  }
+}
+
+function handleWebScroll() {
+  const wrap = document.getElementById('web-showcase-container');
+  if (!wrap) return;
+  const slideHeight = wrap.clientHeight || 1;
+  const scrollTop = wrap.scrollTop;
+  const activeIndex = Math.round(scrollTop / slideHeight);
+  
+  if (activeIndex === activeWebSlideIndex) return;
+  activeWebSlideIndex = activeIndex;
+
+  document.querySelectorAll('.webar-carousel-card').forEach((card, i) => {
+    card.classList.toggle('active', i === activeIndex);
+  });
+
+  document.querySelectorAll('.web-scroll-dot').forEach((dot, i) => {
+    dot.classList.toggle('active', i === activeIndex);
+  });
+}
+
+function focusWebSlide(index) {
+  const wrap = document.getElementById('web-showcase-container');
+  if (!wrap) return;
+  const slideHeight = wrap.clientHeight;
+  wrap.scrollTo({
+    top: index * slideHeight,
+    behavior: 'smooth'
+  });
+  
+  const keyMap = ['canteen', 'library', 'gym', 'toa_b', 'toa_a', 'toa_c', 'toa_e', 'toa_f', 'toa_g', 'parking', 'atm', 'admin', 'gate'];
+  keyMap.forEach((key, i) => {
+    const marker = document.getElementById(`ar-marker-${key}`);
+    if (marker) {
+      marker.classList.remove('glow-pulse');
+      void marker.offsetWidth;
+      marker.classList.add('glow-pulse');
+    }
+  });
+}
+
+function toggleArFilter(isChecked) {
+  const label = document.getElementById('ar-filter-label');
+  if (label) {
+    label.textContent = isChecked ? 'Top 10' : 'Tất cả';
+  }
+  
+  const keyMap = ['canteen', 'library', 'gym', 'toa_b', 'toa_a', 'toa_c', 'toa_e', 'toa_f', 'toa_g', 'parking', 'atm', 'admin', 'gate'];
+  keyMap.forEach(key => {
+    const marker = document.getElementById(`ar-marker-${key}`);
+    if (marker) {
+      const matchText = document.getElementById(`ar-match-${key}`).textContent;
+      const pct = parseInt(matchText);
+      if (isChecked && pct < 80) {
+        marker.style.opacity = '0.15';
+        marker.style.pointerEvents = 'none';
+      } else {
+        marker.style.opacity = '1';
+        marker.style.pointerEvents = 'auto';
+      }
+    }
+  });
+}
+
+function toggleWebarLocationList() {
+  const carousel = document.querySelector('.webar-bottom-carousel');
+  const icon = document.getElementById('webar-location-toggle-icon');
+  if (!carousel) return;
+  isWebarLocationListCollapsed = !isWebarLocationListCollapsed;
+  carousel.classList.toggle('collapsed', isWebarLocationListCollapsed);
+  if (icon) icon.textContent = isWebarLocationListCollapsed ? '⌖' : '▤';
+}
+
+function toggleLike(key) {
+  const btn = document.getElementById(`like-${key}`);
+  const countEl = document.getElementById(`count-like-${key}`);
+  if (!btn || !countEl) return;
+  
+  const isLiked = btn.classList.toggle('liked');
+  let currentVal = parseFloat(countEl.textContent);
+  if (countEl.textContent.includes('k')) {
+    currentVal = parseFloat(countEl.textContent) * 1000;
+  }
+  
+  if (isLiked) {
+    btn.querySelector('.web-action-icon').textContent = '❤️';
+    currentVal += 1;
+    if (!userFavorites.liked.includes(key)) {
+      userFavorites.liked.push(key);
+    }
+  } else {
+    btn.querySelector('.web-action-icon').textContent = '🤍';
+    currentVal -= 1;
+    const idx = userFavorites.liked.indexOf(key);
+    if (idx > -1) {
+      userFavorites.liked.splice(idx, 1);
+    }
+  }
+  
+  currentVal = Math.max(0, currentVal);
+  countEl.textContent = currentVal >= 1000 ? (currentVal / 1000).toFixed(1) + 'k' : currentVal;
+  
+  localStorage.setItem('campus_user_favorites', JSON.stringify(userFavorites));
+  renderFavoritesTab();
+  const info = locationKeyInfo[key] || { name: key };
+  toast(isLiked ? `Đã thêm ${info.name} vào tab Tim/Lưu.` : `Đã bỏ thích ${info.name}.`);
+}
+
+function toggleSave(key) {
+  const btn = document.getElementById(`save-${key}`);
+  const countEl = document.getElementById(`count-save-${key}`);
+  if (!btn || !countEl) return;
+  
+  const isSaved = btn.classList.toggle('saved');
+  let currentVal = parseInt(countEl.textContent);
+  
+  if (isSaved) {
+    btn.querySelector('.web-action-icon').style.color = '#facc15';
+    currentVal += 1;
+    if (!userFavorites.saved.includes(key)) {
+      userFavorites.saved.push(key);
+    }
+  } else {
+    btn.querySelector('.web-action-icon').style.color = '#fff';
+    currentVal -= 1;
+    const idx = userFavorites.saved.indexOf(key);
+    if (idx > -1) {
+      userFavorites.saved.splice(idx, 1);
+    }
+  }
+  
+  currentVal = Math.max(0, currentVal);
+  countEl.textContent = currentVal;
+  
+  localStorage.setItem('campus_user_favorites', JSON.stringify(userFavorites));
+  renderFavoritesTab();
+  const info = locationKeyInfo[key] || { name: key };
+  toast(isSaved ? `Đã lưu ${info.name} vào tab Tim/Lưu.` : `Đã bỏ lưu ${info.name}.`);
+}
+
+// --- COLLAPSIBLE TASKBAR LOGIC ---
+function toggleTaskbar() {
+  const sidebar = document.querySelector('.sidebar');
+  const showBtn = document.getElementById('taskbar-show-btn');
+  if (!sidebar) return;
+  sidebar.classList.toggle('collapsed');
+  const isCollapsed = sidebar.classList.contains('collapsed');
+  if (showBtn) showBtn.style.display = isCollapsed ? 'flex' : 'none';
+  
+  // Smoothly resize canvas during transition
+  let start = null;
+  function step(timestamp) {
+    if (!start) start = timestamp;
+    updateFloatingOffsets();
+    resizeCanvas();
+    if (G) drawGraph(currentPath);
+    if (timestamp - start < 350) {
+      window.requestAnimationFrame(step);
+    }
+  }
+  window.requestAnimationFrame(step);
+}
+
+function toggleSidebar() {
+  toggleTaskbar();
+}
+
+function updateFloatingOffsets() {
+  const sidebar = document.querySelector('.sidebar');
+  const hud = document.querySelector('.gps-hud');
+  const hidden = sidebar && sidebar.classList.contains('collapsed');
+  const offset = hidden || !sidebar ? 20 : sidebar.offsetHeight + 20;
+  if (hud) hud.style.top = `${offset}px`;
+}
+
+// --- FAVORITES RENDERING AND EVENT HANDLER ---
+function syncLikedSavedUI() {
+  const keys = Object.keys(locationKeyInfo);
+  keys.forEach(key => {
+    const btnLike = document.getElementById(`like-${key}`);
+    if (btnLike) {
+      const liked = userFavorites.liked.includes(key);
+      btnLike.classList.toggle('liked', liked);
+      btnLike.querySelector('.web-action-icon').textContent = liked ? '❤️' : '🤍';
+    }
+    const btnSave = document.getElementById(`save-${key}`);
+    if (btnSave) {
+      const saved = userFavorites.saved.includes(key);
+      btnSave.classList.toggle('saved', saved);
+      btnSave.querySelector('.web-action-icon').style.color = saved ? '#facc15' : '#fff';
+    }
+  });
+}
+
+function renderFavoritesTab() {
+  const likedBox = document.getElementById('liked-list');
+  const savedBox = document.getElementById('saved-list');
+  const likedCount = document.getElementById('liked-count');
+  const savedCount = document.getElementById('saved-count');
+  
+  if (!likedBox || !savedBox) return;
+  
+  if (likedCount) likedCount.textContent = userFavorites.liked.length;
+  if (savedCount) savedCount.textContent = userFavorites.saved.length;
+  
+  if (userFavorites.liked.length === 0) {
+    likedBox.innerHTML = '<div style="font-size: 0.72rem; color: var(--muted); text-align: center; padding: 10px;">Chưa thích địa điểm nào.</div>';
+  } else {
+    likedBox.innerHTML = userFavorites.liked.map(key => {
+      const info = locationKeyInfo[key] || { name: key, index: 0, icon: '📍' };
+      const currentIdx = showcaseNodes.findIndex(x => x.key === key);
+      const targetIdx = currentIdx !== -1 ? currentIdx : info.index;
+      return `
+        <div class="fav-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.1rem;">${info.icon}</span>
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 600; color: #fff;">${info.name}</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-ghost" onclick="viewLocationShowcase(${targetIdx})" style="padding: 4px 8px; font-size: 0.7rem; border-color: rgba(255,255,255,0.15); color:#fff;">📱 Xem AR</button>
+            <button class="btn btn-primary" onclick="setDest('${info.name.replace(/'/g, "\\'")}')" style="padding: 4px 8px; font-size: 0.7rem;">🧭 Chỉ đường</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+  
+  if (userFavorites.saved.length === 0) {
+    savedBox.innerHTML = '<div style="font-size: 0.72rem; color: var(--muted); text-align: center; padding: 10px;">Chưa lưu địa điểm nào.</div>';
+  } else {
+    savedBox.innerHTML = userFavorites.saved.map(key => {
+      const info = locationKeyInfo[key] || { name: key, index: 0, icon: '📍' };
+      const currentIdx = showcaseNodes.findIndex(x => x.key === key);
+      const targetIdx = currentIdx !== -1 ? currentIdx : info.index;
+      return `
+        <div class="fav-item-card" style="background: rgba(255,255,255,0.03); border: 1px solid var(--border); padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center;">
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <span style="font-size: 1.1rem;">${info.icon}</span>
+            <div>
+              <div style="font-size: 0.8rem; font-weight: 600; color: #fff;">${info.name}</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button class="btn btn-ghost" onclick="viewLocationShowcase(${targetIdx})" style="padding: 4px 8px; font-size: 0.7rem; border-color: rgba(255,255,255,0.15); color:#fff;">📱 Xem AR</button>
+            <button class="btn btn-primary" onclick="setDest('${info.name.replace(/'/g, "\\'")}')" style="padding: 4px 8px; font-size: 0.7rem;">🧭 Chỉ đường</button>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+}
+
+function viewLocationShowcase(index) {
+  switchToTab('tab-ar-ui');
+  focusWebSlide(index);
+}
+
+// --- COMMENTS SYSTEM LOGIC ---
+function nodeSafeId(nodeName) {
+  return nodeName.replace(/[^\p{L}\p{N}]+/gu, '-');
+}
+
+function injectCommentSections() {
+  document.querySelectorAll('.web-slide').forEach(slide => {
+    const stars = slide.querySelector('.web-rating-stars[data-node]');
+    const actions = slide.querySelector('.web-slide-actions');
+    if (!stars || !actions || slide.querySelector('.web-comments-section')) return;
+
+    const nodeName = stars.getAttribute('data-node');
+    const safeNodeId = nodeSafeId(nodeName);
+    const section = document.createElement('div');
+    section.className = 'web-comments-section';
+    section.innerHTML = `
+      <button class="web-comments-toggle-btn" onclick="toggleComments('${nodeName.replace(/'/g, "\\'")}')">
+        💬 Bình luận hôm nay <span id="comment-count-${safeNodeId}">0</span>
+      </button>
+      <div class="web-comments-box" id="comments-box-${safeNodeId}" style="display:none">
+        <div class="web-comments-list" id="comments-list-${safeNodeId}">
+          <div style="font-size:0.65rem;color:var(--muted);text-align:center;padding:10px;">Đang tải bình luận...</div>
+        </div>
+        <div class="web-comment-form">
+          <input id="comment-input-${safeNodeId}" type="text" maxlength="180" placeholder="Hỏi nhanh về địa điểm này..." onkeydown="if(event.key==='Enter') submitComment('${nodeName.replace(/'/g, "\\'")}')"/>
+          <button onclick="submitComment('${nodeName.replace(/'/g, "\\'")}')">Gửi</button>
+        </div>
+      </div>
+    `;
+    actions.insertAdjacentElement('afterend', section);
+  });
+}
+
+function toggleComments(nodeName) {
+  const safeNodeId = nodeSafeId(nodeName);
+  const box = document.getElementById(`comments-box-${safeNodeId}`);
+  if (!box) return;
+  const isHidden = box.style.display === 'none';
+  box.style.display = isHidden ? 'flex' : 'none';
+  if (isHidden) {
+    loadComments(nodeName);
+  }
+}
+
+async function loadComments(nodeName) {
+  const safeNodeId = nodeSafeId(nodeName);
+  const listEl = document.getElementById(`comments-list-${safeNodeId}`);
+  const countEl = document.getElementById(`comment-count-${safeNodeId}`);
+  if (!listEl) return;
+  
+  try {
+    const res = await fetch(`/api_get_comments?node_id=${encodeURIComponent(nodeName)}`);
+    const d = await res.json();
+    if (d.status === 'success') {
+      const comments = d.comments || [];
+      if (countEl) countEl.textContent = comments.length;
+      if (comments.length === 0) {
+        listEl.innerHTML = '<div style="font-size: 0.65rem; color: var(--muted); text-align: center; padding: 10px;">Chưa có bình luận nào.</div>';
+      } else {
+        listEl.innerHTML = comments.map(c => {
+          const dateStr = formatCommentTime(c.created_at * 1000);
+          const displayAuthor = c.session_id.substring(0, 12);
+          return `
+            <div class="web-comment-item">
+              <div class="web-comment-author">👤 ${displayAuthor} <span style="color:var(--muted); font-size:0.6rem; font-weight:normal; margin-left:6px">${dateStr}</span></div>
+              <div class="web-comment-content">${escapeHTML(c.content)}</div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+  } catch (e) {
+    console.error("Failed to load comments", e);
+  }
+}
+
+async function submitComment(nodeName) {
+  const safeNodeId = nodeSafeId(nodeName);
+  const input = document.getElementById(`comment-input-${safeNodeId}`);
+  if (!input) return;
+  const content = input.value.trim();
+  if (!content) {
+    toast("Nội dung bình luận không được để trống!");
+    return;
+  }
+  
+  try {
+    const res = await fetchWithSession(`/api_submit_comment?node_id=${encodeURIComponent(nodeName)}&content=${encodeURIComponent(content)}`, { method: 'POST' });
+    const d = await res.json();
+    if (d.status === 'success') {
+      toast("Đã gửi bình luận thành công!");
+      input.value = '';
+      await loadComments(nodeName);
+    } else {
+      toast(`Lỗi: ${d.detail || 'Không thể gửi bình luận'}`);
+    }
+  } catch (e) {
+    console.error(e);
+    toast("Lỗi kết nối gửi bình luận.");
+  }
+}
+
+function escapeHTML(str) {
+  return str.replace(/[&<>'"]/g, 
+    tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+  );
+}
+
+function formatCommentTime(ms) {
+  const diffSec = Math.max(0, Math.floor((Date.now() - ms) / 1000));
+  if (diffSec < 60) return 'vừa xong';
+  if (diffSec < 3600) return `${Math.floor(diffSec / 60)} phút trước`;
+  if (diffSec < 86400) return `${Math.floor(diffSec / 3600)} giờ trước`;
+  return new Date(ms).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' });
+}
+
+async function loadAllCommentCounts() {
+  for (const node of showcaseNodes.map(x => x.id)) {
+    const safeNodeId = nodeSafeId(node);
+    const countEl = document.getElementById(`comment-count-${safeNodeId}`);
+    if (countEl) {
+      try {
+        const res = await fetch(`/api_get_comments?node_id=${encodeURIComponent(node)}`);
+        const d = await res.json();
+        if (d.status === 'success') {
+          countEl.textContent = (d.comments || []).length;
+        }
+      } catch (e) {
+        console.warn("Failed to prefetch comments count", e);
+      }
+    }
+  }
+}
+
+// --- TRENDING REORDERING LOGIC ---
+async function applyTrendingOrdering() {
+  try {
+    const res = await fetch('/api_trending_locations');
+    const d = await res.json();
+    if (d.status === 'success' && d.trending) {
+      const trendingList = d.trending;
+      
+      const currentActiveNode = showcaseNodes[activeWebSlideIndex] ? showcaseNodes[activeWebSlideIndex].id : 'Căn tin';
+      
+      showcaseNodes.sort((a, b) => {
+        const idxA = trendingList.findIndex(x => x.node === a.id);
+        const idxB = trendingList.findIndex(x => x.node === b.id);
+        return (idxA === -1 ? 999 : idxA) - (idxB === -1 ? 999 : idxB);
+      });
+      
+      const container = document.getElementById('web-showcase-container');
+      if (container) {
+        const slides = Array.from(container.children);
+        slides.sort((slideA, slideB) => {
+          const starsA = slideA.querySelector('.web-rating-stars');
+          const starsB = slideB.querySelector('.web-rating-stars');
+          const nodeA = starsA ? starsA.getAttribute('data-node') : '';
+          const nodeB = starsB ? starsB.getAttribute('data-node') : '';
+          
+          const idxA = showcaseNodes.findIndex(x => x.id === nodeA);
+          const idxB = showcaseNodes.findIndex(x => x.id === nodeB);
+          return idxA - idxB;
+        });
+        
+        slides.forEach(slide => container.appendChild(slide));
+      }
+      
+      const newIndex = showcaseNodes.findIndex(x => x.id === currentActiveNode);
+      if (newIndex !== -1 && newIndex !== activeWebSlideIndex) {
+        activeWebSlideIndex = newIndex;
+        const container = document.getElementById('web-showcase-container');
+        if (container) {
+          container.scrollTop = newIndex * container.clientHeight;
+        }
+      }
+      
+      rebuildCarouselAndDots();
+    }
+  } catch (e) {
+    console.error("Failed to apply trending ordering", e);
+  }
+}
+
+function rebuildCarouselAndDots() {
+  const carousel = document.querySelector('.webar-bottom-carousel');
+  const indicator = document.querySelector('.web-scroll-indicator');
+  
+  if (!carousel || !indicator) return;
+  
+  carousel.innerHTML = showcaseNodes.map((node, i) => {
+    const info = locationKeyInfo[node.key] || { icon: '📍' };
+    const activeClass = i === activeWebSlideIndex ? 'active' : '';
+    return `<div class="webar-carousel-card ${activeClass}" onclick="focusWebSlide(${i})" id="ar-car-${i}">${info.icon} ${node.id}</div>`;
+  }).join('');
+  
+  indicator.innerHTML = showcaseNodes.map((node, i) => {
+    const activeClass = i === activeWebSlideIndex ? 'active' : '';
+    return `<div class="web-scroll-dot ${activeClass}" onclick="focusWebSlide(${i})" id="web-dot-${i}" title="${node.id}"></div>`;
+  }).join('');
+}
+</script>
+</body>
+</html>

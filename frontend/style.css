@@ -1,0 +1,42 @@
+/* Xử lý hiệu ứng quét dòng laser cho Face Guard */
+@keyframes scanning {
+    0% { top: 0%; }
+    50% { top: 100%; }
+    100% { top: 0%; }
+}
+
+.scanner-line {
+    animation: scanning 3s infinite linear;
+}
+
+/* Base grid pattern giả lập bản đồ không gian của GNN */
+.base-grid-pattern {
+    background-size: 40px 40px;
+    background-image: linear-gradient(to right, rgba(59, 130, 246, 0.1) 1px, transparent 1px),
+                      linear-gradient(to bottom, rgba(59, 130, 246, 0.1) 1px, transparent 1px);
+}
+
+/* Custom Scrollbar ẩn để tăng cảm giác như native app di động */
+#chat-logs::-webkit-scrollbar {
+    width: 4px;
+}
+#chat-logs::-webkit-scrollbar-track {
+    background: transparent;
+}
+#chat-logs::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 4px;
+}
+#chat-logs::-webkit-scrollbar-thumb:hover {
+    background: #64748b;
+}
+
+/* Keyframes cho hiệu ứng mượt khi đổi view */
+@keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.99); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}

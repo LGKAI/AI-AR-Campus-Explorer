@@ -1,0 +1,71 @@
+# ========================
+# PYTHON & ENVIRONMENTS
+# ========================
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+env/
+.env
+.venv/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ========================
+# DATABASE & SECRETS (QUAN TRỌNG)
+# ========================
+backend/core/serviceAccountKey.json
+*.sqlite3
+
+# ========================
+# AI MODELS & WEIGHTS (Từ module Face Guard)
+# ========================
+backend/ai/face_guard/yolov8n.pt
+backend/ai/face_guard/*.onnx
+backend/ai/face_guard/face_db.pkl
+
+# ========================
+# RAG CHATBOT & GNN MODULE
+# ========================
+backend/ai/information_chatbot/data/
+backend/ai/information_chatbot/chroma_db/
+backend/ai/information_chatbot/models/
+backend/ai/information_chatbot/cache/
+backend/ai/information_chatbot/logs/
+backend/ai/information_chatbot/*.log
+backend/ai/recommendation_system/data/
+backend/ai/recommendation_system/*.pkl
+backend/ai/recommendation_system/*.log
+
+# ========================
+# OS GENERATED
+# ========================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+ehthumbs_vista.db
+[Tt]humbs.db
+
+# ========================
+# IDE & TOOLS
+# ========================
+.vscode/
+.idea/
+*.swp
+*.swo

@@ -1,0 +1,6 @@
+ultralytics
+opencv-python
+numpy
+insightface
+faiss-cpu
+onnxruntime

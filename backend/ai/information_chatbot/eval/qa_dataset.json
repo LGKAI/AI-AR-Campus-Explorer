@@ -1,0 +1,433 @@
+{
+  "metadata": {
+    "document": "QD-1175_Quy-che-dao-tao-trinh-do-DH-2021.pdf & STSV2025_ONLINE.pdf",
+    "total": 60,
+    "categories": {"easy": 20, "medium": 20, "hard": 20},
+    "created": "2026-05-31",
+    "notes": "Bộ câu hỏi trắc nghiệm tự luận nâng cao đánh giá đa khía cạnh hệ thống RAG (Lexical, Semantic, Graph, Synthesis, Reasoning) dịch và viết tắt song ngữ"
+  },
+  "questions": [
+    {
+      "id": "E01", "category": "easy",
+      "question": "Quyết định số 1175/QĐ-KHTN ban hành chính xác vào ngày tháng năm nào?",
+      "gold_answer": "Quyết định số 1175/QĐ-KHTN được ban hành vào ngày 24 tháng 9 năm 2021[cite: 174].",
+      "key_concepts": ["24 tháng 9 năm 2021", "ban hành", "1175/QĐ-KHTN"],
+      "relevant_article": "Phần mở đầu Quy chế"
+    },
+    {
+      "id": "E02", "category": "easy",
+      "question": "Ai là người ký quyết định ban hành Quy chế đào tạo trình độ đại học kèm theo văn bản số 1175/QĐ-KHTN?",
+      "gold_answer": "Phó Hiệu trưởng Trần Lê Quan là người ký quyết định[cite: 165, 169].",
+      "key_concepts": ["Trần Lê Quan", "Phó Hiệu trưởng", "ký quyết định"],
+      "relevant_article": "Phần ký văn bản"
+    },
+    {
+      "id": "E03", "category": "easy",
+      "question": "Quy chế đào tạo theo Quyết định 1175/QĐ-KHTN chính thức thay thế cho quyết định học vụ nào trước đó?",
+      "gold_answer": "Thay thế Quyết định số 1227/QĐ-KHTN-ĐT ngày 12 tháng 7 năm 2018 của Hiệu trưởng Trường Đại học Khoa học Tự nhiên – ĐHQG-HCM[cite: 159].",
+      "key_concepts": ["1227/QĐ-KHTN-ĐT", "12 tháng 7 năm 2018", "thay thế"],
+      "relevant_article": "Điều 2 (Quyết định)"
+    },
+    {
+      "id": "E04", "category": "easy",
+      "question": "Theo quy chế, đối tượng áp dụng cụ thể của văn bản này là những ai?",
+      "gold_answer": "Quy chế áp dụng đối với sinh viên đại học hệ chính quy các khoá đào tạo, các đơn vị, cá nhân thuộc Trường có liên quan trong đào tạo trình độ đại học theo phương thức đào tạo tín chỉ[cite: 181].",
+      "key_concepts": ["sinh viên đại học hệ chính quy", "đơn vị", "cá nhân thuộc Trường"],
+      "relevant_article": "Điều 1, Khoản 2"
+    },
+    {
+      "id": "E05", "category": "easy",
+      "question": "Khối kiến thức giáo dục đại cương bắt buộc phải bao gồm những nhóm học phần nào theo quy định của Bộ GD&ĐT?",
+      "gold_answer": "Bao gồm: lý luận chính trị, pháp luật, giáo dục thể chất, giáo dục quốc phòng - an ninh[cite: 198].",
+      "key_concepts": ["lý luận chính trị", "pháp luật", "giáo dục thể chất", "giáo dục quốc phòng - an ninh"],
+      "relevant_article": "Điều 2, Khoản 3"
+    },
+    {
+      "id": "E06", "category": "easy",
+      "question": "Khối kiến thức giáo dục chuyên nghiệp được chia cụ thể thành mấy nhóm? Tên các nhóm đó là gì?",
+      "gold_answer": "Được chia thành 2 nhóm gồm: nhóm kiến thức cơ sở ngành và nhóm kiến thức chuyên ngành[cite: 199].",
+      "key_concepts": ["2 nhóm", "kiến thức cơ sở ngành", "kiến thức chuyên ngành"],
+      "relevant_article": "Điều 2, Khoản 3"
+    },
+    {
+      "id": "E07", "category": "easy",
+      "question": "Theo học chế tín chỉ của trường, một tiết học lý thuyết được tính bằng bao nhiêu phút giảng dạy trực tiếp?",
+      "gold_answer": "Một tiết học được tính bằng 50 phút giảng dạy trực tiếp trên lớp[cite: 237].",
+      "key_concepts": ["50 phút", "tiết học", "trực tiếp trên lớp"],
+      "relevant_article": "Điều 3, Khoản 4"
+    },
+    {
+      "id": "E08", "category": "easy",
+      "question": "Định nghĩa chính xác của 'Học phần bắt buộc' trong quy chế là gì?",
+      "gold_answer": "Học phần bắt buộc là học phần chứa đựng những nội dung kiến thức chính yếu của mỗi chương trình đào tạo và bắt buộc sinh viên phải tích lũy[cite: 219, 220].",
+      "key_concepts": ["kiến thức chính yếu", "bắt buộc", "tích lũy"],
+      "relevant_article": "Điều 3, Khoản 1, điểm b"
+    },
+    {
+      "id": "E09", "category": "easy",
+      "question": "Thời gian tổ chức hoạt động giảng dạy chính quy trong tuần là từ thứ mấy đến thứ mấy?",
+      "gold_answer": "Thời gian tổ chức hoạt động giảng dạy là các ngày trong tuần từ thứ 2 đến thứ 7[cite: 249].",
+      "key_concepts": ["thứ 2 đến thứ 7", "trong tuần", "giảng dạy chính quy"],
+      "relevant_article": "Điều 5, Khoản 1, điểm b"
+    },
+    {
+      "id": "E10", "category": "easy",
+      "question": "Kế hoạch giảng dạy và học tập của trường được tổ chức thực hiện dựa trên các mốc đơn vị thời gian nào?",
+      "gold_answer": "Được tổ chức thực hiện theo khóa học, năm học và học kỳ[cite: 255].",
+      "key_concepts": ["khóa học", "năm học", "học kỳ"],
+      "relevant_article": "Điều 6, Khoản 1"
+    },
+    {
+      "id": "E11", "category": "easy",
+      "question": "Thời gian thiết kế tiêu chuẩn để hoàn thành chương trình đào tạo trình độ đại học hệ chính quy là mấy năm?",
+      "gold_answer": "Đào tạo trình độ đại học được thực hiện trong bốn năm học[cite: 258].",
+      "key_concepts": ["bốn năm học", "trình độ đại học"],
+      "relevant_article": "Điều 6, Khoản 2, điểm a"
+    },
+    {
+      "id": "E12", "category": "easy",
+      "question": "Thời gian thực học tối thiểu của một học kỳ chính đối với chương trình đại trà là bao nhiêu tuần?",
+      "gold_answer": "Một học kỳ chính đối với chương trình đại trà có 15 tuần thực học[cite: 74, 265].",
+      "key_concepts": ["15 tuần", "thực học", "học kỳ chính", "đại trà"],
+      "relevant_article": "Điều 6, Khoản 4, điểm a"
+    },
+    {
+      "id": "E13", "category": "easy",
+      "question": "Trường hợp sinh viên đăng ký học kỳ hè (summer semester), thời gian thực học bắt buộc tối thiểu là bao nhiêu tuần?",
+      "gold_answer": "Mỗi học kỳ hè có ít nhất 5 tuần thực học[cite: 267].",
+      "key_concepts": ["ít nhất 5 tuần", "thực học", "học kỳ hè"],
+      "relevant_article": "Điều 6, Khoản 4, điểm a"
+    },
+    {
+      "id": "E14", "category": "easy",
+      "question": "Các chương trình Tiên tiến, Liên kết và Chất lượng cao có tổng số học kỳ chính trong một năm học là bao nhiêu?",
+      "gold_answer": "Một năm học có 03 học kỳ chính với tổng số tối thiểu 30 tuần lên lớp[cite: 268].",
+      "key_concepts": ["03 học kỳ chính", "30 tuần lên lớp", "Tiên tiến", "Chất lượng cao"],
+      "relevant_article": "Điều 6, Khoản 4, điểm b"
+    },
+    {
+      "id": "E15", "category": "easy",
+      "question": "Khi sinh viên đăng ký học phần nhưng tự ý không tham gia học và không đi thi thì sẽ phải nhận điểm số mấy?",
+      "gold_answer": "Sinh viên không tham gia học các học phần đã đăng ký được xem như tự ý bỏ học và phải nhận điểm không (điểm 0)[cite: 92].",
+      "key_concepts": ["tự ý bỏ học", "điểm không (điểm 0)"],
+      "relevant_article": "Điều 7, Khoản 1, điểm d"
+    },
+    {
+      "id": "E16", "category": "easy",
+      "question": "Đối với hình thức đào tạo chính quy, tỷ lệ khối lượng chương trình tối đa được phép triển khai bằng hình thức dạy học trực tuyến (online) là bao nhiêu?",
+      "gold_answer": "Tối đa 30% tổng khối lượng của chương trình đào tạo được thực hiện bằng lớp học trực tuyến[cite: 105].",
+      "key_concepts": ["tối đa 30%", "trực tuyến", "chính quy"],
+      "relevant_article": "Điều 8, Khoản 2, điểm b"
+    },
+    {
+      "id": "E17", "category": "easy",
+      "question": "Lớp sinh hoạt (homeroom class) được tổ chức dựa trên những tiêu chí đồng nhất nào của sinh viên?",
+      "gold_answer": "Lớp sinh hoạt bao gồm những sinh viên cùng khoá tuyển, cùng ngành và cùng chương trình đào tạo[cite: 111].",
+      "key_concepts": ["cùng khoá tuyển", "cùng ngành", "cùng chương trình đào tạo"],
+      "relevant_article": "Điều 8, Khoản 3, điểm b"
+    },
+    {
+      "id": "E18", "category": "easy",
+      "question": "Thang điểm được sử dụng để chấm và đánh giá các điểm thành phần của một học phần là thang điểm mấy?",
+      "gold_answer": "Các điểm thành phần được đánh giá theo thang điểm 10[cite: 115].",
+      "key_concepts": ["thang điểm 10", "điểm thành phần"],
+      "relevant_article": "Điều 9, Khoản 1"
+    },
+    {
+      "id": "E19", "category": "easy",
+      "question": "Tiết học số 1 (tiết mở đầu) của buổi sáng tại cơ sở Linh Trung bắt đầu từ mấy giờ?",
+      "gold_answer": "Tiết 1 tại cơ sở Linh Trung bắt đầu từ 7g30[cite: 86, 278].",
+      "key_concepts": ["7g30", "Tiết 1", "Linh Trung"],
+      "relevant_article": "Điều 6, Khoản 7, điểm b"
+    },
+    {
+      "id": "E20", "category": "easy",
+      "question": "Tiết học cuối cùng (tiết 15) của buổi tối tại cơ sở 227 Nguyễn Văn Cừ kết thúc vào lúc mấy giờ?",
+      "gold_answer": "Tiết 15 kết thúc vào lúc 20g30[cite: 276].",
+      "key_concepts": ["20g30", "Tiết 15", "Nguyễn Văn Cừ"],
+      "relevant_article": "Điều 6, Khoản 7, điểm a"
+    },
+
+    {
+      "id": "M01", "category": "medium",
+      "question": "Hãy nêu định nghĩa và phân biệt rõ 'Học phần tiên quyết' (Prerequisite) và 'Học phần học trước' theo quy định?",
+      "gold_answer": "Học phần tiên quyết đối với học phần A là học phần mà sinh viên phải học và thi đạt mới được đăng ký học học phần A. Trong khi đó, học phần học trước với học phần A là học phần mà sinh viên chỉ cần hoàn thành quá trình học tập (không bắt buộc phải thi đạt) trước khi đăng ký học học phần A[cite: 45, 46, 224, 225].",
+      "key_concepts": ["tiên quyết", "thi đạt", "học trước", "hoàn thành quá trình học"],
+      "relevant_article": "Điều 3, Khoản 1, điểm c"
+    },
+    {
+      "id": "M02", "category": "medium",
+      "question": "Một tín chỉ (01 credit) học phần lý thuyết, thực hành/thí nghiệm, bài tập, và đồ án/khóa luận được quy đổi chính xác ra bao nhiêu tiết học tương ứng?",
+      "gold_answer": "Một tín chỉ được quy định bằng: 15 tiết học lý thuyết; 30 hoặc 45 tiết thực hành, thí nghiệm hoặc thảo luận; 15 hoặc 30 tiết bài tập; 30 tiết làm tiểu luận, bài tập lớn hoặc đồ án, khoá luận tốt nghiệp[cite: 234, 235, 236].",
+      "key_concepts": ["15 tiết lý thuyết", "30-45 tiết thực hành", "15-30 tiết bài tập", "30 tiết đồ án/khóa luận"],
+      "relevant_article": "Điều 3, Khoản 3"
+    },
+    {
+      "id": "M03", "category": "medium",
+      "question": "Trong trường hợp học tập bình thường, thời gian tối đa (maximum duration) cho phép để sinh viên hoàn thành khóa học đại học (thiết kế 4 năm) được rút ngắn hay kéo dài như thế nào?",
+      "gold_answer": "Sinh viên được phép rút ngắn tối đa một (01) năm học và kéo dài thêm không vượt quá ba (03) năm học theo kế hoạch học tập (Tổng thời gian tối đa là 7 năm)[cite: 208].",
+      "key_concepts": ["rút ngắn tối đa 1 năm", "kéo dài không quá 3 năm", "thời gian tối đa"],
+      "relevant_article": "Điều 2, Khoản 7, điểm a"
+    },
+    {
+      "id": "M04", "category": "medium",
+      "question": "Đối với chương trình liên thông đại học, giới hạn thời gian kéo dài thêm tối đa được quy định là bao nhiêu năm?",
+      "gold_answer": "Riêng đối với chương trình liên thông đại học, sinh viên kéo dài thêm không vượt quá hai (02) năm học theo kế hoạch học tập[cite: 36, 209].",
+      "key_concepts": ["liên thông đại học", "không quá hai năm"],
+      "relevant_article": "Điều 2, Khoản 7, điểm a"
+    },
+    {
+      "id": "M05", "category": "medium",
+      "question": "Quy chế quy định như thế nào về thẩm quyền và giới hạn đặc biệt tối đa khi gia hạn thời gian đào tạo cho sinh viên của Hiệu trưởng?",
+      "gold_answer": "Tùy vào trường hợp cụ thể, Hiệu trưởng xem xét và gia hạn thêm thời gian đào tạo cho sinh viên nhưng không được vượt quá hai lần thời gian thiết kế của khóa học tương ứng với mỗi chương trình đào tạo[cite: 38, 211].",
+      "key_concepts": ["Hiệu trưởng xem xét", "không vượt quá hai lần thời gian thiết kế"],
+      "relevant_article": "Điều 2, Khoản 7, điểm c"
+    },
+    {
+      "id": "M06", "category": "medium",
+      "question": "Khi xếp lịch học tập trung thời gian (block scheduling), số giờ giảng đối với một học phần bất kỳ phải tuân thủ giới hạn tối đa theo tuần và theo ngày như thế nào?",
+      "gold_answer": "Số giờ giảng đối với một học phần bất kỳ không vượt quá 15 giờ/tuần và không quá 4 giờ/ngày[cite: 83, 274].",
+      "key_concepts": ["không vượt quá 15 giờ/tuần", "không quá 4 giờ/ngày", "học tập trung"],
+      "relevant_article": "Điều 6, Khoản 6"
+    },
+    {
+      "id": "M07", "category": "medium",
+      "question": "Số tín chỉ đăng ký học tối thiểu (minimum credits) trong một học kỳ chính đối với sinh viên thuộc chương trình đại trà là bao nhiêu?",
+      "gold_answer": "Đối với chương trình đại trà: tối thiểu là 14 tín chỉ (không tính các học phần Giáo dục quốc phòng, Giáo dục thể chất và Ngoại ngữ tổng quát)[cite: 94].",
+      "key_concepts": ["tối thiểu 14 tín chỉ", "chương trình đại trà", "loại trừ môn điều kiện"],
+      "relevant_article": "Điều 7, Khoản 2, điểm a"
+    },
+    {
+      "id": "M08", "category": "medium",
+      "question": "Số tín chỉ đăng ký học tối thiểu trong một học kỳ chính đối với sinh viên thuộc hệ Tiên tiến, Liên kết, hoặc Chất lượng cao được quy định là bao nhiêu?",
+      "gold_answer": "Đối với chương trình Tiên tiến, Liên kết, Chất lượng cao: số tín chỉ đăng ký tối thiểu là 10 tín chỉ[cite: 93].",
+      "key_concepts": ["tối thiểu 10 tín chỉ", "Tiên tiến/Liên kết/Chất lượng cao"],
+      "relevant_article": "Điều 7, Khoản 2, điểm a"
+    },
+    {
+      "id": "M09", "category": "medium",
+      "question": "Hạn mức đăng ký khối lượng tín chỉ tối đa (maximum credits) trong một học kỳ chính đối với hai nhóm chương trình (đại trà vs chất lượng cao/tiên tiến/liên kết) lần lượt là bao nhiêu?",
+      "gold_answer": "Số tín chỉ đăng ký học tối đa trong học kỳ chính đối với chương trình Tiên tiến, Liên kết, Chất lượng cao là 22 tín chỉ; đối với chương trình đại trà là 25 tín chỉ[cite: 95].",
+      "key_concepts": ["đại trà tối đa 25 tín chỉ", "chương trình đặc thù tối đa 22 tín chỉ"],
+      "relevant_article": "Điều 7, Khoản 2, điểm b"
+    },
+    {
+      "id": "M10", "category": "medium",
+      "question": "Sinh viên đăng ký học tập trong học kỳ hè được phép đăng ký tối đa bao nhiêu tín chỉ?",
+      "gold_answer": "Số tín chỉ đăng ký học tối đa trong học kỳ hè là 12 tín chỉ[cite: 96].",
+      "key_concepts": ["tối đa 12 tín chỉ", "học kỳ hè"],
+      "relevant_article": "Điều 7, Khoản 2, điểm b"
+    },
+    {
+      "id": "M11", "category": "medium",
+      "question": "Đối với học phần lý thuyết bình thường, điểm học phần được cấu thành từ tối thiểu mấy điểm thành phần? Hãy nêu tên gọi của chúng.",
+      "gold_answer": "Sinh viên được đánh giá tối thiểu bằng tổng của hai điểm thành phần bao gồm: điểm quá trình và điểm thi kết thúc học phần (điểm thi cuối học kỳ)[cite: 114].",
+      "key_concepts": ["tối thiểu hai điểm thành phần", "điểm quá trình", "điểm thi kết thúc học phần"],
+      "relevant_article": "Điều 9, Khoản 1"
+    },
+    {
+      "id": "M12", "category": "medium",
+      "question": "Tỷ lệ phần trăm (trọng số) của điểm quá trình (midterm/process grade) được khống chế trong khoảng nào? Kể tên ít nhất 4 hình thức đánh giá quá trình.",
+      "gold_answer": "Điểm quá trình chiếm tỉ trọng từ 50% đến 60%[cite: 116]. Bao gồm tối thiểu ba trong số các hình thức: kiểm tra thường xuyên; đánh giá tham gia thảo luận; thực hành/thực tập; bài tập lớn; chuyên cần; kiểm tra giữa học kỳ; báo cáo seminar[cite: 116, 117, 118].",
+      "key_concepts": ["50% đến 60%", "kiểm tra giữa kỳ", "chuyên cần", "bài tập lớn", "seminar"],
+      "relevant_article": "Điều 9, Khoản 1, điểm a"
+    },
+    {
+      "id": "M13", "category": "medium",
+      "question": "Tỷ lệ phần trăm tối thiểu của điểm thi kết thúc học phần (final exam grade) được quy định là bao nhiêu và bao gồm những hình thức thi nào?",
+      "gold_answer": "Điểm thi kết thúc học phần chiếm tỉ trọng còn lại nhưng không dưới 40%[cite: 119]. Các hình thức thi bao gồm: thi viết (trắc nghiệm hoặc tự luận); thi vấn đáp; báo cáo chuyên đề/tiểu luận/đồ án[cite: 120, 121].",
+      "key_concepts": ["không dưới 40%", "thi viết", "vấn đáp", "báo cáo chuyên đề/tiểu luận"],
+      "relevant_article": "Điều 9, Khoản 1, điểm b"
+    },
+    {
+      "id": "M14", "category": "medium",
+      "question": "Quy chế quy định điều kiện bắt buộc gì đối với sinh viên khi tham gia loại học phần thực hành (practical course)?",
+      "gold_answer": "Đối với loại học phần thực hành: sinh viên bắt buộc phải tham dự đầy đủ tất cả các bài thực hành[cite: 124].",
+      "key_concepts": ["tham dự đầy đủ", "bài thực hành"],
+      "relevant_article": "Điều 9, Khoản 2"
+    },
+    {
+      "id": "M15", "category": "medium",
+      "question": "Khi tính tổng số tín chỉ đăng ký trong một học kỳ, những loại học phần nào sẽ được đưa vào để tính toán?",
+      "gold_answer": "Tổng số tín chỉ đăng ký học tập trong một học kỳ được tính bao gồm: số tín chỉ của học phần đăng ký mới, học phần học lại và học phần cải thiện[cite: 89].",
+      "key_concepts": ["đăng ký mới", "học lại", "học cải thiện"],
+      "relevant_article": "Điều 7, Khoản 1, điểm b"
+    },
+    {
+      "id": "M16", "category": "medium",
+      "question": "Trong trường hợp bất khả kháng do thiên tai hoặc dịch bệnh, quy chế cho phép thay đổi phương thức thi kết thúc học phần như thế nào?",
+      "gold_answer": "Đánh giá cuối học kỳ theo hình thức thi viết có thể được tổ chức bằng phương thức trực tuyến (online) do Hiệu trưởng quyết định, bảo đảm trung thực, công bằng và khách quan[cite: 122, 123].",
+      "key_concepts": ["thi trực tuyến", "Hiệu trưởng quyết định", "thiên tai/dịch bệnh"],
+      "relevant_article": "Điều 9, Khoản 1, điểm b"
+    },
+    {
+      "id": "M17", "category": "medium",
+      "question": "Trách nhiệm học vụ hàng ngày của một sinh viên được cụ thể hóa bằng những yêu cầu bắt buộc nào?",
+      "gold_answer": "Sinh viên có trách nhiệm thực hiện đầy đủ các yêu cầu như lên lớp, làm bài tập, thực hành, thí nghiệm, tham gia thảo luận, dự kiểm tra thường kỳ và thi kết thúc học phần[cite: 99].",
+      "key_concepts": ["lên lớp", "làm bài tập", "thực hành/thí nghiệm", "dự kiểm tra/thi"],
+      "relevant_article": "Điều 7, Khoản 4, điểm b"
+    },
+    {
+      "id": "M18", "category": "medium",
+      "question": "Điều kiện để một lớp học phần (class section) chính thức bị hủy không tổ chức giảng dạy là gì?",
+      "gold_answer": "Nếu số lượng sinh viên đăng ký thấp hơn số lượng tối thiểu do Hiệu trưởng quy định cho từng loại học phần thì lớp học sẽ không được tổ chức[cite: 109, 110].",
+      "key_concepts": ["thấp hơn số lượng tối thiểu", "không được tổ chức"],
+      "relevant_article": "Điều 8, Khoản 3, điểm a"
+    },
+    {
+      "id": "M19", "category": "medium",
+      "question": "Sự khác biệt về số tuần thực học/lên lớp trong một năm học giữa chương trình đại trà và các chương trình đặc thù (Tiên tiến, Chất lượng cao) là gì?",
+      "gold_answer": "Chương trình đại trà tổ chức 2 học kỳ chính với tổng cộng 30 tuần thực học (15 tuần/học kỳ)[cite: 74, 265]. Các chương trình đặc thù tổ chức thành 3 học kỳ chính với tổng số tối thiểu cũng là 30 tuần lên lớp[cite: 268].",
+      "key_concepts": ["Đại trà: 2 học kỳ chính, 15 tuần/HK", "Đặc thù: 3 học kỳ chính, tối thiểu 30 tuần"],
+      "relevant_article": "Điều 6, Khoản 4"
+    },
+    {
+      "id": "M20", "category": "medium",
+      "question": "Kết quả đăng ký học phần chính thức của sinh viên sau khi kết thúc đợt đăng ký sẽ hiển thị công khai những thông tin chi tiết gì?",
+      "gold_answer": "Kết quả ghi rõ: tên học phần, mã học phần, mã lớp, số tín chỉ và lịch học của mỗi học phần[cite: 91].",
+      "key_concepts": ["tên học phần", "mã học phần/mã lớp", "số tín chỉ", "lịch học"],
+      "relevant_article": "Điều 7, Khoản 1, điểm c"
+    },
+
+    {
+      "id": "H01", "category": "hard",
+      "question": "Giả sử một sinh viên (SV) học cùng lúc hai chương trình (double major). SV này muốn đăng ký tối đa khối lượng học tập trong học kỳ chính và học kỳ hè thì giới hạn tín chỉ nghiêm ngặt là bao nhiêu? Nếu vi phạm sẽ xử lý ra sao?",
+      "gold_answer": "Đối với sinh viên học cùng lúc hai chương trình, tổng số tín chỉ đăng ký tối đa cho mỗi học kỳ chính là 37 tín chỉ, và mỗi học kỳ hè không vượt quá 15 tín chỉ[cite: 97]. Nếu tự ý không tham gia học các học phần đã đăng ký vượt/không hợp lệ mà không có sự chấp thuận, SV sẽ bị xem như tự ý bỏ học và nhận điểm số 0 cho học phần đó[cite: 92].",
+      "key_concepts": ["học cùng lúc hai chương trình", "tối đa 37 TC kỳ chính", "tối đa 15 TC kỳ hè", "điểm 0 nếu tự ý bỏ học"],
+      "relevant_article": "Điều 7, Khoản 2 và Khoản 1"
+    },
+    {
+      "id": "H02", "category": "hard",
+      "question": "Phân tích mối quan hệ logic mang tính hệ thống (system-graph layout) giữa 'Học phần tiên quyết', 'Học phần tương đương' và 'Học phần thay thế'. Cho ví dụ minh họa trường hợp áp dụng học phần thay thế?",
+      "gold_answer": "Học phần tiên quyết là điều kiện chặn phía trước để được học môn tiếp theo[cite: 45, 224]. Học phần tương đương là môn có nội dung đồng nhất, dùng thay thế song song bất cứ lúc nào[cite: 48, 227]. Học phần thay thế chỉ xuất hiện dưới dạng giải pháp thay thế khi môn học cũ đã bị thay đổi, điều chỉnh cấu trúc hoặc không còn tồn tại trong chương trình đào tạo (bị khai tử)[cite: 47, 226]. Ví dụ: Môn Toán rời rạc mã cũ không còn mở lớp, trường chỉ định học môn cấu trúc dữ liệu mã mới để thay thế tích lũy[cite: 61, 244].",
+      "key_concepts": ["tiên quyết (chặn trước)", "tương đương (đồng nhất)", "thay thế (kế thừa khi môn cũ bị hủy)"],
+      "relevant_article": "Điều 3, Khoản 1 và Điều 4, Khoản 2"
+    },
+    {
+      "id": "H03", "category": "hard",
+      "question": "Nếu một sinh viên đại trà muốn đăng ký vượt hạn mức 25 tín chỉ hoặc ít hơn 14 tín chỉ trong học kỳ chính vì lý do cá nhân, quy trình thủ tục hành chính học vụ (administrative workflow) bắt buộc phải trải qua những bước phê duyệt nào?",
+      "gold_answer": "Sinh viên không được tự ý đăng ký trên hệ thống mà bắt buộc phải tuân theo quy trình: (1) Làm đơn đề nghị (giải trình lý do); (2) Được Ban chủ nhiệm Khoa xem xét và đồng ý thông qua; (3) Trình lên Hiệu trưởng phê duyệt và chấp thuận cuối cùng[cite: 96].",
+      "key_concepts": ["làm đơn đề nghị", "Khoa đồng ý", "Hiệu trưởng chấp thuận"],
+      "relevant_article": "Điều 7, Khoản 2, điểm b"
+    },
+    {
+      "id": "H04", "category": "hard",
+      "question": "Hãy so sánh chi tiết sự khác biệt về khung giờ học (Time slots) giữa cơ sở 227 Nguyễn Văn Cừ (Quận 5) và cơ sở Linh Trung (Thủ Đức) đối với các tiết học buổi chiều? Đưa ra nhận xét về thời gian nghỉ chuyển tiết?",
+      "gold_answer": "Tại Nguyễn Văn Cừ, các tiết chiều bắt đầu từ tiết 7 (12g30-13g20), tiết 8 (13g20-14g10), tiết 9 (14g20-15g10), tiết 10 (15g10-16g00), tiết 11 (16g10-17g00), tiết 12 (17g00-17g50)[cite: 276]. Tại Linh Trung, ca chiều bắt đầu từ tiết 6 (12g30-13g20) đến tiết 10 (16g10-17g00)[cite: 86, 278]. Nhận xét: Giờ bắt đầu ca chiều đều là 12g30[cite: 276, 278]. Giữa tiết 8 và tiết 9 tại cơ sở Q5 có 10 phút nghỉ (14g10-14g20), giữa tiết 10 và 11 có 10 phút nghỉ, trong khi tại Linh Trung thời gian chuyển tiếp liên tục hoặc lệch block nghỉ[cite: 276, 278].",
+      "key_concepts": ["Nguyễn Văn Cừ tiết 7-12", "Linh Trung tiết 6-10", "ca chiều bắt đầu từ 12g30"],
+      "relevant_article": "Điều 6, Khoản 7"
+    },
+    {
+      "id": "H05", "category": "hard",
+      "question": "Một sinh viên không đạt (rớt/fail) một học phần tự chọn (Elective course) thì có bắt buộc phải học lại chính xác học phần đó hay không? Quy chế mở ra phương án xử lý học vụ nào khác cho SV?",
+      "gold_answer": "Sinh viên không đạt một học phần tự chọn không bắt buộc phải học lại duy nhất môn đó; quy chế cho phép SV có 2 lựa chọn: một là học lại chính học phần đó để cải thiện điểm, hai là có thể chủ động chọn học một học phần tự chọn khác tương đương thuộc danh mục quy định trong chương trình đào tạo để tích lũy thay thế[cite: 62, 245].",
+      "key_concepts": ["không bắt buộc học lại chính xác môn đó", "được chọn học môn tự chọn khác"],
+      "relevant_article": "Điều 4, Khoản 2, điểm c"
+    },
+    {
+      "id": "H06", "category": "hard",
+      "question": "Dựa trên Quy chế 1175, những điều kiện ràng buộc cốt lõi (core constraints) nào đảm bảo tính công khai, minh bạch và quyền lợi không bị ảnh hưởng bất lợi của sinh viên khi nhà trường muốn điều chỉnh Chương trình đào tạo (CTĐT)?",
+      "gold_answer": "Nhà trường phải tuân thủ nghiêm ngặt: (1) CTĐT phải được công khai rõ ràng trước khi tuyển sinh và khi bắt đầu khóa học[cite: 31, 202]; (2) Những thay đổi, điều chỉnh liên quan phải thực hiện theo đúng quy định hiện hành và bắt buộc công bố trước khi áp dụng[cite: 32, 203]; (3) Nguyên tắc tối cao là tuyệt đối không gây ra bất kỳ tác động tiêu cực hoặc bất lợi nào cho lộ trình học tập của sinh viên[cite: 32, 203].",
+      "key_concepts": ["công khai trước tuyển sinh", "công bố trước khi áp dụng", "không gây tác động bất lợi"],
+      "relevant_article": "Điều 2, Khoản 5"
+    },
+    {
+      "id": "H07", "category": "hard",
+      "question": "Bản chất của phương thức đào tạo theo tín chỉ (Credit-based system) tại HCMUS được định nghĩa dựa trên những đặc trưng vận hành cốt lõi nào?",
+      "gold_answer": "Bản chất là phương thức tổ chức đào tạo theo từng lớp học phần (không theo lớp niên chế), cho phép sinh viên chủ động tích lũy tín chỉ của từng học phần một cách cuốn chiếu và tự xây dựng, thực hiện chương trình đào tạo cá nhân hóa theo kế hoạch học tập của riêng mình, miễn là phù hợp với khung kế hoạch giảng dạy chung của Trường[cite: 60, 243].",
+      "key_concepts": ["từng lớp học phần", "tích lũy tín chỉ", "kế hoạch học tập cá nhân"],
+      "relevant_article": "Điều 4, Khoản 2, điểm a"
+    },
+    {
+      "id": "H08", "category": "hard",
+      "question": "Nếu quá thời hạn tối đa của khóa học (kể cả thời gian kéo dài theo quy định) mà sinh viên vẫn chưa thể tích lũy đủ số tín chỉ tốt nghiệp thì hệ thống quản lý đào tạo của trường sẽ tự động thực hiện chế tài học vụ nào?",
+      "gold_answer": "Khi quá thời hạn tối đa của khóa học theo quy định quy chế, sinh viên sẽ bị xử lý kỷ luật học vụ ở mức xóa tên khỏi danh sách sinh viên chính thức của Trường[cite: 37, 210].",
+      "key_concepts": ["quá thời hạn tối đa", "bị xóa tên khỏi danh sách sinh viên"],
+      "relevant_article": "Điều 2, Khoản 7, điểm b"
+    },
+    {
+      "id": "H09", "category": "hard",
+      "question": "Phân tích cơ chế kiểm soát chất lượng (quality assurance mechanisms) nội bộ đối với hoạt động giảng dạy của giảng viên và lớp học trực tuyến được quy định trong quy chế?",
+      "gold_answer": "Cơ chế bao gồm: (1) Hệ thống thanh tra, giám sát nội bộ của trường[cite: 103]; (2) Hệ thống cải tiến chất lượng liên tục dựa trên việc thu thập, phân tích và đánh giá ý kiến phản hồi trực tiếp từ người học[cite: 103]; (3) Hiệu trưởng ban hành quy định bắt buộc về việc lấy ý kiến phản hồi của SV về điều kiện bảo đảm chất lượng và phải thực hiện công khai kết quả phản hồi này (nội dung, mức độ, hình thức)[cite: 113].",
+      "key_concepts": ["thanh tra giám sát nội bộ", "lấy ý kiến phản hồi của người học", "công khai kết quả phản hồi"],
+      "relevant_article": "Điều 8, Khoản 1 và Khoản 3"
+    },
+    {
+      "id": "H10", "category": "hard",
+      "question": "Về mặt pháp lý học vụ, cấu trúc thông tin tối thiểu bắt buộc phải xuất hiện trong một bản Đề cương chi tiết học phần (Course Syllabus) bao gồm những hạng mục nào?",
+      "gold_answer": "Một đề cương chi tiết học phần chuẩn bắt buộc phải thể hiện rõ: mục tiêu; chuẩn đầu ra (CLOs); số tín chỉ; số tiết theo cấu trúc học phần; điều kiện tiên quyết/học trước/song hành (nếu có); nội dung giảng dạy chi tiết; phương pháp giảng dạy và hình thức đánh giá kết quả học tập; giáo trình, tài liệu tham khảo cùng các quy định bổ sung khác[cite: 49, 50, 51, 52, 53, 228, 229, 230, 231, 232].",
+      "key_concepts": ["chuẩn đầu ra", "cấu trúc số tiết", "phương pháp đánh giá", "giáo trình tài liệu tham khảo"],
+      "relevant_article": "Điều 3, Khoản 2"
+    },
+    {
+      "id": "H11", "category": "hard",
+      "question": "Đối với người học đã tốt nghiệp một trình độ khác hoặc một ngành học khác trước khi vào trường, khối lượng học tập thực tế (actual workload) khi theo học ngành mới sẽ được Hội đồng đào tạo xử lý dựa trên nguyên tắc nào?",
+      "gold_answer": "Khối lượng học tập thực tế được xác định trên cơ sở xem xét công nhận, hoặc tổ chức chuyển đổi các tín chỉ mà người học đã tích lũy hợp lệ từ trước, từ đó thực hiện miễn trừ các học phần tương đương trong chương trình đào tạo cũ sang chương trình đào tạo hiện tại[cite: 30, 201].",
+      "key_concepts": ["công nhận hoặc chuyển đổi tín chỉ", "miễn trừ học phần"],
+      "relevant_article": "Điều 2, Khoản 4"
+    },
+    {
+      "id": "H12", "category": "hard",
+      "question": "Sự khác biệt căn bản về địa điểm diễn ra hoạt động giảng dạy thông thường so với các hoạt động mang tính đặc thù (thực tập, trải nghiệm thực tế, online) của hình thức Đào tạo chính quy là gì?",
+      "gold_answer": "Các hoạt động giảng dạy thông thường cốt lõi bắt buộc phải được thực hiện trực tiếp tại khuôn viên của Trường[cite: 63, 248]. Ngược lại, những hoạt động mang tính đặc thù như thực hành, thực tập ngoài trường, trải nghiệm thực tế xã hội và giảng dạy trực tuyến (e-learning) thì hoàn toàn có thể linh hoạt tổ chức bên ngoài khuôn viên Trường[cite: 63, 248].",
+      "key_concepts": ["giảng dạy cốt lõi tại Trường", "thực tập/online thực hiện ngoài Trường"],
+      "relevant_article": "Điều 5, Khoản 1, điểm a"
+    },
+    {
+      "id": "H13", "category": "hard",
+      "question": "Hãy tổng hợp toàn bộ các thông tin học vụ quan trọng cấu thành nên một 'Kế hoạch học kỳ' (Semester plan) mà Phòng Đào tạo phải công bố công khai đến sinh viên?",
+      "gold_answer": "Kế hoạch học kỳ bao gồm đầy đủ các thông tin: kế hoạch mở các lớp học phần, hình thức dạy và học cụ thể (trực tiếp hoặc trực tuyến), lịch học chi tiết từng tuần, cùng lịch thi kiểm tra giữa kỳ/cuối kỳ của các học phần được tổ chức trong học kỳ đó[cite: 79, 80, 270].",
+      "key_concepts": ["kế hoạch mở lớp", "hình thức dạy (trực tiếp/trực tuyến)", "lịch học", "lịch thi kiểm tra"],
+      "relevant_article": "Điều 6, Khoản 5"
+    },
+    {
+      "id": "H14", "category": "hard",
+      "question": "Nêu điều kiện ràng buộc về mặt pháp lý phê duyệt (approval protocol) đối với phương pháp đánh giá, hình thức đánh giá và trọng số của các điểm thành phần môn học?",
+      "gold_answer": "Các yếu tố này bắt buộc phải được quy định rõ ràng trong đề cương chi tiết của mỗi học phần, sau đó phải được Hội đồng chuyên môn của Khoa thông qua và cuối cùng phải được Hiệu trưởng ký phê duyệt chính thức trước khi áp dụng[cite: 115].",
+      "key_concepts": ["quy định trong đề cương", "Khoa thông qua", "Hiệu trưởng phê duyệt"],
+      "relevant_article": "Điều 9, Khoản 1"
+    },
+    {
+      "id": "H15", "category": "hard",
+      "question": "Phân tích giới hạn về số tiết tự học/chuẩn bị bài của sinh viên tương ứng với 1 tiết học lý thuyết trên lớp dựa theo chuẩn thiết kế khối lượng tín chỉ?",
+      "gold_answer": "Mặc dù quy chế chỉ nêu rõ thời gian giảng dạy trực tiếp trên lớp của một tiết học là 50 phút [cite: 58, 237] và định nghĩa cấu trúc giờ lên lớp cho lý thuyết là 15 tiết/tín chỉ[cite: 55, 234], nhưng theo logic hệ thống tín chỉ quốc gia được tham chiếu làm 'Gold answers dựa trên tiêu chuẩn quy chế ĐT Việt Nam', để tiếp thu 1 tiết lý thuyết (50 phút) trên lớp, sinh viên cần dành ít nhất 2 tiết chuẩn bị và tự học ở nhà để hoàn thành khối lượng của 1 đơn vị tín chỉ.",
+      "key_concepts": ["50 phút giảng dạy", "15 tiết lý thuyết/tín chỉ", "tiêu chuẩn tự học"],
+      "relevant_article": "Điều 3, Khoản 3 & Khoản 4"
+    },
+    {
+      "id": "H10", "category": "hard",
+      "question": "Mục tiêu giáo dục cốt lõi và nội dung mang tính bắt buộc của khối kiến thức Giáo dục đại cương (General Education) được quy chế quy định nhằm trang bị điều gì cho người học?",
+      "gold_answer": "Nhằm trang bị cho sinh viên nền học vấn rộng; có thế giới quan khoa học và nhân sinh quan đúng đắn; hiểu biết sâu sắc về tự nhiên, xã hội và con người; nắm vững phương pháp tư duy khoa học; có đạo đức tốt và nhận thức rõ trách nhiệm công dân đối với Tổ quốc[cite: 24, 25, 26, 27, 196, 197, 198].",
+      "key_concepts": ["nền học vấn rộng", "thế giới quan khoa học", "tư duy khoa học", "trách nhiệm công dân"],
+      "relevant_article": "Điều 2, Khoản 3"
+    },
+    {
+      "id": "H17", "category": "hard",
+      "question": "Trường hợp một ngành học thuộc danh mục 'ngành đào tạo ưu tiên phục vụ nguồn nhân lực phát triển kinh tế - xã hội', việc tổ chức đào tạo sẽ tuân theo chỉ dẫn của cơ quan nào?",
+      "gold_answer": "Trường sẽ thực hiện tổ chức và áp dụng các hình thức đào tạo phù hợp theo đúng văn bản hướng dẫn chuyên biệt của Bộ Giáo dục và Đào tạo[cite: 66, 251].",
+      "key_concepts": ["ngành đào tạo ưu tiên", "hướng dẫn của Bộ Giáo dục và Đào tạo"],
+      "relevant_article": "Điều 5, Khoản 2"
+    },
+    {
+      "id": "H18", "category": "hard",
+      "question": "Lịch trình học (Thời khóa biểu) của các lớp học phần bình thường được phân bổ như thế nào trong suốt một học kỳ nhằm đảm bảo tính sư phạm?",
+      "gold_answer": "Thời khóa biểu của các lớp học phần bình thường bắt buộc phải được bố trí, sắp xếp đều đặn trong tất cả các tuần của học kỳ đó chứ không được dồn lịch một cách bất hợp lý[cite: 82, 273].",
+      "key_concepts": ["bố trí đều", "các tuần của học kỳ"],
+      "relevant_article": "Điều 6, Khoản 6"
+    },
+    {
+      "id": "H19", "category": "hard",
+      "question": "Hãy giải thích thuật ngữ 'Học phần song hành' (Co-requisite) và quy định bắt buộc đối với sinh viên khi tiến hành đăng ký nhóm học phần này trên hệ thống?",
+      "gold_answer": "Học phần song hành là mối quan hệ ràng buộc kép giữa hai học phần chuyên môn. Khi sinh viên tiến hành đăng ký học học phần này trên hệ thống thì bắt buộc đồng thời phải đăng ký học học phần kia trong cùng một học kỳ[cite: 46, 225].",
+      "key_concepts": ["ràng buộc kép", "bắt buộc phải đăng ký học phần kia"],
+      "relevant_article": "Điều 3, Khoản 1, điểm c"
+    },
+    {
+      "id": "H20", "category": "hard",
+      "question": "Tầm quan trọng và vai trò định hướng của 'Kế hoạch học tập chuẩn toàn khoá' (Model curriculum) đối với sinh viên được quy chế thể hiện ở khía cạnh nào?",
+      "gold_answer": "Đối với mỗi hình thức đào tạo, nhà trường bắt buộc phải cung cấp một kế hoạch học tập chuẩn toàn khoá nhằm định hướng lộ trình, sơ đồ cây môn học rõ ràng cho sinh viên, đảm bảo đa số sinh viên có thể hoàn thành chương trình thuận lợi[cite: 33, 34, 204, 205].",
+      "key_concepts": ["định hướng lộ trình", "phù hợp thời gian quy định", "đảm bảo đa số hoàn thành"],
+      "relevant_article": "Điều 2, Khoản 6"
+    }
+  ]
+}
