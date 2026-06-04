@@ -67,6 +67,14 @@ def init_db() -> None:
             CREATE INDEX IF NOT EXISTS idx_comments_node
             ON comments(node_id)
         """)
+        conn.execute("""
+            CREATE TABLE IF NOT EXISTS likes (
+                node_id      TEXT NOT NULL,
+                session_id   TEXT NOT NULL,
+                created_at   REAL NOT NULL,
+                PRIMARY KEY (node_id, session_id)
+            )
+        """)
         # WAL mode: concurrent reads + writes
         conn.execute("PRAGMA journal_mode=WAL")
         conn.execute("PRAGMA synchronous=NORMAL")
@@ -274,3 +282,41 @@ def delete_old_comments() -> int:
 def _today_start_ts() -> float:
     today = datetime.now().date()
     return datetime.combine(today, dt_time.min).timestamp()
+
+# ---------------------------------------------------------------------------
+# LIKES CRUD
+# ---------------------------------------------------------------------------
+
+def toggle_like(node_id: str, session_id: str) -> bool:
+    """Toggle like. Trả về True nếu đã like (vừa thêm), False nếu unlike (vừa xóa)."""
+    anon_id = anonymize_session_id(session_id)
+    now = time.time()
+    with _connect() as conn:
+        row = conn.execute(
+            "SELECT 1 FROM likes WHERE node_id=? AND session_id=?",
+            (node_id, anon_id)
+        ).fetchone()
+        
+        if row:
+            conn.execute("DELETE FROM likes WHERE node_id=? AND session_id=?", (node_id, anon_id))
+            return False
+        else:
+            conn.execute("INSERT INTO likes (node_id, session_id, created_at) VALUES (?, ?, ?)", (node_id, anon_id, now))
+            return True
+
+def get_likes_info(node_id: str, session_id: Optional[str]) -> tuple[int, bool]:
+    """Trả về (tổng số like, người dùng hiện tại đã like chưa)."""
+    anon_id = anonymize_session_id(session_id) if session_id else None
+    has_liked = False
+    
+    with _connect() as conn:
+        row_count = conn.execute("SELECT COUNT(*) as c FROM likes WHERE node_id=?", (node_id,)).fetchone()
+        total_likes = row_count["c"] if row_count else 0
+        
+        if anon_id:
+            row_has = conn.execute("SELECT 1 FROM likes WHERE node_id=? AND session_id=?", (node_id, anon_id)).fetchone()
+            if row_has:
+                has_liked = True
+                
+    return total_likes, has_liked
+

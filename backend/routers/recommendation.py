@@ -467,6 +467,118 @@ def api_train_models(
 
 
 # ===========================================================================
+# RATINGS & COMMENTS
+# ===========================================================================
+
+from ai.recommendation_system.engine import storage
+
+@router.post("/api_submit_rating", tags=["Recommendation"])
+def submit_rating(
+    node_id:    str = Query(..., description="Tên địa điểm cần đánh giá"),
+    rating:     float = Query(..., ge=1.0, le=5.0, description="Đánh giá từ 1 đến 5 sao"),
+    session_id: Optional[str] = Query(None, description="Session ID của người dùng"),
+):
+    """
+    Nhận đánh giá sao (explicit rating).
+    """
+    if node_id not in G.nodes:
+        raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+
+    profile = get_session_profile(session_id)
+    ratings = profile.setdefault("ratings", {})
+    ratings[node_id] = float(rating)
+    
+    return {
+        "status": "success",
+        "message": f"Đã ghi nhận đánh giá {rating} sao cho {node_id}.",
+        "ratings": ratings
+    }
+
+@router.get("/api_get_comments", tags=["Recommendation"])
+def api_get_comments(node_id: str = Query(..., description="Tên địa điểm")):
+    """Lấy danh sách bình luận của một địa điểm."""
+    if node_id not in G.nodes:
+        raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+    storage.init_db()
+    comments = storage.get_comments(node_id)
+    return {
+        "status": "success", 
+        "comments": [
+            {"session_id": c["session_id"], "content": c["content"], "timestamp": c["created_at"]} 
+            for c in comments
+        ]
+    }
+
+@router.post("/api_submit_comment", tags=["Recommendation"])
+def api_submit_comment(
+    node_id: str = Query(..., description="Tên địa điểm"),
+    content: str = Query(..., max_length=180, description="Nội dung bình luận"),
+    session_id: Optional[str] = Query(None, description="Session ID của người dùng"),
+):
+    """Gửi bình luận mới cho một địa điểm."""
+    if node_id not in G.nodes:
+        raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+    if not content.strip():
+        raise HTTPException(status_code=400, detail="Bình luận không được để trống")
+    if not session_id or session_id in ("null", "undefined", ""):
+        session_id = "default"
+        
+    storage.init_db()
+    storage.save_comment(node_id, session_id, content.strip())
+    return {"status": "success", "message": f"Đã gửi bình luận cho {node_id}."}
+
+
+@router.get("/api_get_node_stats", tags=["Recommendation"])
+def api_get_node_stats(
+    node_id: str = Query(..., description="Tên địa điểm"),
+    session_id: Optional[str] = Query(None, description="Session ID của người dùng")
+):
+    if node_id not in G.nodes:
+        raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+        
+    storage.init_db()
+    # Lấy comment
+    comments = storage.get_comments(node_id)
+    comments_count = len(comments)
+    
+    # Lấy like
+    likes_count, has_liked = storage.get_likes_info(node_id, session_id)
+    
+    # Lấy ratings
+    profiles = storage.get_all_profiles()
+    ratings = [p["ratings"][node_id] for p in profiles.values() if "ratings" in p and node_id in p["ratings"]]
+    ratings_count = len(ratings)
+    
+    return {
+        "status": "success",
+        "comments_count": comments_count,
+        "likes_count": likes_count,
+        "has_liked": has_liked,
+        "ratings_count": ratings_count
+    }
+
+
+@router.post("/api_toggle_like", tags=["Recommendation"])
+def api_toggle_like(
+    node_id: str = Query(..., description="Tên địa điểm"),
+    session_id: Optional[str] = Query(None, description="Session ID của người dùng")
+):
+    if node_id not in G.nodes:
+        raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+    if not session_id or session_id in ("null", "undefined", ""):
+        session_id = "default"
+        
+    storage.init_db()
+    has_liked = storage.toggle_like(node_id, session_id)
+    
+    return {
+        "status": "success",
+        "has_liked": has_liked
+    }
+
+
+
+# ===========================================================================
 # WEB UI — Giao diện bản đồ cá nhân hóa AI
 # ===========================================================================
 

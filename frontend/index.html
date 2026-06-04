@@ -10,7 +10,7 @@
 </head>
 <body class="bg-slate-900 text-slate-100 h-screen w-screen overflow-hidden font-sans">
 
-    <div id="auth-view" class="relative flex flex-col h-full w-full px-4 py-8 z-20 transition-all duration-500 overflow-y-auto overflow-x-hidden">
+    <div id="auth-view" class="hidden relative flex flex-col h-full w-full px-4 py-8 z-20 transition-all duration-500 overflow-y-auto overflow-x-hidden">
         <!-- Hiệu ứng ánh sáng nền (Ambient Glow) -->
         <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
@@ -40,7 +40,7 @@
                 </div>
             </div>
 
-            <form id="form-login" class="space-y-4">
+            <form id="form-login" onsubmit="event.preventDefault(); submitLogin(event, 'password')" class="space-y-4">
                 <div>
                     <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Đăng Nhập</label>
                     <input type="email" id="login-email" required placeholder="example@domain.com" 
@@ -356,7 +356,7 @@
 
     <!-- Tiktok Swipe Explore Modal -->
     <div id="tiktok-modal" class="hidden fixed inset-0 z-[60] bg-black/95 flex items-center justify-center backdrop-blur-xl">
-        <button onclick="closeTiktokExplore()" class="absolute top-6 left-6 text-white/50 hover:text-white transition-colors z-50 p-2 bg-white/10 rounded-full">
+        <button type="button" onclick="closeTiktokExplore()" class="absolute top-6 left-6 text-white/50 hover:text-white transition-colors z-50 p-2 bg-white/10 rounded-full">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
         </button>
 
@@ -366,6 +366,14 @@
             <div id="tiktok-img-wrapper" class="absolute inset-0 bg-slate-800 flex items-center justify-center overflow-hidden">
                 <img id="tiktok-img" src="" class="w-full h-full object-cover transition-transform duration-700 opacity-0" alt="Location Image">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
+            </div>
+
+            <!-- Empty State (Khi không có gợi ý) -->
+            <div id="tiktok-empty-state" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-md">
+                <svg class="w-16 h-16 text-slate-500 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <h3 class="text-xl font-bold text-white mb-2">Chưa có gợi ý nào</h3>
+                <p class="text-sm text-slate-400 mb-6 max-w-sm">Có thể do hiện tại đã quá khuya hoặc các khu vực đang đóng cửa. Vui lòng quay lại sau nhé!</p>
+                <button type="button" onclick="closeTiktokExplore()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">Quay lại Bản đồ</button>
             </div>
 
             <!-- Content -->
@@ -382,14 +390,77 @@
                 </div>
 
                 <div class="flex items-center gap-4 mt-6">
-                    <button onclick="swipeTiktok('left')" class="flex-1 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2">
+                    <button type="button" onclick="swipeTiktok('left')" class="flex-1 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                         Bỏ qua
                     </button>
-                    <button onclick="swipeTiktok('right')" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3.5 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
+                    <button type="button" onclick="swipeTiktok('right')" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3.5 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
                         Đến đây
                     </button>
+                </div>
+            </div>
+            
+            <!-- Action Side Bar cho Tiktok -->
+            <div class="absolute right-4 bottom-32 z-20 flex flex-col gap-5 items-center">
+                <!-- Nút Yêu thích (Tym) -->
+                <button type="button" onclick="likeTiktokNode()" class="flex flex-col items-center group">
+                    <div id="tiktok-like-btn" class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg relative overflow-hidden">
+                        <!-- Hiệu ứng tym bay -->
+                        <div id="heart-burst" class="absolute inset-0 pointer-events-none"></div>
+                        <svg class="w-6 h-6 transition-transform group-hover:scale-110 group-active:scale-90" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                    </div>
+                    <span id="tiktok-likes-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Tym</span>
+                </button>
+                
+                <!-- Bình luận -->
+                <button type="button" onclick="event.stopPropagation(); openTiktokComments()" class="flex flex-col items-center group">
+                    <div class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                    </div>
+                    <span id="tiktok-comments-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">B.Luận</span>
+                </button>
+
+                <!-- Đánh giá -->
+                <button type="button" onclick="event.stopPropagation(); openTiktokRating()" class="flex flex-col items-center group">
+                    <div class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                    </div>
+                    <span id="tiktok-ratings-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Đ.Giá</span>
+                </button>
+            </div>
+
+            <!-- Tiktok Comments Modal -->
+            <div id="tiktok-comments-modal" onclick="event.stopPropagation()" class="hidden absolute inset-0 z-[70] bg-slate-900/95 backdrop-blur-md flex-col transition-all duration-300">
+                <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
+                    <h3 class="text-lg font-bold text-white">Bình luận</h3>
+                    <button type="button" onclick="closeTiktokComments()" class="text-slate-400 hover:text-white p-2">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+                <div id="tiktok-comments-list" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm custom-scrollbar">
+                    <!-- comments go here -->
+                </div>
+                <div class="p-4 border-t border-slate-700 bg-slate-800 flex gap-2">
+                    <input type="text" id="tiktok-comment-input" onkeypress="if(event.key === 'Enter') submitTiktokComment()" placeholder="Thêm bình luận..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 text-white">
+                    <button type="button" onclick="submitTiktokComment()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold transition-all">Gửi</button>
+                </div>
+            </div>
+
+            <!-- Tiktok Rating Modal -->
+            <div id="tiktok-rating-modal" class="hidden absolute inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center">
+                <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm flex flex-col items-center">
+                    <h3 class="text-lg font-bold text-white mb-4">Đánh giá địa điểm này</h3>
+                    <div class="flex gap-2 mb-6" id="tiktok-stars-container">
+                        <button type="button" onclick="setTiktokRating(1)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                        <button type="button" onclick="setTiktokRating(2)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                        <button type="button" onclick="setTiktokRating(3)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                        <button type="button" onclick="setTiktokRating(4)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                        <button type="button" onclick="setTiktokRating(5)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                    </div>
+                    <div class="flex gap-4 w-full">
+                        <button type="button" onclick="closeTiktokRating()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-xl font-bold transition-all">Hủy</button>
+                    </div>
                 </div>
             </div>
             

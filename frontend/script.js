@@ -191,6 +191,7 @@ function captureFaceBase64() {
 }
 
 async function verifyAuthTokenState() {
+    const authView = document.getElementById("auth-view");
     const token = localStorage.getItem("token");
     if (token) {
         try {
@@ -202,10 +203,14 @@ async function verifyAuthTokenState() {
                 activateMainDashboardView(userData);
             } else {
                 localStorage.removeItem("token");
+                authView.classList.remove("hidden");
             }
         } catch (e) {
             showToast("Mất kết nối gateway backend", "error");
+            authView.classList.remove("hidden");
         }
+    } else {
+        authView.classList.remove("hidden");
     }
 }
 
@@ -1271,9 +1276,18 @@ async function openTiktokExplore() {
             
             document.getElementById('tiktok-loading').classList.add('hidden');
             document.getElementById('tiktok-card-container').classList.remove('opacity-0');
+            
+            const emptyState = document.getElementById('tiktok-empty-state');
+            if (emptyState) emptyState.classList.add('hidden');
         } else {
-            showToast('Không tìm thấy gợi ý nào', 'error');
-            closeTiktokExplore();
+            // Hiển thị giao diện rỗng thay vì đóng ngay lập tức
+            document.getElementById('tiktok-loading').classList.add('hidden');
+            document.getElementById('tiktok-card-container').classList.remove('opacity-0');
+            
+            const emptyState = document.getElementById('tiktok-empty-state');
+            if (emptyState) emptyState.classList.remove('hidden');
+            
+            showToast('Không có gợi ý nào vào lúc này', 'warning');
         }
     } catch (error) {
         console.error(error);
@@ -1324,7 +1338,38 @@ function renderTiktokCard() {
                 amenitiesEl.innerHTML += `<span class="bg-white/20 text-white text-[9px] px-2 py-0.5 rounded backdrop-blur-md">${a}</span>`;
             });
         }
+        
+        // Cập nhật số liệu (tym, bình luận, đánh giá)
+        loadTiktokNodeStats(rec.node);
+        
     }, 300);
+}
+
+async function loadTiktokNodeStats(node) {
+    const emailInput = document.getElementById('login-email');
+    const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
+    try {
+        const res = await fetch(`${BACKEND_URL}/map/api_get_node_stats?node_id=${node}&session_id=${session_id}`);
+        const data = await res.json();
+        if (data.status === 'success') {
+            document.getElementById('tiktok-likes-count').textContent = data.likes_count;
+            document.getElementById('tiktok-comments-count').textContent = data.comments_count;
+            document.getElementById('tiktok-ratings-count').textContent = data.ratings_count;
+            
+            const btnLike = document.getElementById("tiktok-like-btn");
+            if (btnLike) {
+                if (data.has_liked) {
+                    btnLike.classList.add("bg-rose-500", "border-rose-500");
+                    btnLike.classList.remove("bg-slate-800/80");
+                } else {
+                    btnLike.classList.remove("bg-rose-500", "border-rose-500");
+                    btnLike.classList.add("bg-slate-800/80");
+                }
+            }
+        }
+    } catch(e) {
+        console.error("Lỗi khi tải thống kê:", e);
+    }
 }
 
 function swipeTiktok(direction) {
@@ -1383,5 +1428,170 @@ function toggleMobilePanels() {
     if (container) {
         container.classList.toggle("hidden");
         container.classList.toggle("flex");
+    }
+}
+
+// ==========================================
+// TIKTOK ACTION LOGIC (Like, Comment, Rating)
+// ==========================================
+
+async function likeTiktokNode() {
+    const emailInput = document.getElementById('login-email');
+    const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
+    if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
+    const node = tiktokRecommendations[currentTiktokIndex].node;
+    
+    try {
+        const url = `${BACKEND_URL}/map/api_toggle_like?node_id=${node}&session_id=${session_id}`;
+        const res = await fetch(url, { method: "POST" });
+        const data = await res.json();
+        
+        if (data.status === 'success') {
+            // Cập nhật thống kê ngay lập tức
+            loadTiktokNodeStats(node);
+            
+            // Hiện hiệu ứng tim bay nếu vừa thả tim
+            if (data.has_liked) {
+                const burst = document.getElementById('heart-burst');
+                if (burst) {
+                    const heart = document.createElement('div');
+                    heart.innerHTML = '💖';
+                    heart.className = 'absolute inset-0 flex items-center justify-center text-xl animate-ping opacity-0';
+                    burst.appendChild(heart);
+                    setTimeout(() => heart.remove(), 1000);
+                }
+            }
+        } else {
+            showToast("Lỗi khi thả tim", "error");
+        }
+    } catch(e) {
+        showToast("Lỗi kết nối khi thả tim", "error");
+    }
+}
+
+function openTiktokComments() {
+    if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
+    const node = tiktokRecommendations[currentTiktokIndex].node;
+    const modal = document.getElementById("tiktok-comments-modal");
+    if (modal) {
+        modal.classList.remove("hidden");
+        // Trigger reflow
+        void modal.offsetWidth;
+        modal.classList.remove("translate-y-full");
+    }
+    loadTiktokComments(node);
+}
+
+function closeTiktokComments() {
+    const modal = document.getElementById("tiktok-comments-modal");
+    if (modal) {
+        modal.classList.add("translate-y-full");
+        setTimeout(() => {
+            modal.classList.add("hidden");
+        }, 300);
+    }
+}
+
+async function loadTiktokComments(node) {
+    const listEl = document.getElementById("tiktok-comments-list");
+    if (!listEl) return;
+    listEl.innerHTML = `<div class="text-center text-slate-400 mt-4">Đang tải bình luận...</div>`;
+    try {
+        const url = `${BACKEND_URL}/map/api_get_comments?node_id=${node}`;
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        listEl.innerHTML = "";
+        if (data.status === "success" && data.comments.length > 0) {
+            data.comments.forEach(c => {
+                const date = new Date(c.timestamp * 1000).toLocaleString('vi-VN', { hour: '2-digit', minute: '2-digit', day: '2-digit', month: '2-digit' });
+                listEl.innerHTML += `
+                    <div class="bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="text-xs text-blue-400 font-bold">${c.session_id.split('@')[0]}</span>
+                            <span class="text-[10px] text-slate-500">${date}</span>
+                        </div>
+                        <p class="text-sm text-slate-200">${c.content}</p>
+                    </div>
+                `;
+            });
+        } else {
+            listEl.innerHTML = `<div class="text-center text-slate-400 text-xs mt-4">Chưa có bình luận nào. Hãy là người đầu tiên!</div>`;
+        }
+    } catch(e) {
+        listEl.innerHTML = `<div class="text-center text-rose-400 text-xs mt-4">Lỗi khi tải bình luận.</div>`;
+    }
+}
+
+async function submitTiktokComment() {
+    const emailInput = document.getElementById('login-email');
+    const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
+    if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
+    const node = tiktokRecommendations[currentTiktokIndex].node;
+    
+    const input = document.getElementById("tiktok-comment-input");
+    const content = input.value.trim();
+    if (!content) {
+        showToast("Vui lòng nhập bình luận", "error");
+        return;
+    }
+    
+    try {
+        const url = `${BACKEND_URL}/map/api_submit_comment?node_id=${node}&content=${encodeURIComponent(content)}&session_id=${session_id}`;
+        const res = await fetch(url, { method: "POST" });
+        if (res.ok) {
+            input.value = "";
+            showToast("Đã gửi bình luận!", "success");
+            loadTiktokComments(node);
+            loadTiktokNodeStats(node);
+        } else {
+            showToast("Lỗi khi gửi bình luận", "error");
+        }
+    } catch(e) {
+        showToast("Lỗi kết nối", "error");
+    }
+}
+
+function openTiktokRating() {
+    if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
+    const modal = document.getElementById("tiktok-rating-modal");
+    if (modal) modal.classList.remove("hidden");
+    
+    const stars = document.querySelectorAll(".tiktok-star");
+    stars.forEach(s => s.classList.remove("text-yellow-400"));
+}
+
+function closeTiktokRating() {
+    const modal = document.getElementById("tiktok-rating-modal");
+    if (modal) modal.classList.add("hidden");
+}
+
+async function setTiktokRating(rating) {
+    const emailInput = document.getElementById('login-email');
+    const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
+    if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
+    const node = tiktokRecommendations[currentTiktokIndex].node;
+    
+    const stars = document.querySelectorAll(".tiktok-star");
+    stars.forEach((s, idx) => {
+        if (idx < rating) {
+            s.classList.add("text-yellow-400");
+        } else {
+            s.classList.remove("text-yellow-400");
+        }
+    });
+    
+    try {
+        const url = `${BACKEND_URL}/map/api_submit_rating?node_id=${node}&rating=${rating}&session_id=${session_id}`;
+        const res = await fetch(url, { method: "POST" });
+        if (res.ok) {
+            showToast(`Đã đánh giá ${rating} sao!`, "success");
+            loadTiktokNodeStats(node);
+            setTimeout(closeTiktokRating, 500);
+        } else {
+            showToast("Lỗi khi đánh giá", "error");
+        }
+    } catch(e) {
+        showToast("Lỗi kết nối", "error");
     }
 }
