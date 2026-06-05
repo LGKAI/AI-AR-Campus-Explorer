@@ -24,6 +24,7 @@ if khoa_root_dir not in sys.path:
 
 from fastapi import APIRouter, HTTPException, Query, Depends, status
 from fastapi.responses import HTMLResponse
+from core.config import db
 from typing import Optional, List, Dict, Any
 from pydantic import BaseModel
 
@@ -467,10 +468,8 @@ def api_train_models(
 
 
 # ===========================================================================
-# RATINGS & COMMENTS
+# RATINGS & COMMENTS (FIREBASE MIGRATION)
 # ===========================================================================
-
-from ai.recommendation_system.engine import storage
 
 @router.post("/api_submit_rating", tags=["Recommendation"])
 def submit_rating(
@@ -479,35 +478,60 @@ def submit_rating(
     session_id: Optional[str] = Query(None, description="Session ID của người dùng"),
 ):
     """
-    Nhận đánh giá sao (explicit rating).
+    Nhận đánh giá sao (explicit rating) lưu lên Firebase.
     """
     if node_id not in G.nodes:
         raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
+    if not session_id or session_id in ("null", "undefined", ""):
+        session_id = "default"
 
-    profile = get_session_profile(session_id)
-    ratings = profile.setdefault("ratings", {})
-    ratings[node_id] = float(rating)
-    
-    return {
-        "status": "success",
-        "message": f"Đã ghi nhận đánh giá {rating} sao cho {node_id}.",
-        "ratings": ratings
-    }
+    try:
+        db.collection("LOCATION_TIKTOK").document(node_id).collection("ratings").document(session_id).set({
+            "rating": float(rating),
+            "timestamp": datetime.utcnow().isoformat()
+        })
+        return {
+            "status": "success",
+            "message": f"Đã ghi nhận đánh giá {rating} sao cho {node_id}."
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.get("/api_get_comments", tags=["Recommendation"])
 def api_get_comments(node_id: str = Query(..., description="Tên địa điểm")):
-    """Lấy danh sách bình luận của một địa điểm."""
+    """Lấy danh sách bình luận của một địa điểm từ Firebase."""
     if node_id not in G.nodes:
         raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
-    storage.init_db()
-    comments = storage.get_comments(node_id)
-    return {
-        "status": "success", 
-        "comments": [
-            {"session_id": c["session_id"], "content": c["content"], "timestamp": c["created_at"]} 
-            for c in comments
-        ]
-    }
+    
+    try:
+        docs = db.collection("LOCATION_TIKTOK").document(node_id).collection("comments").order_by("timestamp", direction="DESCENDING").limit(50).get()
+        comments = []
+        for doc in docs:
+            d = doc.to_dict()
+            raw_session = d.get("session_id", "Ẩn danh")
+            
+            if "@" in raw_session:
+                display_name = "user" + raw_session.split("@")[0]
+            elif raw_session != "Ẩn danh" and raw_session != "default":
+                display_name = "user" + raw_session
+            elif raw_session == "default":
+                display_name = "user_khach"
+            else:
+                display_name = "Ẩn danh"
+                
+            comments.append({
+                "session_id": display_name,
+                "content": d.get("content", ""),
+                "timestamp": d.get("timestamp", 0)
+            })
+        return {
+            "status": "success", 
+            "comments": comments
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
 
 @router.post("/api_submit_comment", tags=["Recommendation"])
 def api_submit_comment(
@@ -515,7 +539,7 @@ def api_submit_comment(
     content: str = Query(..., max_length=180, description="Nội dung bình luận"),
     session_id: Optional[str] = Query(None, description="Session ID của người dùng"),
 ):
-    """Gửi bình luận mới cho một địa điểm."""
+    """Gửi bình luận mới cho một địa điểm lên Firebase."""
     if node_id not in G.nodes:
         raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
     if not content.strip():
@@ -523,9 +547,15 @@ def api_submit_comment(
     if not session_id or session_id in ("null", "undefined", ""):
         session_id = "default"
         
-    storage.init_db()
-    storage.save_comment(node_id, session_id, content.strip())
-    return {"status": "success", "message": f"Đã gửi bình luận cho {node_id}."}
+    try:
+        db.collection("LOCATION_TIKTOK").document(node_id).collection("comments").add({
+            "session_id": session_id,
+            "content": content.strip(),
+            "timestamp": datetime.utcnow().isoformat()
+        })
+        return {"status": "success", "message": f"Đã gửi bình luận cho {node_id}."}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("/api_get_node_stats", tags=["Recommendation"])
@@ -536,26 +566,46 @@ def api_get_node_stats(
     if node_id not in G.nodes:
         raise HTTPException(status_code=400, detail=f"Node không tồn tại: '{node_id}'")
         
-    storage.init_db()
-    # Lấy comment
-    comments = storage.get_comments(node_id)
-    comments_count = len(comments)
-    
-    # Lấy like
-    likes_count, has_liked = storage.get_likes_info(node_id, session_id)
-    
-    # Lấy ratings
-    profiles = storage.get_all_profiles()
-    ratings = [p["ratings"][node_id] for p in profiles.values() if "ratings" in p and node_id in p["ratings"]]
-    ratings_count = len(ratings)
-    
-    return {
-        "status": "success",
-        "comments_count": comments_count,
-        "likes_count": likes_count,
-        "has_liked": has_liked,
-        "ratings_count": ratings_count
-    }
+    try:
+        node_ref = db.collection("LOCATION_TIKTOK").document(node_id)
+        
+        # Get comments
+        comments_docs = node_ref.collection("comments").get()
+        comments_count = len(comments_docs)
+        
+        # Get likes
+        likes_docs = node_ref.collection("likes").get()
+        likes_count = len(likes_docs)
+        has_liked = False
+        if session_id and session_id not in ("null", "undefined", ""):
+            if any(l.id == session_id for l in likes_docs):
+                has_liked = True
+                
+        # Get ratings
+        ratings_docs = node_ref.collection("ratings").get()
+        ratings_count = len(ratings_docs)
+        total_rating = 0.0
+        user_rating = 0.0
+        for r in ratings_docs:
+            rd = r.to_dict()
+            val = rd.get("rating", 0)
+            total_rating += val
+            if session_id and r.id == session_id:
+                user_rating = val
+                
+        average_rating = round(total_rating / ratings_count, 1) if ratings_count > 0 else 0.0
+        
+        return {
+            "status": "success",
+            "comments_count": comments_count,
+            "likes_count": likes_count,
+            "has_liked": has_liked,
+            "ratings_count": ratings_count,
+            "average_rating": average_rating,
+            "user_rating": user_rating
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.post("/api_toggle_like", tags=["Recommendation"])
@@ -568,13 +618,24 @@ def api_toggle_like(
     if not session_id or session_id in ("null", "undefined", ""):
         session_id = "default"
         
-    storage.init_db()
-    has_liked = storage.toggle_like(node_id, session_id)
-    
-    return {
-        "status": "success",
-        "has_liked": has_liked
-    }
+    try:
+        like_ref = db.collection("LOCATION_TIKTOK").document(node_id).collection("likes").document(session_id)
+        like_doc = like_ref.get()
+        
+        has_liked = False
+        if like_doc.exists:
+            like_ref.delete()
+            has_liked = False
+        else:
+            like_ref.set({"timestamp": datetime.utcnow().isoformat()})
+            has_liked = True
+            
+        return {
+            "status": "success",
+            "has_liked": has_liked
+        }
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 

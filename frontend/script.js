@@ -1250,27 +1250,39 @@ let tiktokRecommendations = [];
 let currentTiktokIndex = 0;
 
 async function openTiktokExplore() {
-    // Nếu chưa có GPS, lấy tọa độ mặc định của trường (Tòa D) làm mốc
-    let targetLat = 10.878000;
-    let targetLon = 106.798750;
-    if (currentGPSPos) {
-        targetLat = currentGPSPos.lat;
-        targetLon = currentGPSPos.lon;
-    }
-    
     // Hiện loading
     document.getElementById('tiktok-modal').classList.remove('hidden');
     document.getElementById('tiktok-loading').classList.remove('hidden');
     document.getElementById('tiktok-card-container').classList.add('opacity-0');
     
     try {
-        const emailInput = document.getElementById('login-email');
-        const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
-        const res = await fetch(`${BACKEND_URL}/map/api_recommend?current_lat=${targetLat}&current_lon=${targetLon}&limit=10&session_id=${session_id}`);
-        const data = await res.json();
-        
-        if (data.status === 'success' && data.recommendations && data.recommendations.length > 0) {
-            tiktokRecommendations = data.recommendations;
+        if (graphData && graphData.nodes && graphData.nodes.length > 0) {
+            // Lấy tất cả các địa điểm và xáo trộn (shuffle)
+            let allNodes = [...graphData.nodes];
+            for (let i = allNodes.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [allNodes[i], allNodes[j]] = [allNodes[j], allNodes[i]];
+            }
+            
+            tiktokRecommendations = allNodes.map(n => {
+                let ams = [];
+                if (n.features) {
+                    if (n.features.parking) ams.push("Bãi xe");
+                    if (n.features.wc) ams.push("WC");
+                    if (n.features.water) ams.push("Nước uống");
+                    if (n.features.elevator) ams.push("Thang máy");
+                }
+                
+                return {
+                    node: n.id,
+                    tagline: n.tagline || 'Khu vực trong khuôn viên trường',
+                    function_summary: n.function_summary || '',
+                    image_url: n.image_url || '',
+                    amenities: ams,
+                    score: 100
+                };
+            });
+            
             currentTiktokIndex = 0;
             renderTiktokCard();
             
@@ -1286,12 +1298,10 @@ async function openTiktokExplore() {
             
             const emptyState = document.getElementById('tiktok-empty-state');
             if (emptyState) emptyState.classList.remove('hidden');
-            
-            showToast('Không có gợi ý nào vào lúc này', 'warning');
         }
     } catch (error) {
         console.error(error);
-        showToast('Lỗi khi tải gợi ý Tiktok', 'error');
+        showToast('Lỗi khi tải Tiktok Explore', 'error');
         closeTiktokExplore();
     }
 }
@@ -1345,6 +1355,8 @@ function renderTiktokCard() {
     }, 300);
 }
 
+let currentTiktokUserRating = 0; // Lưu tạm rating của user hiện tại
+
 async function loadTiktokNodeStats(node) {
     const emailInput = document.getElementById('login-email');
     const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
@@ -1354,7 +1366,13 @@ async function loadTiktokNodeStats(node) {
         if (data.status === 'success') {
             document.getElementById('tiktok-likes-count').textContent = data.likes_count;
             document.getElementById('tiktok-comments-count').textContent = data.comments_count;
-            document.getElementById('tiktok-ratings-count').textContent = data.ratings_count;
+            
+            // Cập nhật số sao trung bình và số lượt đánh giá
+            const ratingText = data.ratings_count > 0 ? `${data.average_rating}⭐ (${data.ratings_count})` : "Đ.Giá";
+            document.getElementById('tiktok-ratings-count').textContent = ratingText;
+            
+            // Lưu rating của user cho modal
+            currentTiktokUserRating = data.user_rating || 0;
             
             const btnLike = document.getElementById("tiktok-like-btn");
             if (btnLike) {
@@ -1558,7 +1576,13 @@ function openTiktokRating() {
     if (modal) modal.classList.remove("hidden");
     
     const stars = document.querySelectorAll(".tiktok-star");
-    stars.forEach(s => s.classList.remove("text-yellow-400"));
+    stars.forEach((s, idx) => {
+        if (idx < currentTiktokUserRating) {
+            s.classList.add("text-yellow-400");
+        } else {
+            s.classList.remove("text-yellow-400");
+        }
+    });
 }
 
 function closeTiktokRating() {
