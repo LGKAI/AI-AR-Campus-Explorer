@@ -1,0 +1,410 @@
+<?xml version='1.0' encoding='utf-8'?>
+<graphml xmlns="http://graphml.graphdrawing.org/xmlns" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://graphml.graphdrawing.org/xmlns http://graphml.graphdrawing.org/xmlns/1.0/graphml.xsd">
+  <key id="d4" for="edge" attr.name="relation" attr.type="string" />
+  <key id="d3" for="node" attr.name="page" attr.type="long" />
+  <key id="d2" for="node" attr.name="name" attr.type="string" />
+  <key id="d1" for="node" attr.name="source" attr.type="string" />
+  <key id="d0" for="node" attr.name="type" attr.type="string" />
+  <graph edgedefault="directed">
+    <node id="9 năm">
+      <data key="d0">value</data>
+      <data key="d1">quy_che_dao_tao.pdf</data>
+    </node>
+    <node id="03 năm">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="8 năm">
+      <data key="d0">value</data>
+      <data key="d1">quy_che_dao_tao.pdf</data>
+    </node>
+    <node id="4 năm">
+      <data key="d0">value</data>
+      <data key="d1">quy_che_dao_tao.pdf</data>
+    </node>
+    <node id="3 năm">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="15 tiết">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="45 tiết">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="30 tiết">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="06 giờ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="20 giờ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="03 học kỳ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="10 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="14 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="22 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="25 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="12 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="38 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="7 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="130 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="2 học kỳ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="01 học kỳ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="15 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 1">
+      <data key="d0">article</data>
+      <data key="d2">Phạm vi điều chỉnh và đối tượng áp dụng</data>
+      <data key="d3">134</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 2">
+      <data key="d0">article</data>
+      <data key="d2">Mục đích, yêu cầu của công tác khen thưởng, kỷ luật SV</data>
+      <data key="d3">134</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 3">
+      <data key="d0">article</data>
+      <data key="d2">Các hình thức triển khai công tác khen thưởng</data>
+      <data key="d3">135</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 4">
+      <data key="d0">article</data>
+      <data key="d2">Đối tượng ưu tiên tiếp nhận ở nội trú</data>
+      <data key="d3">155</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 5">
+      <data key="d0">article</data>
+      <data key="d2">Quyền của học sinh, sinh viên nội trú</data>
+      <data key="d3">156</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 6">
+      <data key="d0">article</data>
+      <data key="d2">Nghĩa vụ của học sinh, sinh viên nội trú</data>
+      <data key="d3">158</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="15 giờ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="4 giờ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 7">
+      <data key="d0">article</data>
+      <data key="d2">Các hành vi học sinh, sinh viên nội trú không được làm</data>
+      <data key="d3">159</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 8">
+      <data key="d0">article</data>
+      <data key="d2">Quy trình khen thưởng</data>
+      <data key="d3">141</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 9">
+      <data key="d0">article</data>
+      <data key="d2">Định mức khen thưởng</data>
+      <data key="d3">142</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 10">
+      <data key="d0">article</data>
+      <data key="d2">Quyền khiếu nại về khen thưởng</data>
+      <data key="d3">142</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 11">
+      <data key="d0">article</data>
+      <data key="d2">Quy định về hình thức kỷ luật và nội dung vi phạm</data>
+      <data key="d3">143</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 12">
+      <data key="d0">article</data>
+      <data key="d2">Kiểm tra, khen thưởng, kỷ luật</data>
+      <data key="d3">154</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 13">
+      <data key="d0">article</data>
+      <data key="d2">Chấm dứt hiệu lực của quyết định kỷ luật</data>
+      <data key="d3">144</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 14">
+      <data key="d0">article</data>
+      <data key="d2">Quyền khiếu nại về kỷ luật</data>
+      <data key="d3">150</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 15">
+      <data key="d0">article</data>
+      <data key="d2">Tổ chức thực hiện</data>
+      <data key="d3">109</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 16">
+      <data key="d0">article</data>
+      <data key="d2">Quản lý, lưu trữ điểm thi, bài thi</data>
+      <data key="d3">94</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 17">
+      <data key="d0">article</data>
+      <data key="d2">Đối với các cá nhân nộp đề thi, điểm thi trễ hạn</data>
+      <data key="d3">95</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 18">
+      <data key="d0">article</data>
+      <data key="d2">Đối với các cá nhân vi phạm quy chế coi thi</data>
+      <data key="d3">95</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 19">
+      <data key="d0">article</data>
+      <data key="d2">Đối với sinh viên vi phạm quy chế thi</data>
+      <data key="d3">97</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 20">
+      <data key="d0">article</data>
+      <data key="d2">Kiểm tra, khen thưởng, kỷ luật</data>
+      <data key="d3">160</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 21">
+      <data key="d0">article</data>
+      <data key="d2">Trách nhiệm thực hiện</data>
+      <data key="d3">97</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 22">
+      <data key="d0">article</data>
+      <data key="d2">Cấp khen thưởng</data>
+      <data key="d3">110</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 23">
+      <data key="d0">article</data>
+      <data key="d2">Hội đồng thi đua, khen thưởng và kỷ luật sinh viên</data>
+      <data key="d3">110</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="2 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="3 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="4 tín chỉ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="1 năm">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="Điều 24">
+      <data key="d0">article</data>
+      <data key="d2">Đối tượng, quy trình xét khen thưởng cấp ĐHQG-HCM</data>
+      <data key="d3">112</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="24 giờ">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="01 năm">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <node id="5 năm">
+      <data key="d0">value</data>
+      <data key="d1">so_tay_sinh_vien.pdf</data>
+    </node>
+    <edge source="Điều 3" target="15 tiết">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 3" target="45 tiết">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 3" target="30 tiết">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 4" target="03 học kỳ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 4" target="03 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 5" target="06 giờ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 5" target="20 giờ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 5" target="2 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 5" target="3 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 5" target="4 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 6" target="03 học kỳ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 6" target="15 giờ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 6" target="4 giờ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 7" target="10 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 7" target="14 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 7" target="22 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 7" target="25 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 7" target="12 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 8" target="Điều 4">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 8" target="Điều 6">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 10" target="10 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 11" target="Điều 12">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 12" target="24 giờ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 12" target="Điều 6">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 14" target="01 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 15" target="38 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 16" target="7 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 16" target="130 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 16" target="2 học kỳ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 16" target="Điều 2">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 18" target="Điều 15">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 18" target="03 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 19" target="01 học kỳ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 19" target="Điều 2">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 20" target="Điều 2">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 20" target="Điều 6">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 20" target="Điều 7">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 20" target="3 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 20" target="Điều 5">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 20" target="5 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 20" target="03 năm">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 22" target="15 tín chỉ">
+      <data key="d4">specifies</data>
+    </edge>
+    <edge source="Điều 22" target="Điều 2">
+      <data key="d4">references</data>
+    </edge>
+    <edge source="Điều 22" target="1 năm">
+      <data key="d4">specifies</data>
+    </edge>
+  </graph>
+</graphml>

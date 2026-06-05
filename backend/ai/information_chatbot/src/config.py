@@ -296,3 +296,4 @@ class Settings:
         return self.default_doc_type
 
 settings = Settings()
+settings.ensure_dirs()

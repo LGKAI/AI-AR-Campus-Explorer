@@ -205,7 +205,7 @@
                             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
                             Lấy đề xuất địa điểm
                         </button>
-                        <button onclick="openTiktokExplore()" class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-300 py-2 rounded-lg transition-all flex items-center justify-center gap-2 font-bold">
+                        <button type="button" onclick="event.preventDefault(); openTiktokExplore()" class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-300 py-2 rounded-lg transition-all flex items-center justify-center gap-2 font-bold">
                             <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v5.37c-.01 2.21-.6 4.41-1.83 6.24-1.22 1.83-3.05 3.16-5.18 3.75-2.13.59-4.42.42-6.42-.48-2.01-.89-3.64-2.45-4.6-4.38C-2.4 15.63-2.6 13.34-1.8 11.3c.79-2.03 2.36-3.67 4.31-4.5 1.95-.83 4.2-.82 6.13.02 1.93.83 3.49 2.44 4.31 4.4.08.19.14.39.18.59V.02z"/></svg>
                             Khám phá (Tiktok Swipe)
                         </button>
@@ -404,7 +404,7 @@
             <!-- Action Side Bar cho Tiktok -->
             <div class="absolute right-4 bottom-32 z-20 flex flex-col gap-5 items-center">
                 <!-- Nút Yêu thích (Tym) -->
-                <button type="button" onclick="likeTiktokNode()" class="flex flex-col items-center group">
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); likeTiktokNode()" class="flex flex-col items-center group">
                     <div id="tiktok-like-btn" class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg relative overflow-hidden">
                         <!-- Hiệu ứng tym bay -->
                         <div id="heart-burst" class="absolute inset-0 pointer-events-none"></div>
@@ -473,7 +473,7 @@
         
         <!-- Nút hướng dẫn bên phải -->
         <div class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 text-white/50 hidden md:flex">
-            <button onclick="swipeTiktok('left')" class="p-4 bg-white/5 hover:bg-white/10 rounded-full hover:text-white transition-all">
+            <button type="button" onclick="event.preventDefault(); swipeTiktok('left')" class="p-4 bg-white/5 hover:bg-white/10 rounded-full hover:text-white transition-all">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
             </button>
             <span class="text-xs font-bold tracking-widest rotate-90 my-8">VUỐT LÊN / BỎ QUA</span>
