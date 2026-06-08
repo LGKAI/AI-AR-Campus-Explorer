@@ -46,44 +46,8 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 function initChatDrag() {
-    const chatWin = document.getElementById("chat-window");
-    const chatHeader = chatWin.querySelector('.bg-slate-800\\/80');
-    if (!chatWin || !chatHeader) return;
-
-    chatHeader.addEventListener('mousedown', (e) => {
-        if (e.target.closest('button')) return; // Bỏ qua nếu bấm vào nút Thu nhỏ
-        isDraggingChat = true;
-        
-        // Chuyển sang Absolute thuần túy
-        chatWin.style.bottom = 'auto';
-        chatWin.style.right = 'auto';
-        
-        const rect = chatWin.getBoundingClientRect();
-        chatWin.style.left = rect.left + 'px';
-        chatWin.style.top = rect.top + 'px';
-        
-        chatOffsetX = e.clientX - rect.left;
-        chatOffsetY = e.clientY - rect.top;
-        
-        chatHeader.style.cursor = 'grabbing';
-        chatWin.style.transition = 'none'; // Tắt animation mượt khi đang kéo
-    });
-
-    document.addEventListener('mousemove', (e) => {
-        if (!isDraggingChat) return;
-        chatWin.style.left = (e.clientX - chatOffsetX) + 'px';
-        chatWin.style.top = (e.clientY - chatOffsetY) + 'px';
-    });
-
-    document.addEventListener('mouseup', () => {
-        if (isDraggingChat) {
-            isDraggingChat = false;
-            chatHeader.style.cursor = 'grab';
-            chatWin.style.transition = 'all 0.3s'; // Bật lại transition
-        }
-    });
-
-    chatHeader.style.cursor = 'grab';
+    // Đã vô hiệu hoá tính năng kéo thả Chatbot theo yêu cầu của user
+    return;
 }
 
 function initMapControls() {
@@ -1002,9 +966,21 @@ async function fetchAIRecommendations() {
             
             const tagsEl = document.getElementById("ai-intent-tags");
             tagsEl.innerHTML = "";
-            if (data.user_profile && data.user_profile.interests) {
+            const INTEREST_LABELS = {
+                "hoc_tap": "Học tập & Nghiên cứu 📚",
+                "an_uong": "Ăn uống & Căn tin 🍽️",
+                "nghi_ngoi": "Nghỉ ngơi & Thư giãn 😴",
+                "the_thao": "Thể thao & Vận động 🏃",
+                "cntt": "CNTT & Lập trình 💻",
+                "tien_ich": "Tiện ích campus 🏪",
+                "giai_tri": "Sự kiện & Giải trí 🎪",
+                "hanh_chinh": "Hành chính & Giao vụ 🏛️"
+            };
+
+            if (data.user_profile && data.user_profile.interests && data.user_profile.interests.length > 0) {
                 data.user_profile.interests.forEach(interest => {
-                    tagsEl.innerHTML += `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50 mr-1">${interest}</span>`;
+                    const displayLabel = INTEREST_LABELS[interest] || interest;
+                    tagsEl.innerHTML += `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50 mr-1">${displayLabel}</span>`;
                 });
             } else {
                 tagsEl.innerHTML = `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50">Chưa có dữ liệu học</span>`;
@@ -1080,9 +1056,12 @@ function toggleMapMode() {
         if(gpsPanel) gpsPanel.classList.add("hidden");
     }
 
-    const isHome = mapLayer.classList.contains("hidden") && arLayer.classList.contains("hidden");
-    if (isHome) minimizeChat('maximize');
-    else minimizeChat('minimize');
+    const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
+    if (isHome) {
+        minimizeChat('maximize');
+    } else {
+        minimizeChat('minimize');
+    }
 }
 
 function toggleARMode() {
@@ -1121,9 +1100,12 @@ function toggleARMode() {
         btn.classList.remove("bg-indigo-600", "border-indigo-400");
     }
 
-    const isHome = mapLayer.classList.contains("hidden") && arLayer.classList.contains("hidden");
-    if (isHome) minimizeChat('maximize');
-    else minimizeChat('minimize');
+    const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
+    if (isHome) {
+        minimizeChat('maximize');
+    } else {
+        minimizeChat('minimize');
+    }
 }
 
 // Lấy lịch sử ghé thăm của người dùng

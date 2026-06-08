@@ -1,11 +1,12 @@
 {
-  "timestamp": "2026-06-08T10:55:20.427928",
+  "timestamp": "2026-06-08T23:44:51.617129",
   "pdfs": [
+    "gioi_thieu_truong.pdf",
     "quy_che_dao_tao.pdf",
     "so_tay_sinh_vien.pdf"
   ],
-  "total_chunks": 641,
-  "elapsed_s": 291.7,
+  "total_chunks": 660,
+  "elapsed_s": 330.1,
   "skip_graph": false,
   "graph_mode": "fast_regex",
   "ner_model": "NlpHUST/ner-vietnamese-electra-base",

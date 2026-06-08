@@ -181,9 +181,10 @@ _DOMAIN_ENTITIES_RAW: list[str] = [
     "miễn giảm học phí", "hoãn thi", "xin nghỉ", "bảo lưu",
     "thôi học", "buộc thôi học", "nghỉ học tạm thời", "cảnh báo học tập",
     "khoa", "trường", "bộ môn", "phòng đào tạo", "phòng công tác sinh viên",
-    "sinh viên", "giảng viên", "giáo sư", "tiến sĩ",
+    "sinh viên", "giảng viên", " giáo sư", "tiến sĩ",
     "chương trình đào tạo", "ngành", "chuyên ngành", "môn học",
     "học phần", "loại học phần", "quy chế", "điều khoản",
+    "địa chỉ", "hcmus", "khoa học tự nhiên", "cơ sở", "vị trí địa lý", "trường gì",
 ]
 
 _DOMAIN_ENTITIES: list[tuple[str, str]] = sorted(
@@ -992,6 +993,8 @@ class Agent:
 
         Returns (answer_str, turn_id).
         """
+        import re
+        user_query = re.sub(r'(?i)\bHCMUS\b', 'Trường Đại học Khoa học Tự nhiên', user_query)
         turn_id = str(uuid.uuid4())
 
         self.debug_info = {
@@ -1060,7 +1063,6 @@ class Agent:
         # Simple queries (single-entity factual lookups) don't benefit from
         # paraphrase variants; expansion only adds LLM latency.
         if (settings.query_expansion_enabled
-                and complexity != "simple"
                 and len(processed.sub_queries) == 1):
             expanded_variants = self.query_expander.expand(user_query)
             self.debug_info["expansion_variants"] = expanded_variants
@@ -1167,6 +1169,8 @@ class Agent:
         The critic loop runs before streaming begins (retrieval phase is always
         blocking).  Streaming only covers the LLM generation phase.
         """
+        import re
+        user_query = re.sub(r'(?i)\bHCMUS\b', 'Trường Đại học Khoa học Tự nhiên', user_query)
         turn_id = str(uuid.uuid4())
 
         # 0a. Input guardrail

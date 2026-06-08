@@ -1,0 +1,296 @@
+[
+  {
+    "id": 1,
+    "role": "user",
+    "content": "Thời gian học từ thứ mấy đến thứ mấy?",
+    "ts": "2026-06-08T04:21:08.457530",
+    "turn_id": "eaac0968-237c-46a3-b3ed-78a0cc1d418d"
+  },
+  {
+    "id": 2,
+    "role": "assistant",
+    "content": "Thời gian tổ chức hoạt động giảng dạy trong khoảng từ 06 giờ đến 20 giờ các ngày từ thứ 2 đến thứ 7. Các ngày nghỉ lễ sẽ tuân theo quy định của Nhà nước.",
+    "ts": "2026-06-08T04:21:08.463455",
+    "turn_id": "eaac0968-237c-46a3-b3ed-78a0cc1d418d"
+  },
+  {
+    "id": 3,
+    "role": "user",
+    "content": "HCMUS là trường gì",
+    "ts": "2026-06-08T15:55:11.681500",
+    "turn_id": "1ee248e4-5b97-497a-917b-7e6d497ea3f0"
+  },
+  {
+    "id": 4,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến HCMUS là trường đại học nào và vị trí địa lý của nó.",
+    "ts": "2026-06-08T15:55:11.714091",
+    "turn_id": "1ee248e4-5b97-497a-917b-7e6d497ea3f0"
+  },
+  {
+    "id": 5,
+    "role": "user",
+    "content": "trường có mấy khoa",
+    "ts": "2026-06-08T15:56:45.849830",
+    "turn_id": "0ecb3ca7-ccbb-4a6b-bfb0-26c099a66b36"
+  },
+  {
+    "id": 6,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến số lượng khoa hoặc danh sách các khoa của trường.",
+    "ts": "2026-06-08T15:56:45.869830",
+    "turn_id": "0ecb3ca7-ccbb-4a6b-bfb0-26c099a66b36"
+  },
+  {
+    "id": 7,
+    "role": "user",
+    "content": "trường này tên gì",
+    "ts": "2026-06-08T16:03:38.197988",
+    "turn_id": "2c6a9356-f4da-4caa-91a0-f32016468400"
+  },
+  {
+    "id": 8,
+    "role": "assistant",
+    "content": "Tên chính thức của trường là Đại học Khoa học tự nhiên, Đại học Quốc Gia Thành Phố Hồ Chí Minh.Tên gọi tắt là Trường Đại học Khoa học tự nhiên.",
+    "ts": "2026-06-08T16:03:38.216302",
+    "turn_id": "2c6a9356-f4da-4caa-91a0-f32016468400"
+  },
+  {
+    "id": 9,
+    "role": "user",
+    "content": "HCMUS là trường gì",
+    "ts": "2026-06-08T16:18:24.761524",
+    "turn_id": "e79702e8-7b29-4a42-902e-80c16419633d"
+  },
+  {
+    "id": 10,
+    "role": "assistant",
+    "content": "HCMUS là viết tắt của Trường Đại học Khoa học Tự nhiên (University of Science, University of胡锦涛 - 请注意，这里的回复不符合规定，请使用正确的表述。)\n\n HOUSE) thuộc Đại học Quốc gia Thành phố Hồ Chí Minh. Trụ sở chính tọa lạc tại địa chỉ số 227 Nguyễn Văn Cừ, Quận 5, Thành phố Hồ Chí Minh.",
+    "ts": "2026-06-08T16:18:24.775277",
+    "turn_id": "e79702e8-7b29-4a42-902e-80c16419633d"
+  },
+  {
+    "id": 11,
+    "role": "user",
+    "content": "HCMUS có mấy khoa, đó là những khoa nào",
+    "ts": "2026-06-08T16:21:00.542236",
+    "turn_id": "17871bd1-229f-473a-b9b1-f4ade0007481"
+  },
+  {
+    "id": 12,
+    "role": "assistant",
+    "content": "HCMUS là viết tắt của Trường Đại học Khoa học Tự nhiên (University of Science, University of Public Works) thuộc Đại học Quốc gia Thành phố Hồ Chí Minh. Trường có các khoa như Công nghệ thông tin, Toán học và]|[Lý thuyết máy tính, Vật lý học, Hóa học, Sinh học, Kỹ thuật vật liệu, Viễn thông, Khoa học máy tính, Khoa học địa chất, Địa chất kỹ thuật, Quản trị kinh doanh, Hoá sinh và Công nghệ, Sinh học y tế và Môi trường. Tuy nhiên, để biết chính xác số lượng khoa và danh sách các khoa, bạn nên tham khảo tài liệu chính thức của Trường Đại học Khoa học Tự nhiên.\n\nTrên đây là thông tin tổng quát về các khoa tại HCMUS dựa trên kiến thức chung, nhưng không phải tất cả các khoa đều được liệt kê.",
+    "ts": "2026-06-08T16:21:00.608611",
+    "turn_id": "17871bd1-229f-473a-b9b1-f4ade0007481"
+  },
+  {
+    "id": 13,
+    "role": "user",
+    "content": "HCMUS có mấy khoa",
+    "ts": "2026-06-08T16:49:20.166283",
+    "turn_id": "8892fc15-7cd1-4f7b-bb4d-a4821ff1bc82"
+  },
+  {
+    "id": 14,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến số lượng khoa cụ thể của HCMUS.",
+    "ts": "2026-06-08T16:49:20.176448",
+    "turn_id": "8892fc15-7cd1-4f7b-bb4d-a4821ff1bc82"
+  },
+  {
+    "id": 15,
+    "role": "user",
+    "content": "HCMUS có mấy khoa",
+    "ts": "2026-06-08T17:12:19.164357",
+    "turn_id": "d53b169c-0576-481f-af4e-7e62e7b39cc5"
+  },
+  {
+    "id": 16,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến số lượng khoa cụ thể tại Trường Đại học Khoa học Tự nhiên, Đại học Quốc gia Thành phố Hồ Chí Minh (HCMUS).",
+    "ts": "2026-06-08T17:12:19.179600",
+    "turn_id": "d53b169c-0576-481f-af4e-7e62e7b39cc5"
+  },
+  {
+    "id": 17,
+    "role": "user",
+    "content": "HCMUS có mấy khoa",
+    "ts": "2026-06-08T17:14:37.283212",
+    "turn_id": "df9b4be8-0f84-4eb4-baa8-bf7fc4517b0d"
+  },
+  {
+    "id": 18,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến số lượng khoa cụ thể của HCMUS.",
+    "ts": "2026-06-08T17:14:37.306753",
+    "turn_id": "df9b4be8-0f84-4eb4-baa8-bf7fc4517b0d"
+  },
+  {
+    "id": 19,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên có mấy khoa",
+    "ts": "2026-06-08T17:16:32.702693",
+    "turn_id": "f1ddbd11-9f9f-4669-83ce-32b43160a972"
+  },
+  {
+    "id": 20,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên của Đại học Quốc gia Thành phố Hồ Chí Minh bao gồm 9 khoa chuyên môn, cụ thể như sau:\n- Khoa Công nghệ Thông tin: có các ngành như Khoa học Máy tính, Kỹ thuật Phần mềm, Trí tuệ Nhân tạo, Hệ thống Thông tin, Mạng máy tính & Truyền thông, Khoa học Dữ liệu.\n- Khoa Toán - Tin học: có các ngành như Toán học, Toán tin, Thống kê dữ liệu, Toán ứng dụng.\n- Khoa Hóa học: có các ngành như Hóa hữu cơ, Hóa vô cơ, Hóa phân tích, Hóa lý, Công nghệ Kỹ thuật Hóa học.",
+    "ts": "2026-06-08T17:16:32.715528",
+    "turn_id": "f1ddbd11-9f9f-4669-83ce-32b43160a972"
+  },
+  {
+    "id": 21,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên có mấy khoa?",
+    "ts": "2026-06-08T17:22:02.705986",
+    "turn_id": "76598f66-50d3-4d57-9fb9-25221de58cf8"
+  },
+  {
+    "id": 22,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên của Đại học Quốc gia Thành phố Hồ Chí Minh bao gồm 9 khoa chuyên môn, cụ thể như sau:\n\n- Công nghệ Thông tin: Khoa học Máy tính, Kỹ thuật Phần mềm, Trí tuệ Nhân tạo, Hệ thống Thông tin, Mạng máy tính & Truyền thông, Khoa học Dữ liệu.\n- Toán - Tin học: Toán học, Toán tin, Thống kê dữ liệu, Toán ứng dụng.\n- Hóa học: Hóa hữu cơ, Hóa vô cơ, Hóa phân tích, Hóa lý, Công nghệ Kỹ thuật Hóa học.",
+    "ts": "2026-06-08T17:22:02.719441",
+    "turn_id": "76598f66-50d3-4d57-9fb9-25221de58cf8"
+  },
+  {
+    "id": 23,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên là trường gì",
+    "ts": "2026-06-08T17:41:18.267646",
+    "turn_id": "3dd803b4-60de-4f42-832f-5c7ae860b68a"
+  },
+  {
+    "id": 24,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM bao gồm 9 khoa chuyên môn.",
+    "ts": "2026-06-08T17:41:18.288419",
+    "turn_id": "3dd803b4-60de-4f42-832f-5c7ae860b68a"
+  },
+  {
+    "id": 25,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên ở địa chỉ nào",
+    "ts": "2026-06-08T17:44:17.745971",
+    "turn_id": "42c02a7f-ab24-4222-9c0a-f626ee7696df"
+  },
+  {
+    "id": 26,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến địa chỉ cụ thể của Trường Đại học Khoa học Tự nhiên.",
+    "ts": "2026-06-08T17:44:17.759473",
+    "turn_id": "42c02a7f-ab24-4222-9c0a-f626ee7696df"
+  },
+  {
+    "id": 27,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên là trường gì",
+    "ts": "2026-06-08T17:47:33.637338",
+    "turn_id": "9ba3cc93-1d6d-42bf-b4e7-45a0b94fb9c8"
+  },
+  {
+    "id": 28,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM bao gồm 9 khoa chuyên môn.",
+    "ts": "2026-06-08T17:47:33.651541",
+    "turn_id": "9ba3cc93-1d6d-42bf-b4e7-45a0b94fb9c8"
+  },
+  {
+    "id": 29,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên la truong gi",
+    "ts": "2026-06-08T17:48:15.709987",
+    "turn_id": "fc23003c-c824-411b-9d5b-5aba29d08d07"
+  },
+  {
+    "id": 30,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên, Đại học Quốc gia Thành phố Hồ Chí Minh (HCMUS) là một trường đại học công lập hàng đầu tại Việt Nam. Trường đóng vai trò nòng cốt trong hệ thống giáo dục đại học và nghiên cứu khoa học cơ bản, khoa học công nghệ mũi nhọn của cả nước. Nhà trường bao gồm 9 khoa chuyên môn, quản lý toàn bộ các chương trình đào tạo từ bậc Cử nhân, Thạc sĩ đến Tiến sĩ như Công nghệ Thông tin, Toán - Tin học và Hóa học.",
+    "ts": "2026-06-08T17:48:15.725577",
+    "turn_id": "fc23003c-c824-411b-9d5b-5aba29d08d07"
+  },
+  {
+    "id": 31,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên o dia chi nao",
+    "ts": "2026-06-08T17:49:45.795617",
+    "turn_id": "4282e4ab-9848-47ba-b217-b360e6481bae"
+  },
+  {
+    "id": 32,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến địa chỉ cụ thể của trường Đại học Khoa học Tự nhiên.",
+    "ts": "2026-06-08T17:49:45.813079",
+    "turn_id": "4282e4ab-9848-47ba-b217-b360e6481bae"
+  },
+  {
+    "id": 33,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên o dia chi nao",
+    "ts": "2026-06-08T17:52:48.674205",
+    "turn_id": "9fd17a32-2ac4-4ce3-a49f-cab036b815c7"
+  },
+  {
+    "id": 34,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến địa chỉ cụ thể của trường Đại học Khoa học Tự nhiên.",
+    "ts": "2026-06-08T17:52:48.686339",
+    "turn_id": "9fd17a32-2ac4-4ce3-a49f-cab036b815c7"
+  },
+  {
+    "id": 35,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên ở địa chỉ nào",
+    "ts": "2026-06-08T17:55:59.563379",
+    "turn_id": "35c2d4c4-d83d-483e-b9ca-550c76fa96f7"
+  },
+  {
+    "id": 36,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến địa chỉ chính thức của Trường Đại học Khoa học Tự nhiên.",
+    "ts": "2026-06-08T17:55:59.579030",
+    "turn_id": "35c2d4c4-d83d-483e-b9ca-550c76fa96f7"
+  },
+  {
+    "id": 37,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên ở địa chỉ nào",
+    "ts": "2026-06-08T17:58:55.569389",
+    "turn_id": "baf7f683-1f69-430b-9141-9806042c40ad"
+  },
+  {
+    "id": 38,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến địa chỉ cụ thể của Trường Đại học Khoa học Tự nhiên.",
+    "ts": "2026-06-08T17:58:55.607663",
+    "turn_id": "baf7f683-1f69-430b-9141-9806042c40ad"
+  },
+  {
+    "id": 39,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên là trường nào?",
+    "ts": "2026-06-08T18:02:24.172015",
+    "turn_id": "0b2f41e6-b88f-4afe-b689-d839f380e9ae"
+  },
+  {
+    "id": 40,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên là một trường đại học công lập hàng đầu tại Việt Nam, thuộc Đại học Quốc gia Thành phố Hồ Chí Minh. Trường đóng vai trò nòng cốt trong hệ thống giáo dục đại học và nghiên cứu khoa học cơ bản, khoa học công nghệ mũi nhọn của cả nước. Trụ sở chính của trường tọa lạc tại Thành phố Hồ Chí Minh.",
+    "ts": "2026-06-08T18:02:24.191937",
+    "turn_id": "0b2f41e6-b88f-4afe-b689-d839f380e9ae"
+  },
+  {
+    "id": 41,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên có mấy khoa?",
+    "ts": "2026-06-08T18:03:19.449222",
+    "turn_id": "20c0761f-2410-40f1-9804-d270fb97cbb1"
+  },
+  {
+    "id": 42,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM bao gồm 9 khoa chuyên môn, quản lý toàn bộ các chương trình đào tạo từ bậc Cử nhân, Thạc sĩ đến Tiến sĩ.",
+    "ts": "2026-06-08T18:03:19.459568",
+    "turn_id": "20c0761f-2410-40f1-9804-d270fb97cbb1"
+  }
+]

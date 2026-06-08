@@ -82,7 +82,7 @@ class LLMQueryExpander:
         "           'bị đuổi' → 'buộc thôi học'\n"
         "           'rớt môn' → 'không đạt học phần'\n"
         "           'thi lại' → 'thi kết thúc học phần lần hai'\n"
-        "  - Mở rộng viết tắt nếu có (GPA → điểm trung bình tích lũy, CNTT → công nghệ thông tin)\n"
+        "  - Mở rộng viết tắt nếu có (GPA → điểm trung bình tích lũy, CNTT → công nghệ thông tin, HCMUS → Trường Đại học Khoa học Tự nhiên)\n"
         "  - Ngắn gọn, không thêm thông tin mới\n\n"
         'Câu hỏi gốc: "{query}"\n\n'
         "Trả về JSON thuần túy (không giải thích, không markdown):\n"
@@ -116,6 +116,11 @@ class LLMQueryExpander:
         Returns ``[original]`` if the LLM call fails or client is *None*.
         """
         base = _nfc(query.strip())
+        
+        # Deterministic acronym expansion for crucial terms before LLM
+        base = re.sub(r'(?i)\bHCMUS\b', 'Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM', base)
+        base = re.sub(r'(?i)\bđịa chỉ\b|\bdia chi\b', 'địa chỉ, vị trí địa lý, cơ sở', base)
+        base = re.sub(r'(?i)\btrường gì\b|\btruong gi\b', 'tổng quan về nhà trường, đại học', base)
 
         if self.client is None:
             return [base]
