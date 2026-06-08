@@ -450,9 +450,9 @@ function appendChatBubble(text, sender) {
     const bubble = document.createElement("div");
     
     if (sender === "user") {
-        bubble.className = "bg-blue-600 text-white p-2.5 rounded-xl max-w-[85%] self-end ml-auto shadow-md leading-relaxed animate-fade-in";
+        bubble.className = "bg-blue-600 text-white p-3.5 rounded-2xl rounded-tr-sm max-w-[85%] self-end ml-auto shadow-md leading-relaxed animate-fade-in";
     } else {
-        bubble.className = "bg-slate-800 border border-slate-700 text-slate-200 p-2.5 rounded-xl max-w-[85%] self-start shadow-md leading-relaxed animate-fade-in";
+        bubble.className = "bg-slate-800 border border-slate-700 text-slate-200 p-3.5 rounded-2xl rounded-tl-sm max-w-[85%] self-start shadow-md leading-relaxed animate-fade-in";
     }
     
     bubble.innerText = text;
@@ -521,19 +521,24 @@ function stopVoiceInput() {
     input.placeholder = "Hỏi RAG Chatbot...";
 }
 
-function minimizeChat() {
+function minimizeChat(action = 'toggle') {
     const chatWin = document.getElementById("chat-window");
     const toggleIcon = document.getElementById("chat-toggle-icon");
 
+    if (action === 'minimize' && isChatMinimized) return;
+    if (action === 'maximize' && !isChatMinimized) return;
+
     if (!isChatMinimized) {
         // Trạng thái: Thu nhỏ lại
-        chatWin.style.height = "56px";
+        chatWin.classList.remove("h-[450px]", "md:h-[500px]");
+        chatWin.classList.add("h-[56px]");
         isChatMinimized = true;
         // Đổi icon thành dấu Cộng (+)
         toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />';
     } else {
         // Trạng thái: Phóng to ra
-        chatWin.style.height = "260px";
+        chatWin.classList.remove("h-[56px]");
+        chatWin.classList.add("h-[450px]", "md:h-[500px]");
         isChatMinimized = false;
         // Đổi icon về lại dấu Trừ (-)
         toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />';
@@ -543,6 +548,7 @@ function minimizeChat() {
 function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     toast.innerText = message;
+    toast.style.transform = "";
     
     if (type === "success") {
         toast.className = "fixed top-5 right-5 z-50 bg-slate-950 border border-emerald-500/40 text-emerald-400 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold translate-x-0 transition-all duration-300";
@@ -791,7 +797,7 @@ async function calculateRoute() {
     waypoints += `,${endNode}`;
 
     try {
-        const res = await fetch(`${BACKEND_URL}/map/api_get_route?waypoints=${waypoints}&weather=${weather}&preference=${preference}`);
+        const res = await fetch(`${BACKEND_URL}/map/api_get_route?waypoints=${encodeURIComponent(waypoints)}&weather=${weather}&preference=${preference}`);
         const data = await res.json();
 
         document.getElementById("route-result").classList.remove("hidden");
@@ -829,6 +835,11 @@ async function calculateRoute() {
             document.getElementById("route-distance").innerText = "";
         }
     } catch (e) {
+        console.error("calculateRoute error:", e);
+        currentRouteWaypoints = [];
+        drawMap();
+        document.getElementById("route-path-text").innerHTML = `<span class="text-rose-400">Lỗi kết nối máy chủ.</span>`;
+        document.getElementById("route-distance").innerText = "";
         showToast("Lỗi hệ thống Router", "error");
     }
 }
@@ -1068,6 +1079,10 @@ function toggleMapMode() {
         if(aiPanel) aiPanel.classList.add("hidden");
         if(gpsPanel) gpsPanel.classList.add("hidden");
     }
+
+    const isHome = mapLayer.classList.contains("hidden") && arLayer.classList.contains("hidden");
+    if (isHome) minimizeChat('maximize');
+    else minimizeChat('minimize');
 }
 
 function toggleARMode() {
@@ -1105,6 +1120,10 @@ function toggleARMode() {
         viewport.classList.replace("bg-black", "bg-slate-950");
         btn.classList.remove("bg-indigo-600", "border-indigo-400");
     }
+
+    const isHome = mapLayer.classList.contains("hidden") && arLayer.classList.contains("hidden");
+    if (isHome) minimizeChat('maximize');
+    else minimizeChat('minimize');
 }
 
 // Lấy lịch sử ghé thăm của người dùng
