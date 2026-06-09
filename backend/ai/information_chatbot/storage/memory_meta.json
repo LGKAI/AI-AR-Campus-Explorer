@@ -292,5 +292,89 @@
     "content": "Trường Đại học Khoa học Tự nhiên, ĐHQG-HCM bao gồm 9 khoa chuyên môn, quản lý toàn bộ các chương trình đào tạo từ bậc Cử nhân, Thạc sĩ đến Tiến sĩ.",
     "ts": "2026-06-08T18:03:19.459568",
     "turn_id": "20c0761f-2410-40f1-9804-d270fb97cbb1"
+  },
+  {
+    "id": 43,
+    "role": "user",
+    "content": "Thời gian học từ thứ mấy đến thứ mấy?",
+    "ts": "2026-06-08T18:04:12.871949",
+    "turn_id": "7d589c62-e42c-44d4-9b3a-26ab699c1c74"
+  },
+  {
+    "id": 44,
+    "role": "assistant",
+    "content": "Theo tài liệu, thời gian tổ chức hoạt động giảng dạy trong khoảng từ 06 giờ đến 20 giờ các ngày từ thứ 2 đến thứ 7.",
+    "ts": "2026-06-08T18:04:12.884340",
+    "turn_id": "7d589c62-e42c-44d4-9b3a-26ab699c1c74"
+  },
+  {
+    "id": 45,
+    "role": "user",
+    "content": "Hcm ueh là trường nào?",
+    "ts": "2026-06-09T10:04:49.103833",
+    "turn_id": "028d89a9-64a4-4c78-ad74-d3dfcc7b0b57"
+  },
+  {
+    "id": 46,
+    "role": "assistant",
+    "content": "HCMUEH là Trường Đại học Khoa học Tự nhiên, Đại học Quốc gia Thành phố Hồ Chí Minh (HCMUS). Đây là trường đại học công lập hàng đầu tại Việt Nam. Địa chỉ chính của trường nằm ở đường Mạc Đỉnh Chi, phường Đông Hòa, TP.HCM.",
+    "ts": "2026-06-09T10:04:49.117826",
+    "turn_id": "028d89a9-64a4-4c78-ad74-d3dfcc7b0b57"
+  },
+  {
+    "id": 47,
+    "role": "user",
+    "content": "HCMUE có mấy khoa.",
+    "ts": "2026-06-09T10:08:30.369822",
+    "turn_id": "399b158d-8b75-4e2f-a9e5-ea83aaf6843e"
+  },
+  {
+    "id": 48,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên (HCMUE) bao gồm 9 khoa chuyên môn. Các khoa của trường là:\n1. Công nghệ Thông tin\n2. Toán - Tin học\n3. Hóa học\n4. Khoa học & Công nghệ Vật liệu\n5. Hóa học & Công nghệ Sinh học\n\nTài liệu không đề cập đến số lượng và danh sách các khoa còn lại.",
+    "ts": "2026-06-09T10:08:30.384236",
+    "turn_id": "399b158d-8b75-4e2f-a9e5-ea83aaf6843e"
+  },
+  {
+    "id": 49,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên là trường nào",
+    "ts": "2026-06-09T10:14:38.514161",
+    "turn_id": "e4220220-132f-432c-9e76-7d27a08a42c2"
+  },
+  {
+    "id": 50,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên thuộc Đại học Quốc gia Thành phố Hồ Chí Minh (HCMUS). Đây là một trường đại học công lập hàng đầu tại Việt Nam, đóng vai trò nòng cốt trong hệ thống giáo dục đại học và nghiên cứu khoa học cơ bản, khoa học công nghệ mũi nhọn của cả nước. Trường có lịch sử phát triển từ năm 1941 với tiền thân là Cao đẳng Khoa học Đông Dương, trải qua các giai đoạn Đại học Đường Khoa học Sài Gòn và Đại học Tổng hợp TP.HCM, chính thức mang tên gọi hiện tại từ năm 1996 khi gia nhập Đại học Quốc gia TP.HCM.",
+    "ts": "2026-06-09T10:14:38.529253",
+    "turn_id": "e4220220-132f-432c-9e76-7d27a08a42c2"
+  },
+  {
+    "id": 51,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên có mấy khoa? kể tên",
+    "ts": "2026-06-09T10:15:58.135168",
+    "turn_id": "ec55d502-f82f-4072-ba78-3bc728f42f2b"
+  },
+  {
+    "id": 52,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên bao gồm 9 khoa chuyên môn, cụ thể là:\n- Công nghệ Thông tin\n- Toán - Tin học\n- Hóa học\n\nTài liệu không đề cập đến số lượng và tên của các khoa khác.",
+    "ts": "2026-06-09T10:15:58.152683",
+    "turn_id": "ec55d502-f82f-4072-ba78-3bc728f42f2b"
+  },
+  {
+    "id": 53,
+    "role": "user",
+    "content": "thời gian đào tạo cử nhân là bao lâu?",
+    "ts": "2026-06-09T10:16:49.550253",
+    "turn_id": "52464828-b7b0-4657-96e9-4883a8b22c5f"
+  },
+  {
+    "id": 54,
+    "role": "assistant",
+    "content": "Thời gian đào tạo trình độ cử nhân chính quy là bốn năm học. Tuy nhiên, sinh viên có thể được rút ngắn tối đa một năm học và kéo dài thêm không vượt quá ba năm học theo kế hoạch học tập của mình. Nếu quá thời hạn tối đa, sinh viên sẽ bị xóa tên khỏi danh sách sinh viên của trường, trừ khi Hiệu trưởng đồng ý gia hạn thêm thời gian nhưng không được vượt quá hai lần thời gian thiết kế của khóa học tương ứng với mỗi chương trình đào tạo.",
+    "ts": "2026-06-09T10:16:49.561875",
+    "turn_id": "52464828-b7b0-4657-96e9-4883a8b22c5f"
   }
 ]

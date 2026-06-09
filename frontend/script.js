@@ -1057,7 +1057,7 @@ function toggleMapMode() {
     }
 
     const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
-    if (isHome) {
+    if (isHome && window.innerWidth >= 768) {
         minimizeChat('maximize');
     } else {
         minimizeChat('minimize');
@@ -1101,7 +1101,7 @@ function toggleARMode() {
     }
 
     const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
-    if (isHome) {
+    if (isHome && window.innerWidth >= 768) {
         minimizeChat('maximize');
     } else {
         minimizeChat('minimize');
@@ -1620,3 +1620,4 @@ async function setTiktokRating(rating) {
         showToast("Lỗi kết nối", "error");
     }
 }
+window.addEventListener('DOMContentLoaded', () => { if (window.innerWidth < 768) { minimizeChat('minimize'); } });
