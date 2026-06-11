@@ -1,0 +1,13 @@
+{
+  "name": "vps-indoor-navigation",
+  "version": "1.0.0",
+  "description": "Virtual Positioning System — Hệ thống chỉ đường trong toà nhà",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  }
+}

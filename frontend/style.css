@@ -40,3 +40,9 @@
 .animate-fade-in {
     animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
+
+/* Ẩn icon con mắt mặc định của trình duyệt (Edge) ở ô password */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+    display: none;
+}

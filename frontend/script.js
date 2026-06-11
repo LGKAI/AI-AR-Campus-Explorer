@@ -1084,12 +1084,17 @@ function toggleARMode() {
 
     if (arLayer.classList.contains("hidden")) {
         arLayer.classList.remove("hidden");
-        canvasCont.classList.remove("hidden");
+        canvasCont.classList.add("hidden"); // Ẩn 3D map của GNN
         viewport.classList.replace("bg-slate-950", "bg-black");
         placeholder.classList.add("opacity-0", "pointer-events-none");
         btn.classList.add("bg-indigo-600", "border-indigo-400");
+        
+        if (typeof initLocalMap === 'function') {
+            initLocalMap();
+        }
+        
         fetchCampusNodes(); // To ensure graphData is loaded
-        transmitWebSocketPayload({ action: "ar_nav", payload: "start_camera_tracking" });
+        // transmitWebSocketPayload({ action: "ar_nav", payload: "start_camera_tracking" }); // Bỏ cái websocket tracking cũ này đi vì AR đã xử lý local
     } else {
         arLayer.classList.add("hidden");
         if (mapLayer.classList.contains("hidden")) {

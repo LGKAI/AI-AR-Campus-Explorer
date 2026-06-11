@@ -1,0 +1,139 @@
+{
+  "buildings": [
+    {
+      "id": "bldg_mq3aucsm",
+      "name": "Toà A",
+      "description": "",
+      "lat": 10.8738204,
+      "lng": 106.7971408,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3aurv2",
+      "name": "Toà B",
+      "description": "",
+      "lat": 10.8742024,
+      "lng": 106.797232,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3av1by",
+      "name": "Toà C",
+      "description": "",
+      "lat": 10.8746185,
+      "lng": 106.7974466,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3av7q4",
+      "name": "Toà D",
+      "description": "",
+      "lat": 10.8749689,
+      "lng": 106.7974547,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3avdqo",
+      "name": "Toà E",
+      "description": "",
+      "lat": 10.8753324,
+      "lng": 106.7978221,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3avw3x",
+      "name": "Nhà thi đấu",
+      "description": "",
+      "lat": 10.8759435,
+      "lng": 106.7967063,
+      "icon": "🏋️",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3aw75h",
+      "name": "Toà F",
+      "description": "",
+      "lat": 10.8763676,
+      "lng": 106.797767,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3awbov",
+      "name": "Toà G",
+      "description": "",
+      "lat": 10.8768681,
+      "lng": 106.7977644,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3aycsx",
+      "name": "Phòng Thí nghiệm Nghiên cứu Ung thư",
+      "description": "",
+      "lat": 10.8774134,
+      "lng": 106.7966834,
+      "icon": "🔬",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3ayl0l",
+      "name": "Viện Tế bào gốc",
+      "description": "",
+      "lat": 10.8780113,
+      "lng": 106.7967317,
+      "icon": "🔬",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3ayxi6",
+      "name": "Nhà điều hành",
+      "description": "",
+      "lat": 10.8758091,
+      "lng": 106.7991793,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3azi6x",
+      "name": "Trường Phổ thông Năng khiếu",
+      "description": "",
+      "lat": 10.8780401,
+      "lng": 106.7992625,
+      "icon": "🏫",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3b0201",
+      "name": "Bãi giữ xe - Cổng sau",
+      "description": "",
+      "lat": 10.8762095,
+      "lng": 106.7968377,
+      "icon": "🅿️",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3b0k2z",
+      "name": "Bãi giữ xe - Cổng trước",
+      "description": "",
+      "lat": 10.8750189,
+      "lng": 106.7986026,
+      "icon": "🅿️",
+      "color": "#00d4ff"
+    },
+    {
+      "id": "bldg_mq3b1ehg",
+      "name": "Hồ nước",
+      "description": "",
+      "lat": 10.8759316,
+      "lng": 106.7977846,
+      "icon": "🏆",
+      "color": "#00d4ff"
+    }
+  ]
+}

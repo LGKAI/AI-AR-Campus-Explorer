@@ -1,0 +1,60 @@
+{
+  "nodes": {
+    "hanh_lang_tang_2_1": {
+      "coords": [7.35, 8.84, -1.17],
+      "label": "Hành lang tầng 2 — Khu A",
+      "floor": 2
+    },
+    "hanh_lang_tang_2_2": {
+      "coords": [-4.88, 8.96, -1.17],
+      "label": "Hành lang tầng 2 — Khu B",
+      "floor": 2
+    },
+    "ghe_da": {
+      "coords": [-9.60, 9.94, -1.17],
+      "label": "Khu vực ghế đá",
+      "floor": 2
+    },
+    "cau_thang_tang_2": {
+      "coords": [-15.70, 10.67, -1.17],
+      "label": "Cầu thang — Tầng 2",
+      "floor": 2
+    },
+    "giua_cau_thang": {
+      "coords": [-15.39, 14.70, -2.69],
+      "label": "Chiếu nghỉ cầu thang",
+      "floor": 1.5
+    },
+    "cau_thang_tang_1": {
+      "coords": [-14.34, 10.79, -4.21],
+      "label": "Cầu thang — Tầng 1",
+      "floor": 1
+    },
+    "hanh_lang_tang_1_1": {
+      "coords": [-18.27, 6.82, -4.21],
+      "label": "Hành lang tầng 1 — Khu A",
+      "floor": 1
+    },
+    "hanh_lang_tang_1_2": {
+      "coords": [-18.24, -8.77, -4.21],
+      "label": "Hành lang tầng 1 — Khu B",
+      "floor": 1
+    },
+    "phong_1": {
+      "coords": [-15.48, 6.39, -4.21],
+      "label": "Phòng 1",
+      "floor": 1
+    }
+  },
+  "edges": [
+    ["hanh_lang_tang_2_1", "hanh_lang_tang_2_2", 12.23],
+    ["hanh_lang_tang_2_2", "ghe_da", 4.82],
+    ["hanh_lang_tang_2_2", "cau_thang_tang_2", 10.95],
+    ["ghe_da", "cau_thang_tang_2", 6.14],
+    ["cau_thang_tang_2", "giua_cau_thang", 4.32],
+    ["giua_cau_thang", "cau_thang_tang_1", 4.32],
+    ["cau_thang_tang_1", "hanh_lang_tang_1_1", 5.59],
+    ["hanh_lang_tang_1_1", "hanh_lang_tang_1_2", 15.59],
+    ["hanh_lang_tang_1_1", "phong_1", 2.82]
+  ]
+}

@@ -1,0 +1,11 @@
+[
+  ["hanh_lang_tang_2_1", "hanh_lang_tang_2_2"],
+  ["hanh_lang_tang_2_2", "ghe_da"],
+  ["hanh_lang_tang_2_2", "cau_thang_tang_2"],
+  ["ghe_da", "cau_thang_tang_2"],
+  ["cau_thang_tang_2", "giua_cau_thang"],
+  ["giua_cau_thang", "cau_thang_tang_1"],
+  ["cau_thang_tang_1", "hanh_lang_tang_1_1"],
+  ["hanh_lang_tang_1_1", "hanh_lang_tang_1_2"],
+  ["hanh_lang_tang_1_1", "phong_1"]
+]

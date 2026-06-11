@@ -10,7 +10,9 @@ source/
 ├── backend/
 │   ├── ai/
 │   │   ├── information_chatbot/   # Module STELLAR-RAG (Hỏi đáp quy chế) do Kin phụ trách
-│   │   ├── local_map/             # Module CV, DUSt3R (Đồ hoạ 3D, AR) do Hiếu phụ trách
+│   │   ├── local_map/             # Module Bản đồ 2D (Leaflet) & API AR Camera Navigation do Hiếu phụ trách
+│   │   │   ├── data/              # Chứa file toạ độ toà nhà (buildings.json) & điểm gốc (nav_graph.json)
+│   │   │   └── router.py          # FastAPI Router cấp dữ liệu bản đồ cục bộ
 │   │   ├── recommendation_system/ # Module GNN & Pathfinding (Tìm đường) do Khoa phụ trách
 │   │   └── face_guard/            # Module Face Recognition (Xác thực khuôn mặt) do Khanh phụ trách
 │   ├── core/
@@ -32,6 +34,7 @@ source/
 │   └── requirements.txt           # Danh sách các thư viện cần thiết
 └── frontend/
     ├── img/                       # Thư mục chứa hình ảnh tài nguyên
+    ├── local_map/                 # Thư mục chứa CSS và script AR Camera (ar-integration.js, leaflet)
     ├── index.html                 # Giao diện của ứng dụng
     ├── style.css                  # Thiết kế giao diện
     └── script.js                  # Logic xử lý giao diện, bản đồ, gọi API, Web Speech API

@@ -7,8 +7,12 @@
     <link rel="icon" type="image/png" href="\img\logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
+    
+    <!-- Leaflet map -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen w-screen overflow-hidden font-sans">
+<body class="bg-slate-900 text-slate-100 h-[100dvh] w-full overflow-hidden font-sans">
 
     <div id="auth-view" class="hidden relative flex flex-col h-full w-full px-4 py-8 z-20 transition-all duration-500 overflow-y-auto overflow-x-hidden">
         <!-- Hiệu ứng ánh sáng nền (Ambient Glow) -->
@@ -107,13 +111,16 @@
     <div id="main-view" class="hidden h-full w-full flex-col relative z-10 animate-fade-in">
         
         <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between shadow-md z-30">
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2 md:gap-3">
                 <img src="img/logo.png" alt="Small Logo" class="w-6 h-6 object-contain">
-                <span class="font-bold tracking-wide text-sm text-blue-400">AI AR CAMPUS EXPLORER</span>
+                <span class="font-bold tracking-wide text-sm text-blue-400 hidden sm:block">AI AR CAMPUS EXPLORER</span>
             </div>
-            <div class="flex items-center gap-3">
-                <button id="user-display" onclick="showUserHistory()" class="text-xs text-slate-300 font-medium bg-slate-950 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-blue-500 transition-all cursor-pointer shadow-md">👤 Sinh viên</button>
-                <button onclick="executeLogout()" class="text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-550/10 border border-rose-500/20 px-2.5 py-1.5 rounded-lg transition-all">Đăng xuất</button>
+            <div class="flex items-center gap-2 sm:gap-3">
+                <button id="user-display" onclick="showUserHistory()" class="text-xs text-slate-300 font-medium bg-slate-950 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-blue-500 transition-all cursor-pointer shadow-md">👤 <span class="hidden sm:inline">Sinh viên</span></button>
+                <button onclick="executeLogout()" class="text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-550/10 border border-rose-500/20 px-2.5 py-1.5 rounded-lg transition-all" title="Đăng xuất">
+                    <span class="hidden sm:inline">Đăng xuất</span>
+                    <svg class="w-4 h-4 sm:hidden inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                </button>
                 <button onclick="toggleMobilePanels()" class="md:hidden text-slate-300 p-1.5 border border-slate-700 rounded-lg hover:bg-slate-700 transition-all focus:outline-none ml-1">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
                 </button>
@@ -140,6 +147,67 @@
 
             <div id="map-layer" class="absolute inset-0 hidden pointer-events-none z-10 overflow-hidden">
                 <!-- map-layer is now empty, panels are managed by panels-container -->
+            </div>
+
+            <div id="ar-layer" class="absolute inset-0 hidden pointer-events-auto z-[40] overflow-hidden bg-slate-900">
+                <!-- 1. Leaflet Map View -->
+                <div id="local-map-container" class="absolute inset-0"></div>
+                
+                <!-- Nút Launch AR -->
+                <div id="ar-launch-overlay" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-[1000]">
+                    <button id="btn-launch-ar" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all flex items-center gap-2 border border-indigo-400">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        AR CAMERA
+                    </button>
+                </div>
+
+                <!-- 2. AR Camera View (Hidden initially) -->
+                <video id="ar-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover hidden z-10"></video>
+                <canvas id="ar-canvas" class="absolute inset-0 w-full h-full hidden z-20 pointer-events-auto"></canvas>
+
+                <!-- AR HUD (Top) -->
+                <div id="ar-top-hud" class="absolute top-0 left-0 right-0 hidden p-4 pt-safe-top flex justify-between items-start z-30 pointer-events-none">
+                    <div id="ar-gps-pill" class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
+                        <span>📍 Lấy GPS...</span>
+                    </div>
+                    <div id="ar-compass-pill" class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
+                        <span>🧭 --°</span>
+                    </div>
+                </div>
+
+                <!-- AR Close Panel -->
+                <div id="ar-bottom-panel" class="absolute top-[80px] right-4 hidden z-[100] pointer-events-none">
+                    <div class="pointer-events-auto">
+                        <button id="btn-close-ar" class="bg-slate-900/80 hover:bg-red-500 text-white font-bold p-2.5 rounded-2xl backdrop-blur-md border border-slate-700 hover:border-red-500 shadow-xl transition-all flex items-center justify-center group" title="Đóng Camera AR">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- AR Destination Selection (Shown when selectedDestination is null) -->
+                <div id="ar-destination-selector" class="absolute bottom-6 left-0 right-0 z-30 pointer-events-none hidden">
+                    <div class="pointer-events-auto px-4 pb-4 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent pt-12">
+                        <h3 class="text-white font-bold text-base mb-1 drop-shadow-lg">Bạn muốn đến đâu? 📍</h3>
+                        <p class="text-slate-300 text-[11px] mb-3 drop-shadow-md">Chọn một toà nhà bên dưới để bắt đầu chỉ đường</p>
+                        <div id="ar-destination-list" class="flex overflow-x-auto gap-3 pb-2 custom-scrollbar snap-x snap-mandatory">
+                            <!-- Chips will be generated here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- AR Selected Destination Card (Shown when selectedDestination is set) -->
+                <div id="ar-selected-card" class="absolute bottom-6 left-4 right-4 z-30 pointer-events-none hidden">
+                    <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 border border-slate-700 flex justify-between items-center shadow-2xl">
+                        <div class="flex items-center gap-3">
+                            <div id="ar-card-icon" class="bg-blue-600 w-11 h-11 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">P</div>
+                            <div>
+                                <h3 id="ar-card-name" class="text-white font-bold text-sm">Bãi giữ xe</h3>
+                                <p id="ar-card-dist" class="text-cyan-400 text-xs font-medium mt-0.5">📍 -- m</p>
+                            </div>
+                        </div>
+                        <button onclick="clearARDestination()" class="text-slate-400 text-[11px] font-medium hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-all border border-slate-700">× Đóng</button>
+                    </div>
+                </div>
             </div>
 
             <div id="panels-container" class="hidden flex-col gap-6 fixed inset-0 z-[60] bg-slate-950/98 overflow-y-auto p-4 pt-16 md:flex-none md:block md:absolute md:inset-0 md:z-10 md:pointer-events-none md:overflow-hidden md:bg-transparent md:p-0">
@@ -300,26 +368,10 @@
                     </div>
             </div>
 
-            <div id="ar-layer" class="absolute inset-0 hidden pointer-events-none z-10">
-                <div class="absolute top-4 left-4 pointer-events-auto bg-slate-950/80 p-3.5 rounded-xl border border-slate-700 text-xs text-indigo-400 space-y-2 z-20 shadow-lg backdrop-blur-sm max-w-[280px]">
-                    <div class="font-bold flex items-center gap-2 tracking-wide">
-                        <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                            <rect x="2" y="7" width="20" height="10" rx="3" ry="3"></rect>
-                            <path d="M12 17v-6"></path>
-                            <circle cx="7.5" cy="12" r="1.5"></circle>
-                            <circle cx="16.5" cy="12" r="1.5"></circle>
-                        </svg>
-                        WEBXR AR MODE ACTIVE
-                    </div>
-                    <p class="text-slate-300 text-[11px] leading-relaxed">Nhấn vào biểu tượng các tòa nhà trên bản đồ để xem mô hình không gian 3D Hologram.</p>
-                </div>
-                <div class="absolute top-1/3 left-1/4 w-2 h-2 bg-cyan-400 rounded-full animate-ping"></div>
-                <div class="absolute top-1/2 left-2/3 w-2 h-2 bg-indigo-400 rounded-full animate-ping"></div>
-            </div>
+
 
         </div>
-
-        <div class="fixed bottom-[84px] left-4 md:bottom-4 md:left-[430px] flex flex-row gap-3 z-[90]">
+        <div id="bottom-nav-buttons" class="fixed bottom-[84px] left-4 md:bottom-4 md:left-[430px] flex flex-row gap-3 z-[90]">
             <button onclick="toggleMapMode()" id="btn-map" class="p-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 hover:border-blue-500 rounded-2xl shadow-xl transition-all group relative flex items-center justify-center" title="Bản đồ cơ sở">
                 <svg class="w-6 h-6 text-slate-300 group-hover:text-blue-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M14.12 3.88 16 2v14l-4 2-4-2-4 2V4l4-2 4 2z" />
@@ -524,6 +576,7 @@
         </div>
     </div>
 
+    <script src="local_map/js/ar-integration.js"></script>
     <script src="script.js"></script>
 </body>
 </html>

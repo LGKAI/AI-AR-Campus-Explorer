@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers import users, locations, ws, recommendation, chat, history
+from ai.local_map import router as local_map_router
 from fastapi.staticfiles import StaticFiles
 import os
 
@@ -26,7 +27,7 @@ app.include_router(ws.router)
 app.include_router(recommendation.router)
 app.include_router(chat.router)
 app.include_router(history.router)
-
+app.include_router(local_map_router.router)
 @app.get("/")
 async def root():
     return {"status": "ok", "message": "FastAPI Gateway is running smoothly"}

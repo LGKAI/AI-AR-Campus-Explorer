@@ -35,7 +35,8 @@ class Embedder:
             self.client = Client(host=settings.ollama_host)
             self.model  = None
         else:
-            device = "cuda" if settings.use_gpu else "cpu"
+            import torch
+            device = "cuda" if (settings.use_gpu and torch.cuda.is_available()) else "cpu"
             self.model = SentenceTransformer(settings.embed_model, device=device)
             # Cap sequence length to prevent O(n²) attention OOM
             if hasattr(self.model, "max_seq_length"):
