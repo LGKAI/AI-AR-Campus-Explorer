@@ -376,5 +376,61 @@
     "content": "Thời gian đào tạo trình độ cử nhân chính quy là bốn năm học. Tuy nhiên, sinh viên có thể được rút ngắn tối đa một năm học và kéo dài thêm không vượt quá ba năm học theo kế hoạch học tập của mình. Nếu quá thời hạn tối đa, sinh viên sẽ bị xóa tên khỏi danh sách sinh viên của trường, trừ khi Hiệu trưởng đồng ý gia hạn thêm thời gian nhưng không được vượt quá hai lần thời gian thiết kế của khóa học tương ứng với mỗi chương trình đào tạo.",
     "ts": "2026-06-09T10:16:49.561875",
     "turn_id": "52464828-b7b0-4657-96e9-4883a8b22c5f"
+  },
+  {
+    "id": 55,
+    "role": "user",
+    "content": "Thư Lê là ai?",
+    "ts": "2026-06-09T10:18:50.859770",
+    "turn_id": "f4eb477f-3aa3-492b-896c-3497f9fc6a78"
+  },
+  {
+    "id": 56,
+    "role": "assistant",
+    "content": "Tài liệu không đề cập đến Thư Lê.",
+    "ts": "2026-06-09T10:18:50.871370",
+    "turn_id": "f4eb477f-3aa3-492b-896c-3497f9fc6a78"
+  },
+  {
+    "id": 57,
+    "role": "user",
+    "content": "Thời gian đào tạo cử nhân là bao lâu?",
+    "ts": "2026-06-11T09:18:46.823579",
+    "turn_id": "9bed3df5-3abd-4a15-9f9e-b83777d5c630"
+  },
+  {
+    "id": 58,
+    "role": "assistant",
+    "content": "Thời gian đào tạo trình độ cử nhân chính quy là bốn năm học. Sinh viên có thể được rút ngắn tối đa một (01) năm học và kéo dài thêm không vượt quá ba (03) năm học theo kế hoạch học tập.",
+    "ts": "2026-06-11T09:18:46.835502",
+    "turn_id": "9bed3df5-3abd-4a15-9f9e-b83777d5c630"
+  },
+  {
+    "id": 59,
+    "role": "user",
+    "content": "Thời gian đào tạo cử nhân là bao lâu?",
+    "ts": "2026-06-11T09:30:52.652542",
+    "turn_id": "8b7d9463-c814-4eef-99cf-c240d0fddfce"
+  },
+  {
+    "id": 60,
+    "role": "assistant",
+    "content": "Thời gian đào tạo trình độ cử nhân chính quy là bốn năm học. Sinh viên có thể được rút ngắn tối đa một (01) năm học và kéo dài thêm không vượt quá ba (03) năm học theo kế hoạch học tập.",
+    "ts": "2026-06-11T09:30:52.692602",
+    "turn_id": "8b7d9463-c814-4eef-99cf-c240d0fddfce"
+  },
+  {
+    "id": 61,
+    "role": "user",
+    "content": "Trường Đại học Khoa học Tự nhiên là trường nào",
+    "ts": "2026-06-12T01:15:28.656466",
+    "turn_id": "47da265a-ed63-46b9-bc45-6ac2f2ecb5a7"
+  },
+  {
+    "id": 62,
+    "role": "assistant",
+    "content": "Trường Đại học Khoa học Tự nhiên, Đại học Quốc gia Thành phố Hồ Chí Minh (HCMUS) là trường đại học công lập hàng đầu tại Việt Nam. Trường đóng vai trò nòng cốt trong hệ thống giáo dục đại học và nghiên cứu khoa học cơ bản, khoa học công nghệ mũi nhọn của cả nước. Nhà trường có lịch sử phát triển từ năm 1941 với tiền thân là Cao đẳng Khoa học Đông Dương, trải qua các giai đoạn Đại học Đường Khoa học Sài Gòn và Đại học Tổng hợp TP.HCM, chính thức mang tên hiện tại từ năm 1996 khi gia nhập Đại học Quốc gia TP.HCM.",
+    "ts": "2026-06-12T01:15:28.674440",
+    "turn_id": "47da265a-ed63-46b9-bc45-6ac2f2ecb5a7"
   }
 ]
