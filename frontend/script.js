@@ -1179,10 +1179,8 @@ async function clearUserHistory() {
     }
 }
 
-// AR 3D Model logic
+// Node Image Modal logic (GNN Map Visualization)
 document.getElementById('canvas-container').addEventListener('click', (e) => {
-    // Chỉ kích hoạt chức năng này khi đang bật chế độ AR WebXR
-    if (document.getElementById('ar-layer').classList.contains('hidden')) return;
     
     // Bỏ qua nếu người dùng vừa mới kéo bản đồ xong (tránh lỗi click nhầm khi đang kéo)
     if (window.lastClickDownX && window.lastClickDownY) {
@@ -1218,14 +1216,15 @@ document.getElementById('canvas-container').addEventListener('click', (e) => {
     
     // Bán kính click (nhạy hơn một chút để dễ bấm trên điện thoại)
     if (minDist < 40 && closestNode) {
-        showARModel(closestNode);
+        showNodeImage(closestNode);
     }
 });
 
-function showARModel(node) {
-    document.getElementById('ar-model-title').innerText = node.id.replace(/_/g, " ");
-    const iconEl = document.getElementById('ar-model-icon');
-    const imgEl = document.getElementById('ar-model-img');
+function showNodeImage(node) {
+    console.log("Showing node image for:", node);
+    document.getElementById('node-image-title').innerText = node.id.replace(/_/g, " ");
+    const iconEl = document.getElementById('node-image-icon');
+    const imgEl = document.getElementById('node-image-img');
     
     if (node.image_url) {
         iconEl.classList.add('hidden');
@@ -1245,7 +1244,7 @@ function showARModel(node) {
         
         iconEl.innerText = icon;
     }
-    document.getElementById('ar-model-modal').classList.remove('hidden');
+    document.getElementById('node-image-modal').classList.remove('hidden');
 }
 
 // ==========================================

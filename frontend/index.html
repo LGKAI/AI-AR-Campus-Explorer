@@ -137,7 +137,7 @@
                 </div>
                 <h3 class="text-lg font-bold text-slate-100 mt-2">AI AR CAMPUS EXPLORER</h3>
                 <p class="text-sm text-slate-400 max-w-md mt-2 leading-relaxed">Hệ thống Bản đồ Campus và Trợ lý ảo thông minh cho HCMUS.</p>
-                <p class="text-sm text-slate-400 max-w-md mt-2 leading-relaxed">Hãy bật chế độ <span class="text-blue-400 font-semibold">GNN Map</span> hoặc <span class="text-indigo-400 font-semibold">AR WebXR</span> để bắt đầu trải nghiệm!</p>
+                <p class="text-sm text-slate-400 max-w-md mt-2 leading-relaxed">Hãy bật chế độ <span class="text-blue-400 font-semibold">GNN Map</span> hoặc <span class="text-indigo-400 font-semibold">Thực tế tăng cường Web AR</span> để bắt đầu trải nghiệm!</p>
             </div>
 
             <div class="absolute inset-0 hidden cursor-grab active:cursor-grabbing z-0" id="canvas-container">
@@ -386,7 +386,7 @@
                     <path d="M9 7v4a3 3 0 0 0 6 0V7" />
                     <path d="M12 15v3" />
                 </svg>
-                <span class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-950 text-xs font-bold tracking-wide text-indigo-400 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap border border-slate-700 shadow-lg">AR WebXR</span>
+                <span class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-950 text-xs font-bold tracking-wide text-indigo-400 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap border border-slate-700 shadow-lg">Thực tế tăng cường Web AR</span>
             </button>
         </div>
 
@@ -541,37 +541,30 @@
         </div>
     </div>
 
-    <!-- 3D AR Model Modal -->
-    <div id="ar-model-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md">
-        <div class="bg-slate-900 border border-indigo-500/50 p-6 rounded-3xl shadow-[0_0_50px_rgba(79,70,229,0.3)] w-full max-w-xl animate-fade-in relative flex flex-col items-center">
-            <button onclick="document.getElementById('ar-model-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-20">
+    <!-- Node Image Modal -->
+    <div id="node-image-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div class="bg-slate-900 border border-blue-500/50 p-6 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.3)] w-full max-w-xl animate-fade-in relative flex flex-col items-center">
+            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-20">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
-            <h3 id="ar-model-title" class="text-xl font-bold text-indigo-400 mb-2 uppercase tracking-wider">TÒA NHÀ X</h3>
-            <p class="text-xs text-slate-400 mb-6">Mô hình 3D Hologram (Minh họa)</p>
+            <h3 id="node-image-title" class="text-xl font-bold text-blue-400 mb-2 uppercase tracking-wider">TÒA NHÀ X</h3>
+            <p class="text-xs text-slate-400 mb-6">Hình ảnh thực tế địa điểm</p>
             
             <div class="w-full aspect-video bg-slate-950 rounded-xl border border-slate-700 relative overflow-hidden flex items-center justify-center group perspective-1000">
-                <!-- Vòng tròn quét -->
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-64 h-64 border-[4px] border-indigo-500/30 rounded-full animate-spin-slow pointer-events-none"></div>
-                </div>
-                <div class="absolute inset-0 flex items-center justify-center">
-                    <div class="w-48 h-48 border-[2px] border-cyan-400/20 rounded-full animate-reverse-spin pointer-events-none"></div>
-                </div>
                 
-                <!-- Hình ảnh minh họa xoay hoặc Ảnh thực tế -->
+                <!-- Hình ảnh minh họa hoặc Ảnh thực tế -->
                 <div class="absolute inset-0 z-10 transform transition-transform duration-1000 group-hover:scale-110 flex items-center justify-center">
-                    <div id="ar-model-icon" class="text-9xl drop-shadow-[0_0_30px_rgba(99,102,241,0.8)] filter animate-float">🏢</div>
-                    <img id="ar-model-img" src="" class="hidden w-full h-full object-cover z-20">
+                    <div id="node-image-icon" class="text-9xl drop-shadow-[0_0_30px_rgba(59,130,246,0.8)] filter">🏢</div>
+                    <img id="node-image-img" src="" class="hidden w-full h-full object-cover z-20">
                 </div>
                 
-                <div class="absolute bottom-4 left-4 bg-indigo-900/50 text-indigo-200 text-[10px] px-2 py-1 rounded border border-indigo-500/50 backdrop-blur-md">
-                    Chế độ: WebXR / Hologram
+                <div class="absolute bottom-4 left-4 z-30 bg-blue-900/50 text-blue-200 text-[10px] px-2 py-1 rounded border border-blue-500/50 backdrop-blur-md">
+                    GNN Map Visualization
                 </div>
             </div>
             
-            <button onclick="document.getElementById('ar-model-modal').classList.add('hidden')" class="mt-6 w-full bg-indigo-600 hover:bg-indigo-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(79,70,229,0.4)]">
-                Đóng mô hình
+            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+                Đóng
             </button>
         </div>
     </div>
