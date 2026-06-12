@@ -80,3 +80,25 @@ Cách chạy nhanh nhất:
 3. Hoặc mở trực tiếp file `index.html` trên trình duyệt Chrome/Edge/Firefox.
 
 > **Lưu ý:** Để tính năng thu âm (Web Speech API) và Webcam (FaceID) hoạt động, bạn cần chạy Frontend trên một Local server (VD: `http://127.0.0.1:5500`) thay vì mở file dạng `file:///...` do chính sách bảo mật của trình duyệt.
+
+### 3. Hướng dẫn test trên Điện thoại (Cùng mạng Wi-Fi)
+Để sử dụng đồ án trên điện thoại thật (cần thiết cho chức năng GPS và Camera AR), bạn cần làm theo các bước sau:
+
+**Bước 1: Khởi động Backend cho phép mạng ngoài truy cập**
+Thay vì chạy `127.0.0.1`, bạn hãy chạy Backend với host `0.0.0.0`:
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
+**Bước 2: Sửa IP trong Frontend**
+1. Lấy địa chỉ IPv4 của Laptop (Dùng lệnh `ipconfig` trên Windows, ví dụ `192.168.1.15`).
+2. Sửa toàn bộ đường dẫn gọi API trong các file JS (như `api.js`, `script.js`) từ `http://localhost:8000` thành `http://<IP_Laptop>:8000`.
+
+**Bước 3: Vượt rào bảo mật HTTPS (Bắt buộc cho Camera & GPS)**
+Trình duyệt trên điện thoại sẽ chặn Camera và GPS nếu đường dẫn truy cập là HTTP thay vì HTTPS. Bạn có 2 cách giải quyết:
+- **Cách 1 (Dành cho điện thoại Android):** Mở Chrome trên Android, truy cập vào `chrome://flags/#unsafely-treat-insecure-origin-as-secure`. Điền địa chỉ IP của frontend (VD: `http://192.168.1.15:5500`) vào ô, bật **Enabled** và khởi động lại Chrome.
+- **Cách 2 (Dành cho iPhone/Mọi thiết bị):** Dùng công cụ tạo hầm (tunnel) để lấy link HTTPS tạm thời. Trên laptop, chạy lệnh NodeJS:
+```bash
+npx localtunnel --port 5500
+```
+Truy cập vào đường link `https://...` vừa được cấp bằng điện thoại.
