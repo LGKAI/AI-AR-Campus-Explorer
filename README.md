@@ -4,6 +4,8 @@
 
 Video Demo: https://youtu.be/bCx2UIy9N5Y?si=EkbJ5mAB5oKfTRJj
 
+Interactive Prototype: https://lgkai.github.io/AACE-Interactive-Prototype/
+
 AI AR Campus Explorer là một hệ thống bản đồ học thuật tiên tiến dành cho sinh viên trường Đại học Khoa học Tự nhiên (HCMUS). 
 Hệ thống kết hợp nhiều công nghệ AI hiện đại như **Knowledge Graph (GNN)** để tìm đường, **RAG Chatbot** để hỏi đáp thông tin quy chế, **WebXR** để trải nghiệm AR 3D Hologram, và **Face Recognition** để quản lý tài khoản.
 
