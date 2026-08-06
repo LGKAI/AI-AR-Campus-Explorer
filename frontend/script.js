@@ -1,8 +1,20 @@
-const BACKEND_URL = "http://127.0.0.1:8000";
-const WS_URL = "ws://127.0.0.1:8000/ws/ar-stream";
+const BACKEND_URL = "https://essential-snipping-parcel.ngrok-free.dev";
+const WS_URL = "wss://essential-snipping-parcel.ngrok-free.dev/ws/ar-stream";
 
 let socket = null;
 let currentTab = "login";
+
+// --- NGROK BYPASS INTERCEPTOR ---
+// Ngrok free tier blocks API requests with a warning page. This header bypasses it.
+const originalFetch = window.fetch;
+window.fetch = async (...args) => {
+    let [resource, config] = args;
+    if (!config) config = {};
+    if (!config.headers) config.headers = {};
+    config.headers['ngrok-skip-browser-warning'] = 'true';
+    return originalFetch(resource, config);
+};
+// --------------------------------
 let isChatMinimized = false;
 
 // Các biến phục vụ Zoom/Pan bản đồ

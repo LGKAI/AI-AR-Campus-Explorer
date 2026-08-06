@@ -69,3 +69,9 @@ ehthumbs_vista.db
 .idea/
 *.swp
 *.swo
+
+# ========================
+# NGROK
+# ========================
+ngrok.exe
+ngrok.yml
