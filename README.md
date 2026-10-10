@@ -1,9 +1,8 @@
 # AI AR Campus Explorer
 
-**Đồ án môn học:** Tư duy tính toán cho AI (Computational Thinking for AI)  
-**Trường Đại học:** Trường Đại học Khoa học Tự nhiên - ĐHQG TP.HCM (HCMUS)  
+Đồ án Tư duy tính toán cho AI 
 
-🎥 **Video Demo Dự Án:** [Xem trên YouTube](https://youtu.be/bCx2UIy9N5Y?si=EkbJ5mAB5oKfTRJj)
+🎥 **Video Demo:** [Xem trên YouTube](https://youtu.be/bCx2UIy9N5Y?si=EkbJ5mAB5oKfTRJj)
 
 ---
 
