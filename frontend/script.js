@@ -1,5 +1,11 @@
-const BACKEND_URL = "https://essential-snipping-parcel.ngrok-free.dev";
-const WS_URL = "wss://essential-snipping-parcel.ngrok-free.dev/ws/ar-stream";
+// Tự động nhận diện môi trường: Khi chạy Live Server (localhost/127.0.0.1), tự động dùng Backend cổng 8000
+const isLocalhost = ["localhost", "127.0.0.1", "::1", ""].includes(window.location.hostname);
+const PROD_NGROK_URL = "https://essential-snipping-parcel.ngrok-free.dev"; // Cập nhật link ngrok khi deploy Netlify
+
+const BACKEND_URL = isLocalhost ? "http://127.0.0.1:8000" : PROD_NGROK_URL;
+const WS_URL = isLocalhost 
+    ? "ws://127.0.0.1:8000/ws/ar-stream" 
+    : PROD_NGROK_URL.replace(/^http/, "ws") + "/ws/ar-stream";
 
 let socket = null;
 let currentTab = "login";
@@ -11,11 +17,15 @@ window.fetch = async (...args) => {
     let [resource, config] = args;
     if (!config) config = {};
     if (!config.headers) config.headers = {};
-    config.headers['ngrok-skip-browser-warning'] = 'true';
+    if (config.headers instanceof Headers) {
+        config.headers.set('ngrok-skip-browser-warning', 'true');
+    } else {
+        config.headers['ngrok-skip-browser-warning'] = 'true';
+    }
     return originalFetch(resource, config);
 };
 // --------------------------------
-let isChatMinimized = false;
+let isChatMinimized = (window.innerWidth < 768);
 
 // Các biến phục vụ Zoom/Pan bản đồ
 let mapScale = 1;
@@ -50,12 +60,24 @@ const CUSTOM_UI_POSITIONS = {
     "Cây ATM": { x: 38, y: 65 }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+    await verifyAuthTokenState();
     initializeWebcamSimulator();
-    verifyAuthTokenState();
     initMapControls();
     initChatDrag();
 });
+
+// Tự động kích hoạt lại Camera khi người dùng gạt bật quyền trong menu ổ khóa
+if (navigator.permissions && navigator.permissions.query) {
+    navigator.permissions.query({ name: 'camera' }).then(permissionStatus => {
+        permissionStatus.onchange = () => {
+            if (permissionStatus.state === 'granted') {
+                console.log("Quyền camera đã được cấp, tự động mở webcam...");
+                initializeWebcamSimulator();
+            }
+        };
+    }).catch(() => { });
+}
 
 function initChatDrag() {
     // Đã vô hiệu hoá tính năng kéo thả Chatbot theo yêu cầu của user
@@ -77,14 +99,14 @@ function initMapControls() {
         const zoomIntensity = 0.1;
         const wheel = e.deltaY < 0 ? 1 : -1;
         const zoom = Math.exp(wheel * zoomIntensity);
-        
+
         const newScale = mapScale * zoom;
         if (newScale < 0.2 || newScale > 10) return;
-        
+
         mapOffsetX = mouseX - (mouseX - mapOffsetX) * zoom;
         mapOffsetY = mouseY - (mouseY - mapOffsetY) * zoom;
         mapScale = newScale;
-        
+
         drawMap();
     }, { passive: false });
 
@@ -113,55 +135,271 @@ function initMapControls() {
     });
 }
 
-async function initializeWebcamSimulator() {
+let uploadedFaceBase64 = "";
+let uploadedFaceImage = null;
+let overlayAnimId = null;
+
+function startOverlayLoop() {
     const video = document.getElementById("webcam");
     const canvas = document.getElementById("face-overlay");
+    if (!video || !canvas) return;
     const ctx = canvas.getContext("2d");
 
-    try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-        video.srcObject = stream;
-        
-        function drawOverlayLoop() {
-            if (!video.paused && !video.ended) {
-                canvas.width = video.clientWidth;
-                canvas.height = video.clientHeight;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                ctx.strokeStyle = "rgba(34, 221, 238, 0.4)";
-                ctx.lineWidth = 1;
-                ctx.strokeRect(canvas.width/2 - 40, canvas.height/2 - 50, 80, 100);
-                
-                ctx.beginPath();
-                ctx.moveTo(canvas.width/2, canvas.height/2 - 30);
-                ctx.lineTo(canvas.width/2 - 30, canvas.height/2);
-                ctx.lineTo(canvas.width/2, canvas.height/2 + 30);
-                ctx.lineTo(canvas.width/2 + 30, canvas.height/2);
-                ctx.closePath();
-                ctx.stroke();
+    function renderLoop() {
+        if (uploadedFaceImage) {
+            const w = canvas.parentElement ? canvas.parentElement.clientWidth : 320;
+            const h = canvas.parentElement ? canvas.parentElement.clientHeight : 240;
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
             }
-            requestAnimationFrame(drawOverlayLoop);
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.drawImage(uploadedFaceImage, 0, 0, canvas.width, canvas.height);
+
+            // Khung quét AR trên ảnh upload
+            ctx.strokeStyle = "rgba(34, 221, 238, 0.7)";
+            ctx.lineWidth = 2;
+            const boxW = Math.min(100, canvas.width * 0.4);
+            const boxH = boxW * 1.25;
+            ctx.strokeRect((canvas.width - boxW) / 2, (canvas.height - boxH) / 2, boxW, boxH);
+        } else if (!video.paused && !video.ended) {
+            const w = video.clientWidth || 320;
+            const h = video.clientHeight || 240;
+            if (canvas.width !== w || canvas.height !== h) {
+                canvas.width = w;
+                canvas.height = h;
+            }
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Vẽ khung quét nhận diện khuôn mặt
+            ctx.strokeStyle = "rgba(34, 221, 238, 0.6)";
+            ctx.lineWidth = 1.5;
+            const boxW = Math.min(100, canvas.width * 0.4);
+            const boxH = boxW * 1.25;
+            ctx.strokeRect((canvas.width - boxW) / 2, (canvas.height - boxH) / 2, boxW, boxH);
+
+            // Điểm ngắm tâm
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - 25);
+            ctx.lineTo(cx - 25, cy);
+            ctx.lineTo(cx, cy + 25);
+            ctx.lineTo(cx + 25, cy);
+            ctx.closePath();
+            ctx.stroke();
         }
-        video.addEventListener("play", drawOverlayLoop);
+        overlayAnimId = requestAnimationFrame(renderLoop);
+    }
+    cancelAnimationFrame(overlayAnimId);
+    overlayAnimId = requestAnimationFrame(renderLoop);
+}
+
+let availableVideoDevices = [];
+let currentDeviceIndex = 0;
+
+async function startCameraStream(deviceId = null) {
+    const video = document.getElementById("webcam");
+    const canvas = document.getElementById("face-overlay");
+    if (!video || !canvas) return null;
+    const ctx = canvas.getContext("2d");
+
+    // Dừng các track stream cũ
+    if (video.srcObject && video.srcObject.getTracks) {
+        video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    const videoConstraints = deviceId
+        ? { deviceId: { exact: deviceId } }
+        : { width: { ideal: 640 }, height: { ideal: 480 } };
+
+    let stream = null;
+    try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: videoConstraints });
+    } catch (e1) {
+        console.warn("Thử fallback video: true:", e1);
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({ video: true });
+        } catch (e2) {
+            console.error("Cả 2 cách mở stream đều thất bại:", e2);
+            throw e2;
+        }
+    }
+
+    video.srcObject = stream;
+    video.muted = true;
+    video.playsInline = true;
+
+    try {
+        await video.play();
+    } catch (playErr) {
+        console.warn("Lỗi video.play:", playErr);
+    }
+
+    // Xóa sạch canvas đen ngay khi camera chạy!
+    canvas.width = video.clientWidth || 320;
+    canvas.height = video.clientHeight || 240;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    uploadedFaceBase64 = ""; // Reset ảnh upload nếu camera mở thành công
+    uploadedFaceImage = null;
+
+    // Khởi động vòng lặp vẽ khung AR
+    startOverlayLoop();
+
+    return stream;
+}
+
+async function initializeWebcamSimulator() {
+    try {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            throw new Error("Trình duyệt không hỗ trợ Camera hoặc chặn kết nối.");
+        }
+
+        // 1. Thử lấy danh sách camera trước
+        try {
+            const devices = await navigator.mediaDevices.enumerateDevices();
+            availableVideoDevices = devices.filter(d => d.kind === "videoinput");
+            console.log("Danh sách camera tìm thấy:", availableVideoDevices);
+        } catch (enumErr) {
+            console.warn("Lỗi khi enumerate devices ban đầu:", enumErr);
+        }
+
+        let stream = null;
+
+        // Ưu tiên camera thật trước, virtual camera sau
+        if (availableVideoDevices.length > 0) {
+            // Sắp xếp đưa camera không phải obs/virtual lên đầu
+            const sortedDevices = [...availableVideoDevices].sort((a, b) => {
+                const aVirtual = (a.label || "").toLowerCase().includes("obs") || (a.label || "").toLowerCase().includes("virtual");
+                const bVirtual = (b.label || "").toLowerCase().includes("obs") || (b.label || "").toLowerCase().includes("virtual");
+                return aVirtual === bVirtual ? 0 : aVirtual ? 1 : -1;
+            });
+
+            for (let i = 0; i < sortedDevices.length; i++) {
+                const dev = sortedDevices[i];
+                try {
+                    console.log(`Đang thử kết nối camera [${i}]: ${dev.label || dev.deviceId}`);
+                    stream = await startCameraStream(dev.deviceId);
+                    if (stream) {
+                        currentDeviceIndex = availableVideoDevices.findIndex(d => d.deviceId === dev.deviceId);
+                        console.log(`Kết nối thành công camera: ${dev.label || "Camera " + (i + 1)}`);
+                        showToast(`Đã kết nối: ${dev.label || "Camera " + (i + 1)}`, "success");
+                        break;
+                    }
+                } catch (devErr) {
+                    console.warn(`Camera [${dev.label || dev.deviceId}] không phản hồi:`, devErr);
+                }
+            }
+        }
+
+        // Nếu thử theo deviceId chưa được, thử mở mặc định
+        if (!stream) {
+            console.log("Đang thử mở camera mặc định không ràng buộc deviceId...");
+            stream = await startCameraStream();
+            showToast("Đã kết nối Camera thành công!", "success");
+        }
+
+        // Cập nhật lại danh sách devices sau khi đã cấp quyền
+        try {
+            const updated = await navigator.mediaDevices.enumerateDevices();
+            availableVideoDevices = updated.filter(d => d.kind === "videoinput");
+        } catch (e) { }
+
     } catch (err) {
-        showToast("Lỗi: Không thể truy cập Camera. Vui lòng cấp quyền!", "error");
-        ctx.fillStyle = "#020617";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        ctx.font = "12px monospace";
-        ctx.fillStyle = "#ef4444";
-        ctx.fillText("CAMERA OFFLINE", 20, 40);
+        console.error("Lỗi Camera chi tiết:", err);
+        let errorMsg = "Vui lòng cấp quyền Camera";
+        if (err.name === "NotAllowedError" || err.name === "PermissionDeniedError") {
+            errorMsg = "Trình duyệt đang chặn Camera. Bấm vào biểu tượng ổ khóa bên trái URL để Cho phép.";
+        } else if (err.name === "NotFoundError" || err.name === "DevicesNotFoundError") {
+            errorMsg = "Không tìm thấy thiết bị Camera trên máy.";
+        } else if (err.name === "NotReadableError" || err.name === "TrackStartError") {
+            errorMsg = "Camera đang bị trình duyệt/ứng dụng khác khóa. Hãy thử nút '🔄 Đổi Camera' hoặc mở bằng Chrome.";
+        }
+        showToast(errorMsg, "error");
+
+        if (!uploadedFaceBase64) {
+            cancelAnimationFrame(overlayAnimId);
+            const video = document.getElementById("webcam");
+            const canvas = document.getElementById("face-overlay");
+            const ctx = canvas.getContext("2d");
+            canvas.width = video.clientWidth || 320;
+            canvas.height = video.clientHeight || 240;
+            ctx.fillStyle = "#020617";
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.font = "bold 13px monospace";
+            ctx.fillStyle = "#ef4444";
+            ctx.fillText("CAMERA OFFLINE", 20, 35);
+            ctx.font = "11px sans-serif";
+            ctx.fillStyle = "#94a3b8";
+            ctx.fillText("1. Bấm '🔄 Đổi Camera' hoặc '📷 Chọn ảnh' bên dưới", 20, 60);
+            ctx.fillText("2. Hoặc mở trang web này bằng Google Chrome", 20, 80);
+            ctx.fillText("3. Hoặc đăng nhập bằng Mật Khẩu ở bên dưới", 20, 100);
+        }
     }
 }
 
+async function switchCameraDevice() {
+    if (!navigator.mediaDevices || !navigator.mediaDevices.enumerateDevices) {
+        showToast("Trình duyệt không hỗ trợ đổi camera", "error");
+        return;
+    }
+
+    try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        availableVideoDevices = devices.filter(d => d.kind === "videoinput");
+
+        if (availableVideoDevices.length === 0) {
+            showToast("Không tìm thấy thiết bị camera nào", "warning");
+            return;
+        }
+
+        currentDeviceIndex = (currentDeviceIndex + 1) % availableVideoDevices.length;
+        const targetDevice = availableVideoDevices[currentDeviceIndex];
+        console.log("Đang chuyển sang thiết bị:", targetDevice.label || targetDevice.deviceId);
+        await startCameraStream(targetDevice.deviceId);
+        showToast(`Đã chuyển sang: ${targetDevice.label || "Camera " + (currentDeviceIndex + 1)}`, "success");
+    } catch (e) {
+        console.error("Lỗi đổi camera:", e);
+        showToast("Không thể chuyển sang thiết bị này", "error");
+    }
+}
+
+function handleFaceFileUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+        uploadedFaceBase64 = e.target.result;
+
+        // Dừng camera nếu đang chạy để ưu tiên ảnh tải lên
+        const video = document.getElementById("webcam");
+        if (video && video.srcObject && video.srcObject.getTracks) {
+            video.srcObject.getTracks().forEach(t => t.stop());
+            video.srcObject = null;
+        }
+
+        const img = new Image();
+        img.onload = function () {
+            uploadedFaceImage = img;
+            startOverlayLoop();
+            showToast("Đã nạp ảnh khuôn mặt thành công!", "success");
+        };
+        img.src = uploadedFaceBase64;
+    };
+    reader.readAsDataURL(file);
+}
+
 function captureFaceBase64() {
+    if (uploadedFaceBase64) return uploadedFaceBase64;
     const video = document.getElementById("webcam");
-    if (!video.videoWidth) return ""; 
+    if (!video.videoWidth) return "";
 
     const hiddenCanvas = document.createElement("canvas");
     hiddenCanvas.width = video.videoWidth;
     hiddenCanvas.height = video.videoHeight;
     const ctx = hiddenCanvas.getContext("2d");
-    
+
     ctx.drawImage(video, 0, 0, hiddenCanvas.width, hiddenCanvas.height);
     return hiddenCanvas.toDataURL("image/jpeg", 0.8);
 }
@@ -215,7 +453,7 @@ async function submitRegister(e) {
     const name = document.getElementById("reg-name").value.trim();
     const email = document.getElementById("reg-email").value.trim();
     const password = document.getElementById("reg-password").value;
-    
+
     // Ràng buộc 1: Kiểm tra định dạng Email chuẩn bằng biểu thức chính quy (Regex)
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
@@ -228,7 +466,7 @@ async function submitRegister(e) {
         showToast("Mật khẩu đăng ký bắt buộc phải từ 6 ký tự trở lên!", "error");
         return;
     }
-    
+
     const faceDataStr = captureFaceBase64();
     if (!faceDataStr) {
         showToast("Vui lòng nhìn vào camera để lấy dữ liệu khuôn mặt!", "error");
@@ -249,7 +487,7 @@ async function submitRegister(e) {
             showToast("Đăng ký & Lưu khuôn mặt thành công!", "success");
             switchAuthTab("login");
             document.getElementById("login-email").value = email;
-            document.getElementById("login-password").value = ""; 
+            document.getElementById("login-password").value = "";
         } else {
             showToast(data.detail || "Đăng ký thất bại", "error");
         }
@@ -263,7 +501,7 @@ async function submitLogin(e, loginType) {
     e.preventDefault();
     const email = document.getElementById("login-email").value.trim();
     const password = document.getElementById("login-password").value;
-    
+
     if (!email) {
         showToast("Vui lòng nhập Email sinh viên trước khi tiếp tục", "error");
         return;
@@ -304,10 +542,10 @@ async function submitLogin(e, loginType) {
         const res = await fetch(`${BACKEND_URL}/users/login`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ 
-                Email: email, 
+            body: JSON.stringify({
+                Email: email,
                 Password: passwordToSend,
-                FaceData: faceDataStr 
+                FaceData: faceDataStr
             })
         });
         const data = await res.json();
@@ -315,7 +553,7 @@ async function submitLogin(e, loginType) {
         if (res.ok) {
             localStorage.setItem("token", data.access_token);
             showToast("Đăng nhập thành công!", "success");
-            
+
             const userRes = await fetch(`${BACKEND_URL}/users/me`, {
                 headers: { "Authorization": `Bearer ${data.access_token}` }
             });
@@ -333,13 +571,18 @@ function activateMainDashboardView(user) {
     document.getElementById("auth-view").classList.add("hidden");
     document.getElementById("main-view").classList.remove("hidden");
     document.getElementById("main-view").classList.add("flex");
-    document.getElementById("user-display").innerText = `👤 ${user.FullName}`;
-    
+    const userEl = document.getElementById("user-display");
+    if (userEl) {
+        userEl.innerHTML = `<span>👤</span><span class="hidden sm:inline max-w-[110px] md:max-w-[150px] truncate">${user.FullName}</span>`;
+        userEl.title = `Sinh viên: ${user.FullName}`;
+    }
+
     const video = document.getElementById("webcam");
     if (video.srcObject) {
         video.srcObject.getTracks().forEach(track => track.stop());
     }
     establishWebSocketChannel();
+    goHome();
 }
 
 function executeLogout() {
@@ -358,7 +601,7 @@ function establishWebSocketChannel() {
             if (payload.type === "chat_reply" && !payload.message.includes("đang xử lý")) {
                 appendChatBubble(payload.message, "bot");
             }
-        } catch(e) {}
+        } catch (e) { }
     };
     socket.onclose = () => setTimeout(establishWebSocketChannel, 3000);
 }
@@ -370,7 +613,7 @@ async function transmitChatMessage() {
 
     appendChatBubble(message, "user");
     input.value = "";
-    
+
     // Hiệu ứng "Đang gõ..."
     const processingId = "proc-" + Date.now();
     const logs = document.getElementById("chat-logs");
@@ -384,19 +627,19 @@ async function transmitChatMessage() {
     try {
         const response = await fetch(`${BACKEND_URL}/chat/query?q=${encodeURIComponent(message)}`);
         const data = await response.json();
-        
+
         const el = document.getElementById(processingId);
         if (el) el.remove();
-        
+
         if (data.status === "success") {
             appendChatBubble(data.answer, "bot");
-            
+
             // Đẩy lịch sử tìm kiếm lên Firebase
             const token = localStorage.getItem("token");
             if (token) {
                 fetch(`${BACKEND_URL}/history/search`, {
                     method: "POST",
-                    headers: { 
+                    headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
@@ -424,13 +667,13 @@ function transmitWebSocketPayload(obj) {
 function appendChatBubble(text, sender) {
     const logs = document.getElementById("chat-logs");
     const bubble = document.createElement("div");
-    
+
     if (sender === "user") {
         bubble.className = "bg-blue-600 text-white p-3.5 rounded-2xl rounded-tr-sm max-w-[85%] self-end ml-auto shadow-md leading-relaxed animate-fade-in";
     } else {
         bubble.className = "bg-slate-800 border border-slate-700 text-slate-200 p-3.5 rounded-2xl rounded-tl-sm max-w-[85%] self-start shadow-md leading-relaxed animate-fade-in";
     }
-    
+
     bubble.innerText = text;
     logs.appendChild(bubble);
     logs.scrollTop = logs.scrollHeight;
@@ -460,24 +703,24 @@ function toggleVoiceInput() {
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
-        recognition.onstart = function() {
+        recognition.onstart = function () {
             isRecording = true;
             btn.classList.add("text-rose-500", "animate-pulse"); // Đổi màu nút sang đỏ để báo đang thu
             input.placeholder = "Đang nghe...";
         };
 
-        recognition.onresult = function(event) {
+        recognition.onresult = function (event) {
             const transcript = event.results[0][0].transcript;
             input.value = transcript;
             transmitChatMessage(); // Tự động gửi tin nhắn sau khi nói xong
         };
 
-        recognition.onerror = function(event) {
+        recognition.onerror = function (event) {
             showToast("Lỗi nhận diện giọng nói: " + event.error, "error");
             stopVoiceInput();
         };
 
-        recognition.onend = function() {
+        recognition.onend = function () {
             stopVoiceInput();
         };
 
@@ -500,24 +743,25 @@ function stopVoiceInput() {
 function minimizeChat(action = 'toggle') {
     const chatWin = document.getElementById("chat-window");
     const toggleIcon = document.getElementById("chat-toggle-icon");
+    if (!chatWin) return;
 
     if (action === 'minimize' && isChatMinimized) return;
     if (action === 'maximize' && !isChatMinimized) return;
 
     if (!isChatMinimized) {
         // Trạng thái: Thu nhỏ lại
-        chatWin.classList.remove("h-[450px]", "md:h-[500px]");
+        chatWin.classList.remove("h-[75vh]", "max-h-[520px]", "md:h-[500px]", "h-[450px]");
         chatWin.classList.add("h-[56px]");
         isChatMinimized = true;
         // Đổi icon thành dấu Cộng (+)
-        toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />';
+        if (toggleIcon) toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />';
     } else {
         // Trạng thái: Phóng to ra
         chatWin.classList.remove("h-[56px]");
-        chatWin.classList.add("h-[450px]", "md:h-[500px]");
+        chatWin.classList.add("h-[75vh]", "max-h-[520px]", "md:h-[500px]");
         isChatMinimized = false;
         // Đổi icon về lại dấu Trừ (-)
-        toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />';
+        if (toggleIcon) toggleIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />';
     }
 }
 
@@ -525,7 +769,7 @@ function showToast(message, type = "success") {
     const toast = document.getElementById("toast");
     toast.innerText = message;
     toast.style.transform = "";
-    
+
     if (type === "success") {
         toast.className = "fixed top-5 right-5 z-50 bg-slate-950 border border-emerald-500/40 text-emerald-400 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold translate-x-0 transition-all duration-300";
     } else {
@@ -569,7 +813,7 @@ const canvas = document.getElementById('campus-map-canvas');
 const ctx = canvas ? canvas.getContext('2d') : null;
 
 function resizeCanvas() {
-    if(!canvas) return;
+    if (!canvas) return;
     const container = document.getElementById('canvas-container');
     canvas.width = container.clientWidth;
     canvas.height = container.clientHeight;
@@ -579,31 +823,31 @@ window.addEventListener('resize', resizeCanvas);
 
 // Hàm lấy danh sách điểm từ API của Khoa
 async function fetchCampusNodes() {
-    if (campusNodesLoaded) return; 
+    if (campusNodesLoaded) return;
     try {
-        const nodesRes = await fetch(`${BACKEND_URL}/map/api_get_graph`); 
-        
+        const nodesRes = await fetch(`${BACKEND_URL}/map/api_get_graph`);
+
         if (nodesRes.ok) {
             const data = await nodesRes.json();
             graphData = data; // Save graph data
-            
+
             const startSel = document.getElementById("route-start");
             const endSel = document.getElementById("route-end");
             const waySel = document.getElementById("route-waypoint");
-            
+
             startSel.innerHTML = '<option value="">-- Điểm xuất phát --</option>';
             endSel.innerHTML = '<option value="">-- Điểm đến --</option>';
-            if(waySel) waySel.innerHTML = '<option value="">-- Điểm dừng (tuỳ chọn) --</option>';
-            
+            if (waySel) waySel.innerHTML = '<option value="">-- Điểm dừng (tuỳ chọn) --</option>';
+
             // API của Khoa trả về một mảng các object 'nodes', mỗi object có trường 'id'
             data.nodes.forEach(nodeObj => {
                 const nodeId = nodeObj.id; // Lấy ID của node (VD: "Toa_A")
                 const text = nodeId.replace(/_/g, " ");
                 startSel.innerHTML += `<option value="${nodeId}">${text}</option>`;
                 endSel.innerHTML += `<option value="${nodeId}">${text}</option>`;
-                if(waySel) waySel.innerHTML += `<option value="${nodeId}">${text}</option>`;
+                if (waySel) waySel.innerHTML += `<option value="${nodeId}">${text}</option>`;
             });
-            
+
             campusNodesLoaded = true;
             setTimeout(resizeCanvas, 100);
             showToast("Đã tải dữ liệu Không gian 2D", "success");
@@ -618,7 +862,7 @@ async function fetchCampusNodes() {
 function drawMap() {
     if (!ctx || !canvas) return;
     ctx.clearRect(0, 0, canvas.width, canvas.height);
-    
+
     if (!graphData || !graphData.nodes) return;
 
     // Ghi đè tọa độ Node thành Grid 0-100 theo hình sơ đồ
@@ -642,7 +886,7 @@ function drawMap() {
         return base * mapScale + mapOffsetX;
     };
     const mapY = (y) => {
-        const base = padding + (y / 100) * drawH; 
+        const base = padding + (y / 100) * drawH;
         return base * mapScale + mapOffsetY;
     };
 
@@ -665,21 +909,21 @@ function drawMap() {
     // Vẽ lộ trình (Đường dây nối)
     if (currentRouteWaypoints.length > 0) {
         ctx.beginPath();
-        ctx.strokeStyle = '#34d399'; 
+        ctx.strokeStyle = '#34d399';
         ctx.lineWidth = 4;
         ctx.lineCap = 'round';
         ctx.lineJoin = 'round';
         ctx.shadowBlur = 10;
         ctx.shadowColor = '#34d399';
-        
+
         for (let i = 0; i < currentRouteWaypoints.length; i++) {
             const nodeId = currentRouteWaypoints[i];
             const node = nodeDict[nodeId];
             if (!node) continue;
-            
+
             const x = mapX(node.ui_x);
             const y = mapY(node.ui_y);
-            
+
             if (i === 0) ctx.moveTo(x, y);
             else ctx.lineTo(x, y);
         }
@@ -691,22 +935,22 @@ function drawMap() {
     graphData.nodes.forEach(node => {
         const x = mapX(node.ui_x);
         const y = mapY(node.ui_y);
-        
+
         // Chọn icon dựa trên tên đỉnh
         let icon = "🏢"; // Hình tòa nhà mặc định
-        if (node.id.includes("Cổng trường")) icon = "⛩️"; 
+        if (node.id.includes("Cổng trường")) icon = "⛩️";
         else if (node.id.includes("Nhà xe")) icon = "🚙";
         else if (node.id.includes("Nhà thể dục")) icon = "🏟️";
-        else if (node.id.includes("Nhà điều hành")) icon = "🏛️"; 
+        else if (node.id.includes("Nhà điều hành")) icon = "🏛️";
         else if (node.id.includes("ATM") || node.id.includes("Cây ATM")) icon = "🏧";
         else if (node.id.includes("Canteen") || node.id.includes("Căn tin")) icon = "🍽️";
 
         // Vẽ Icon (Emoji)
-        ctx.font = "18px Arial"; 
+        ctx.font = "18px Arial";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillText(icon, x, y);
-        
+
         // Vẽ tên đỉnh đầy đủ, không bị cắt
         ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
         ctx.font = "bold 11px sans-serif";
@@ -721,13 +965,13 @@ function drawMap() {
             const nodeId = currentRouteWaypoints[i];
             const node = nodeDict[nodeId];
             if (!node) continue;
-            
+
             const x = mapX(node.ui_x);
             const y = mapY(node.ui_y);
-            
+
             ctx.fillStyle = '#10b981';
             ctx.fillRect(x - 6, y - 6, 12, 12);
-            
+
             ctx.fillStyle = '#fff';
             ctx.font = 'bold 11px monospace';
             ctx.textAlign = "left";
@@ -740,12 +984,12 @@ function drawMap() {
     if (typeof currentGPSPos !== 'undefined' && currentGPSPos) {
         const x = mapX(currentGPSPos.ui_x);
         const y = mapY(currentGPSPos.ui_y);
-        
+
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, 2 * Math.PI);
         ctx.fillStyle = '#ef4444'; // Red dot
         ctx.fill();
-        
+
         // Hiệu ứng chớp (ping)
         ctx.beginPath();
         ctx.arc(x, y, 10, 0, 2 * Math.PI);
@@ -762,7 +1006,7 @@ async function calculateRoute() {
     const waypointNode = document.getElementById("route-waypoint") ? document.getElementById("route-waypoint").value : "";
     const weather = document.getElementById("route-weather") ? document.getElementById("route-weather").value : "normal";
     const preference = document.getElementById("route-preference") ? document.getElementById("route-preference").value : "fastest";
-    
+
     if (!startNode || !endNode) {
         showToast("Vui lòng chọn 2 điểm!", "error");
         return;
@@ -780,14 +1024,14 @@ async function calculateRoute() {
 
         if (data.status === "success") {
             currentRouteWaypoints = data.path;
-            drawMap(); 
-            
+            drawMap();
+
             // Tự động đóng bảng điều khiển trên mobile để xem bản đồ
             const container = document.getElementById("panels-container");
             if (container && container.classList.contains("flex") && window.innerWidth < 768) {
                 toggleMobilePanels();
-            } 
-            
+            }
+
             document.getElementById("route-path-text").innerHTML = data.path.map(n => n.replace(/_/g, " ")).join(" <br>↓<br> ");
             document.getElementById("route-distance").innerText = `📏 Quãng đường: ${data.total_distance_m}m (${data.estimated_mins} phút)`;
             showToast("Đã vẽ lộ trình!", "success");
@@ -797,7 +1041,7 @@ async function calculateRoute() {
             if (token) {
                 fetch(`${BACKEND_URL}/history/location`, {
                     method: "POST",
-                    headers: { 
+                    headers: {
                         "Content-Type": "application/json",
                         "Authorization": `Bearer ${token}`
                     },
@@ -826,17 +1070,23 @@ async function startGPSTracking(simulate = false) {
         showToast("Vui lòng tính toán lộ trình trước khi mô phỏng GPS", "error");
         return;
     }
-    
+
     if (gpsSimulationInterval) clearInterval(gpsSimulationInterval);
 
     if (simulate) {
+        // Tự động đóng bảng điều khiển trên mobile để người dùng theo dõi mô phỏng trên bản đồ
+        const container = document.getElementById("panels-container");
+        if (container && container.classList.contains("flex") && window.innerWidth < 768) {
+            toggleMobilePanels();
+        }
+
         const endNode = currentRouteWaypoints[currentRouteWaypoints.length - 1];
         const weather = document.getElementById("route-weather") ? document.getElementById("route-weather").value : "normal";
         const preference = document.getElementById("route-preference") ? document.getElementById("route-preference").value : "fastest";
         const session_id = document.getElementById("login-email") ? document.getElementById("login-email").value : "default";
 
         let pathIndex = 0;
-        
+
         gpsSimulationInterval = setInterval(async () => {
             if (pathIndex >= currentRouteWaypoints.length) {
                 clearInterval(gpsSimulationInterval);
@@ -850,7 +1100,7 @@ async function startGPSTracking(simulate = false) {
 
             const currentNodeId = currentRouteWaypoints[pathIndex];
             const node = graphData.nodes.find(n => n.id === currentNodeId);
-            
+
             if (node) {
                 // Giả lập GPS tại node này
                 currentGPSPos = { ui_x: node.ui_x, ui_y: node.ui_y, lat: node.gps[0], lon: node.gps[1] };
@@ -863,23 +1113,23 @@ async function startGPSTracking(simulate = false) {
                     const url = `${BACKEND_URL}/map/api_realtime_tracking?current_lat=${node.gps[0]}&current_lon=${node.gps[1]}&end=${endNode}&weather=${weather}&preference=${preference}&session_id=${session_id}`;
                     const res = await fetch(url);
                     const data = await res.json();
-                    
+
                     if (data.status === "tracking") {
                         // Handle the bug "snroutered_node" from backend replacement if it exists
                         const nearestNode = data.snapped_node || data.snroutered_node || "";
                         document.getElementById("gps-nearest").innerText = nearestNode.replace(/_/g, " ");
                         document.getElementById("gps-dist").innerText = `${data.total_remaining_meters}m`;
                         document.getElementById("gps-time").innerText = `${data.estimated_mins} phút`;
-                        
+
                         // Xử lý geofencing alerts
                         if (data.geofence_alerts && data.geofence_alerts.length > 0) {
                             showToast(`⚠️ ${data.geofence_alerts[0].message}`, "error");
                         }
-                        
+
                         // Cập nhật AI Recommend Box
                         if (data.route_suggestions && data.route_suggestions.length > 0) {
                             const listEl = document.getElementById("ai-recs-list");
-                            if(listEl) {
+                            if (listEl) {
                                 listEl.innerHTML = "";
                                 data.route_suggestions.forEach(rec => {
                                     listEl.innerHTML += `<li><span class="text-purple-300 font-bold">${rec.node.replace(/_/g, " ")}</span> (${rec.score})</li>`;
@@ -890,13 +1140,13 @@ async function startGPSTracking(simulate = false) {
                     } else if (data.status === "arrived") {
                         document.getElementById("gps-nearest").innerText = data.message;
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error("Lỗi gọi GPS API", e);
                 }
             }
             pathIndex++;
         }, 3000); // 3s qua 1 node
-        
+
         showToast("Bắt đầu mô phỏng GPS...", "success");
     } else {
         const endNode = currentRouteWaypoints[currentRouteWaypoints.length - 1];
@@ -909,20 +1159,20 @@ async function startGPSTracking(simulate = false) {
             const watchId = navigator.geolocation.watchPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                
+
                 document.getElementById("gps-coords").innerText = `${lat.toFixed(5)}, ${lon.toFixed(5)}`;
-                
+
                 try {
                     const url = `${BACKEND_URL}/map/api_realtime_tracking?current_lat=${lat}&current_lon=${lon}&end=${endNode}&weather=${weather}&preference=${preference}&session_id=${session_id}`;
                     const res = await fetch(url);
                     const data = await res.json();
-                    
+
                     if (data.status === "tracking") {
                         const nearestNode = data.snapped_node || data.snroutered_node || "";
                         document.getElementById("gps-nearest").innerText = nearestNode.replace(/_/g, " ");
                         document.getElementById("gps-dist").innerText = `${data.total_remaining_meters}m`;
                         document.getElementById("gps-time").innerText = `${data.estimated_mins} phút`;
-                        
+
                         // Cập nhật currentGPSPos dựa trên nearestNode để vẽ lên bản đồ
                         const node = graphData.nodes.find(n => n.id === nearestNode);
                         if (node) {
@@ -938,13 +1188,13 @@ async function startGPSTracking(simulate = false) {
                         currentGPSPos = null;
                         drawMap();
                     }
-                } catch(e) {
+                } catch (e) {
                     console.error("Lỗi gọi GPS API", e);
                 }
             }, (error) => {
                 showToast("Lỗi GPS: " + error.message, "error");
             }, { enableHighAccuracy: true });
-            
+
             // Lưu watchId nếu cần
             window.gpsRealInterval = watchId;
         } else {
@@ -956,172 +1206,252 @@ async function startGPSTracking(simulate = false) {
 // Lấy đề xuất AI
 async function fetchAIRecommendations() {
     try {
-        const session_id = document.getElementById("login-email") ? document.getElementById("login-email").value : "default"; 
-        
+        const session_id = document.getElementById("login-email") ? document.getElementById("login-email").value : "default";
+
         let targetLat = 10.878000;
         let targetLon = 106.798750;
         if (currentGPSPos) {
             targetLat = currentGPSPos.lat;
             targetLon = currentGPSPos.lon;
         }
-        
+
         const res = await fetch(`${BACKEND_URL}/map/api_recommend?current_lat=${targetLat}&current_lon=${targetLon}&session_id=${session_id}`);
         const data = await res.json();
-        
-        if(data.status === "success") {
+
+        if (data.status === "success") {
             const listEl = document.getElementById("ai-recs-list");
             listEl.innerHTML = "";
             data.recommendations.forEach(rec => {
                 listEl.innerHTML += `<li><span class="text-purple-300 font-bold">${rec.node}</span> (Điểm tin cậy: ${rec.score})</li>`;
             });
             document.getElementById("ai-recs-box").classList.remove("hidden");
-            
-            const tagsEl = document.getElementById("ai-intent-tags");
-            tagsEl.innerHTML = "";
-            const INTEREST_LABELS = {
-                "hoc_tap": "Học tập & Nghiên cứu 📚",
-                "an_uong": "Ăn uống & Căn tin 🍽️",
-                "nghi_ngoi": "Nghỉ ngơi & Thư giãn 😴",
-                "the_thao": "Thể thao & Vận động 🏃",
-                "cntt": "CNTT & Lập trình 💻",
-                "tien_ich": "Tiện ích campus 🏪",
-                "giai_tri": "Sự kiện & Giải trí 🎪",
-                "hanh_chinh": "Hành chính & Giao vụ 🏛️"
-            };
 
-            if (data.user_profile && data.user_profile.interests && data.user_profile.interests.length > 0) {
-                data.user_profile.interests.forEach(interest => {
-                    const displayLabel = INTEREST_LABELS[interest] || interest;
-                    tagsEl.innerHTML += `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50 mr-1">${displayLabel}</span>`;
-                });
-            } else {
-                tagsEl.innerHTML = `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50">Chưa có dữ liệu học</span>`;
+            const tagsEl = document.getElementById("ai-intent-tags");
+            if (tagsEl) {
+                tagsEl.innerHTML = "";
+                const INTEREST_LABELS = {
+                    "hoc_tap": "Học tập & Nghiên cứu 📚",
+                    "an_uong": "Ăn uống & Căn tin 🍽️",
+                    "nghi_ngoi": "Nghỉ ngơi & Thư giãn 😴",
+                    "the_thao": "Thể thao & Vận động 🏃",
+                    "cntt": "CNTT & Lập trình 💻",
+                    "tien_ich": "Tiện ích campus 🏪",
+                    "giai_tri": "Sự kiện & Giải trí 🎪",
+                    "hanh_chinh": "Hành chính & Giao vụ 🏛️"
+                };
+
+                if (data.user_profile && data.user_profile.interests && data.user_profile.interests.length > 0) {
+                    data.user_profile.interests.forEach(interest => {
+                        const displayLabel = INTEREST_LABELS[interest] || interest;
+                        tagsEl.innerHTML += `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50 mr-1">${displayLabel}</span>`;
+                    });
+                } else {
+                    tagsEl.innerHTML = `<span class="bg-blue-900/50 text-blue-300 px-2 py-1 rounded border border-blue-700/50">Chưa có dữ liệu học</span>`;
+                }
             }
 
             showToast("Đã phân tích hồ sơ AI thành công", "success");
         }
-    } catch(e) {
+    } catch (e) {
         showToast("Lỗi phân tích hành vi", "error");
     }
 }
 
-// Huấn luyện model
+// Huấn luyện model (nếu còn gọi từ nơi khác)
 async function trainModels() {
     const btn = document.getElementById("btn-train");
-    btn.innerHTML = "⏳ Đang tối ưu hóa PyTorch...";
-    btn.classList.replace("bg-emerald-600", "bg-slate-600");
-    
+    if (btn) {
+        btn.innerHTML = "⏳ Đang tối ưu hóa PyTorch...";
+        btn.classList.replace("bg-emerald-600", "bg-slate-600");
+    }
+
     try {
-        const res = await fetch(`${BACKEND_URL}/map/api_train_models`, {method: "POST"});
+        const res = await fetch(`${BACKEND_URL}/map/api_train_models`, { method: "POST" });
         const data = await res.json();
-        
+
         if (data.status === "success") {
             showToast(`Huấn luyện hoàn tất! MAE: ${data.stats.crowd_mae}`, "success");
         }
     } catch (e) {
         showToast("Lỗi khi huấn luyện mô hình", "error");
     } finally {
-        btn.innerHTML = "🔬 Huấn luyện lại Mạng PyTorch";
-        btn.classList.replace("bg-slate-600", "bg-emerald-600");
-    }
-}
-
-function toggleMapMode() {
-    const mapLayer = document.getElementById("map-layer");
-    const arLayer = document.getElementById("ar-layer");
-    const placeholder = document.getElementById("viewport-placeholder");
-    const btn = document.getElementById("btn-map");
-    const canvasCont = document.getElementById("canvas-container");
-    const viewport = document.getElementById("viewport-container");
-
-    arLayer.classList.add("hidden");
-    document.getElementById("btn-ar").classList.remove("bg-indigo-600", "border-indigo-400");
-
-    if (mapLayer.classList.contains("hidden")) {
-        mapLayer.classList.remove("hidden");
-        canvasCont.classList.remove("hidden");
-        viewport.classList.replace("bg-black", "bg-slate-950");
-        placeholder.classList.add("opacity-0", "pointer-events-none");
-        btn.classList.add("bg-blue-600", "border-blue-400");
-        
-        const gnnPanel = document.getElementById("gnn-panel");
-        const aiPanel = document.getElementById("ai-panel");
-        const gpsPanel = document.getElementById("gps-panel");
-        if(gnnPanel) gnnPanel.classList.remove("hidden");
-        if(aiPanel) aiPanel.classList.remove("hidden");
-        if(gpsPanel) gpsPanel.classList.remove("hidden");
-
-        fetchCampusNodes(); 
-    } else {
-        mapLayer.classList.add("hidden");
-        if (arLayer.classList.contains("hidden")) {
-            canvasCont.classList.add("hidden");
-            placeholder.classList.remove("opacity-0", "pointer-events-none");
+        if (btn) {
+            btn.innerHTML = "🔬 Huấn luyện lại Mạng PyTorch";
+            btn.classList.replace("bg-slate-600", "bg-emerald-600");
         }
-        btn.classList.remove("bg-blue-600", "border-blue-400");
-
-        const gnnPanel = document.getElementById("gnn-panel");
-        const aiPanel = document.getElementById("ai-panel");
-        const gpsPanel = document.getElementById("gps-panel");
-        if(gnnPanel) gnnPanel.classList.add("hidden");
-        if(aiPanel) aiPanel.classList.add("hidden");
-        if(gpsPanel) gpsPanel.classList.add("hidden");
-    }
-
-    const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
-    if (isHome && window.innerWidth >= 768) {
-        minimizeChat('maximize');
-    } else {
-        minimizeChat('minimize');
     }
 }
 
-function toggleARMode() {
+// ==========================================
+// ĐIỀU HƯỚNG TRANG CHỦ & CÁC CHẾ ĐỘ (NAVBAR)
+// ==========================================
+
+function updateNavState(mode) {
+    const homeTitle = document.getElementById("nav-home-title");
+    const mapBtn = document.getElementById("btn-map");
+    const arBtn = document.getElementById("btn-ar");
+
+    // baseClass luôn giữ 'hidden md:flex' để tuyệt đối không tràn thanh header trên mobile
+    const baseClass = "hidden md:flex px-5 md:px-6 py-1.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 transition-all cursor-pointer border whitespace-nowrap shrink-0";
+    const inactiveClass = "text-slate-300 hover:text-white hover:bg-slate-800 border-slate-700/60 bg-slate-900/60";
+
+    if (mapBtn) {
+        if (mode === 'map') {
+            mapBtn.className = `${baseClass} bg-blue-600 text-white border-blue-400 shadow-[0_0_15px_rgba(59,130,246,0.5)]`;
+        } else {
+            mapBtn.className = `${baseClass} ${inactiveClass}`;
+        }
+    }
+
+    if (arBtn) {
+        if (mode === 'ar') {
+            arBtn.className = `${baseClass} bg-indigo-600 text-white border-indigo-400 shadow-[0_0_15px_rgba(99,102,241,0.5)]`;
+        } else {
+            arBtn.className = `${baseClass} ${inactiveClass}`;
+        }
+    }
+
+    if (homeTitle) {
+        if (mode === 'home') {
+            homeTitle.className = "font-bold tracking-tight sm:tracking-wider text-xs sm:text-sm text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.7)] group-hover:text-blue-300 transition-colors uppercase whitespace-nowrap inline-block";
+        } else {
+            homeTitle.className = "font-bold tracking-tight sm:tracking-wider text-xs sm:text-sm text-slate-300 group-hover:text-blue-300 transition-colors uppercase whitespace-nowrap inline-block";
+        }
+    }
+
+    // Đồng bộ trạng thái active cho menu 3 gạch trên mobile
+    const mobHomeBtn = document.getElementById("mobile-btn-home");
+    const mobMapBtn = document.getElementById("mobile-btn-map");
+    const mobArBtn = document.getElementById("mobile-btn-ar");
+
+    const mobBase = "w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border transition-all font-medium text-xs sm:text-sm cursor-pointer";
+    const mobInactive = `${mobBase} border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200`;
+
+    if (mobHomeBtn) {
+        mobHomeBtn.className = (mode === 'home')
+            ? `${mobBase} border-blue-500/70 bg-blue-600/25 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.25)]`
+            : mobInactive;
+    }
+    if (mobMapBtn) {
+        mobMapBtn.className = (mode === 'map')
+            ? `${mobBase} border-blue-500/70 bg-blue-600/25 text-blue-300 shadow-[0_0_15px_rgba(59,130,246,0.25)]`
+            : mobInactive;
+    }
+    if (mobArBtn) {
+        mobArBtn.className = (mode === 'ar')
+            ? `${mobBase} border-indigo-500/70 bg-indigo-600/25 text-indigo-300 shadow-[0_0_15px_rgba(99,102,241,0.25)]`
+            : mobInactive;
+    }
+}
+
+// Về Trang Chủ (Hiện logo HCMUS và giới thiệu, ẩn bản đồ & AR)
+function goHome() {
     const mapLayer = document.getElementById("map-layer");
     const arLayer = document.getElementById("ar-layer");
     const placeholder = document.getElementById("viewport-placeholder");
-    const btn = document.getElementById("btn-ar");
     const canvasCont = document.getElementById("canvas-container");
     const viewport = document.getElementById("viewport-container");
 
-    mapLayer.classList.add("hidden");
-    document.getElementById("btn-map").classList.remove("bg-blue-600", "border-blue-400");
+    if (mapLayer) mapLayer.classList.add("hidden");
+    if (arLayer) arLayer.classList.add("hidden");
+    if (canvasCont) canvasCont.classList.add("hidden");
+    if (placeholder) placeholder.classList.remove("opacity-0", "pointer-events-none");
+    if (viewport) {
+        viewport.classList.remove("bg-black");
+        viewport.classList.add("bg-slate-950");
+    }
 
     const gnnPanel = document.getElementById("gnn-panel");
     const aiPanel = document.getElementById("ai-panel");
     const gpsPanel = document.getElementById("gps-panel");
-    if(gnnPanel) gnnPanel.classList.add("hidden");
-    if(aiPanel) aiPanel.classList.add("hidden");
-    if(gpsPanel) gpsPanel.classList.add("hidden");
+    if (gnnPanel) gnnPanel.classList.add("hidden");
+    if (aiPanel) aiPanel.classList.add("hidden");
+    if (gpsPanel) gpsPanel.classList.add("hidden");
 
-    if (arLayer.classList.contains("hidden")) {
-        arLayer.classList.remove("hidden");
-        canvasCont.classList.add("hidden"); // Ẩn 3D map của GNN
-        viewport.classList.replace("bg-slate-950", "bg-black");
-        placeholder.classList.add("opacity-0", "pointer-events-none");
-        btn.classList.add("bg-indigo-600", "border-indigo-400");
-        
-        if (typeof initLocalMap === 'function') {
-            initLocalMap();
-        }
-        
-        fetchCampusNodes(); // To ensure graphData is loaded
-        // transmitWebSocketPayload({ action: "ar_nav", payload: "start_camera_tracking" }); // Bỏ cái websocket tracking cũ này đi vì AR đã xử lý local
-    } else {
-        arLayer.classList.add("hidden");
-        if (mapLayer.classList.contains("hidden")) {
-            canvasCont.classList.add("hidden");
-            placeholder.classList.remove("opacity-0", "pointer-events-none");
-        }
-        viewport.classList.replace("bg-black", "bg-slate-950");
-        btn.classList.remove("bg-indigo-600", "border-indigo-400");
+    updateNavState('home');
+
+    if (window.innerWidth >= 768) {
+        minimizeChat('maximize');
+    }
+}
+
+// Kích hoạt chế độ Bản đồ GNN
+function activateMapMode() {
+    const mapLayer = document.getElementById("map-layer");
+    const arLayer = document.getElementById("ar-layer");
+    const placeholder = document.getElementById("viewport-placeholder");
+    const canvasCont = document.getElementById("canvas-container");
+    const viewport = document.getElementById("viewport-container");
+
+    if (arLayer) arLayer.classList.add("hidden");
+    if (mapLayer) mapLayer.classList.remove("hidden");
+    if (canvasCont) canvasCont.classList.remove("hidden");
+    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none");
+    if (viewport) {
+        viewport.classList.remove("bg-black");
+        viewport.classList.add("bg-slate-950");
     }
 
-    const isHome = document.getElementById("map-layer").classList.contains("hidden") && document.getElementById("ar-layer").classList.contains("hidden");
-    if (isHome && window.innerWidth >= 768) {
-        minimizeChat('maximize');
+    const gnnPanel = document.getElementById("gnn-panel");
+    const aiPanel = document.getElementById("ai-panel");
+    const gpsPanel = document.getElementById("gps-panel");
+    if (gnnPanel) gnnPanel.classList.remove("hidden");
+    if (aiPanel) aiPanel.classList.remove("hidden");
+    if (gpsPanel) gpsPanel.classList.remove("hidden");
+
+    updateNavState('map');
+    minimizeChat('minimize');
+    fetchCampusNodes();
+}
+
+// Kích hoạt chế độ AR WebXR
+function activateARMode() {
+    const mapLayer = document.getElementById("map-layer");
+    const arLayer = document.getElementById("ar-layer");
+    const placeholder = document.getElementById("viewport-placeholder");
+    const canvasCont = document.getElementById("canvas-container");
+    const viewport = document.getElementById("viewport-container");
+
+    if (mapLayer) mapLayer.classList.add("hidden");
+    if (canvasCont) canvasCont.classList.add("hidden");
+    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none");
+    if (arLayer) arLayer.classList.remove("hidden");
+    if (viewport) {
+        viewport.classList.remove("bg-slate-950");
+        viewport.classList.add("bg-black");
+    }
+
+    const gnnPanel = document.getElementById("gnn-panel");
+    const aiPanel = document.getElementById("ai-panel");
+    const gpsPanel = document.getElementById("gps-panel");
+    if (gnnPanel) gnnPanel.classList.add("hidden");
+    if (aiPanel) aiPanel.classList.add("hidden");
+    if (gpsPanel) gpsPanel.classList.add("hidden");
+
+    updateNavState('ar');
+    minimizeChat('minimize');
+
+    if (typeof initLocalMap === 'function') {
+        initLocalMap();
+    }
+    fetchCampusNodes();
+}
+
+function toggleMapMode() {
+    const mapLayer = document.getElementById("map-layer");
+    if (mapLayer && !mapLayer.classList.contains("hidden")) {
+        goHome();
     } else {
-        minimizeChat('minimize');
+        activateMapMode();
+    }
+}
+
+function toggleARMode() {
+    const arLayer = document.getElementById("ar-layer");
+    if (arLayer && !arLayer.classList.contains("hidden")) {
+        goHome();
+    } else {
+        activateARMode();
     }
 }
 
@@ -1138,11 +1468,11 @@ async function showUserHistory() {
             headers: { "Authorization": `Bearer ${token}` }
         });
         const data = await res.json();
-        
+
         if (data.status === "success") {
             const listEl = document.getElementById("history-list");
             listEl.innerHTML = "";
-            
+
             if (!data.locations || data.locations.length === 0) {
                 listEl.innerHTML = `<p class="text-sm text-slate-400 text-center py-4">Chưa có dữ liệu di chuyển</p>`;
             } else {
@@ -1193,39 +1523,39 @@ async function clearUserHistory() {
 
 // Node Image Modal logic (GNN Map Visualization)
 document.getElementById('canvas-container').addEventListener('click', (e) => {
-    
+
     // Bỏ qua nếu người dùng vừa mới kéo bản đồ xong (tránh lỗi click nhầm khi đang kéo)
     if (window.lastClickDownX && window.lastClickDownY) {
         if (Math.abs(e.clientX - window.lastClickDownX) > 5 || Math.abs(e.clientY - window.lastClickDownY) > 5) return;
     }
-    
+
     if (!graphData || !graphData.nodes) return;
-    
+
     const rect = document.getElementById('canvas-container').getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    
+
     let closestNode = null;
     let minDist = Infinity;
-    
+
     const padding = 50;
     const drawW = canvas.width - padding * 2;
     const drawH = canvas.height - padding * 2;
-    
+
     graphData.nodes.forEach(n => {
         const nx = padding + (n.ui_x / 100) * drawW;
         const ny = padding + (n.ui_y / 100) * drawH;
-        
+
         const mapX = nx * mapScale + mapOffsetX;
         const mapY = ny * mapScale + mapOffsetY;
-        
+
         const dist = Math.hypot(mapX - x, mapY - y);
         if (dist < minDist) {
             minDist = dist;
             closestNode = n;
         }
     });
-    
+
     // Bán kính click (nhạy hơn một chút để dễ bấm trên điện thoại)
     if (minDist < 40 && closestNode) {
         showNodeImage(closestNode);
@@ -1237,7 +1567,7 @@ function showNodeImage(node) {
     document.getElementById('node-image-title').innerText = node.id.replace(/_/g, " ");
     const iconEl = document.getElementById('node-image-icon');
     const imgEl = document.getElementById('node-image-img');
-    
+
     if (node.image_url) {
         iconEl.classList.add('hidden');
         imgEl.classList.remove('hidden');
@@ -1245,15 +1575,15 @@ function showNodeImage(node) {
     } else {
         iconEl.classList.remove('hidden');
         imgEl.classList.add('hidden');
-        
+
         let icon = "🏢";
-        if (node.id.includes("Cổng trường")) icon = "⛩️"; 
+        if (node.id.includes("Cổng trường")) icon = "⛩️";
         else if (node.id.includes("Nhà xe")) icon = "🚙";
         else if (node.id.includes("Nhà thể dục")) icon = "🏟️";
         else if (node.id.includes("Nhà điều hành")) icon = "🏛️";
         else if (node.id.includes("Cây ATM") || node.id.includes("ATM")) icon = "🏧";
         else if (node.id.includes("Canteen") || node.id.includes("Căn tin")) icon = "🍽️";
-        
+
         iconEl.innerText = icon;
     }
     document.getElementById('node-image-modal').classList.remove('hidden');
@@ -1271,7 +1601,7 @@ async function openTiktokExplore() {
     document.getElementById('tiktok-modal').classList.remove('hidden');
     document.getElementById('tiktok-loading').classList.remove('hidden');
     document.getElementById('tiktok-card-container').classList.add('opacity-0');
-    
+
     try {
         if (graphData && graphData.nodes && graphData.nodes.length > 0) {
             // Lấy tất cả các địa điểm và xáo trộn (shuffle)
@@ -1280,7 +1610,7 @@ async function openTiktokExplore() {
                 const j = Math.floor(Math.random() * (i + 1));
                 [allNodes[i], allNodes[j]] = [allNodes[j], allNodes[i]];
             }
-            
+
             tiktokRecommendations = allNodes.map(n => {
                 let ams = [];
                 if (n.features) {
@@ -1289,7 +1619,7 @@ async function openTiktokExplore() {
                     if (n.features.water) ams.push("Nước uống");
                     if (n.features.elevator) ams.push("Thang máy");
                 }
-                
+
                 return {
                     node: n.id,
                     tagline: n.tagline || 'Khu vực trong khuôn viên trường',
@@ -1299,20 +1629,20 @@ async function openTiktokExplore() {
                     score: 100
                 };
             });
-            
+
             currentTiktokIndex = 0;
             renderTiktokCard();
-            
+
             document.getElementById('tiktok-loading').classList.add('hidden');
             document.getElementById('tiktok-card-container').classList.remove('opacity-0');
-            
+
             const emptyState = document.getElementById('tiktok-empty-state');
             if (emptyState) emptyState.classList.add('hidden');
         } else {
             // Hiển thị giao diện rỗng thay vì đóng ngay lập tức
             document.getElementById('tiktok-loading').classList.add('hidden');
             document.getElementById('tiktok-card-container').classList.remove('opacity-0');
-            
+
             const emptyState = document.getElementById('tiktok-empty-state');
             if (emptyState) emptyState.classList.remove('hidden');
         }
@@ -1334,17 +1664,17 @@ function renderTiktokCard() {
         closeTiktokExplore();
         return;
     }
-    
+
     const rec = tiktokRecommendations[currentTiktokIndex];
     const imgEl = document.getElementById('tiktok-img');
     const titleEl = document.getElementById('tiktok-title');
     const taglineEl = document.getElementById('tiktok-tagline');
     const scoreEl = document.getElementById('tiktok-score');
     const amenitiesEl = document.getElementById('tiktok-amenities');
-    
+
     // Reset animation
     imgEl.classList.add('opacity-0', 'scale-110');
-    
+
     setTimeout(() => {
         imgEl.src = rec.image_url ? rec.image_url.replace('/static/images/', 'img/') : 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800';
         imgEl.onload = () => {
@@ -1354,21 +1684,21 @@ function renderTiktokCard() {
             imgEl.src = 'https://images.unsplash.com/photo-1541339907198-e08756dedf3f?auto=format&fit=crop&w=800';
             imgEl.classList.remove('opacity-0', 'scale-110');
         };
-        
+
         titleEl.textContent = rec.node.replace(/_/g, ' ');
         taglineEl.textContent = rec.tagline || rec.function_summary || rec.reason || 'Khu vực trong khuôn viên trường';
         scoreEl.textContent = `Độ phù hợp: ${Math.round(rec.score)}%`;
-        
+
         amenitiesEl.innerHTML = '';
         if (rec.amenities && rec.amenities.length > 0) {
             rec.amenities.forEach(a => {
                 amenitiesEl.innerHTML += `<span class="bg-white/20 text-white text-[9px] px-2 py-0.5 rounded backdrop-blur-md">${a}</span>`;
             });
         }
-        
+
         // Cập nhật số liệu (tym, bình luận, đánh giá)
         loadTiktokNodeStats(rec.node);
-        
+
     }, 300);
 }
 
@@ -1383,14 +1713,14 @@ async function loadTiktokNodeStats(node) {
         if (data.status === 'success') {
             document.getElementById('tiktok-likes-count').textContent = data.likes_count;
             document.getElementById('tiktok-comments-count').textContent = data.comments_count;
-            
+
             // Cập nhật số sao trung bình và số lượt đánh giá
             const ratingText = data.ratings_count > 0 ? `${data.average_rating}⭐ (${data.ratings_count})` : "Đ.Giá";
             document.getElementById('tiktok-ratings-count').textContent = ratingText;
-            
+
             // Lưu rating của user cho modal
             currentTiktokUserRating = data.user_rating || 0;
-            
+
             const btnLike = document.getElementById("tiktok-like-btn");
             if (btnLike) {
                 if (data.has_liked) {
@@ -1402,14 +1732,14 @@ async function loadTiktokNodeStats(node) {
                 }
             }
         }
-    } catch(e) {
+    } catch (e) {
         console.error("Lỗi khi tải thống kê:", e);
     }
 }
 
 function swipeTiktok(direction) {
     const card = document.getElementById('tiktok-card-container');
-    
+
     if (direction === 'left') {
         // Bỏ qua
         card.style.transform = 'translateX(-100%) rotate(-10deg)';
@@ -1418,9 +1748,9 @@ function swipeTiktok(direction) {
         // Đến đây
         card.style.transform = 'translateX(100%) rotate(10deg)';
         card.style.opacity = '0';
-        
+
         const rec = tiktokRecommendations[currentTiktokIndex];
-        
+
         // Setup lộ trình
         const startSel = document.getElementById('route-start');
         const endSel = document.getElementById('route-end');
@@ -1439,18 +1769,18 @@ function swipeTiktok(direction) {
                 });
             }
             if (closestNode) startSel.value = closestNode;
-            
+
             closeTiktokExplore();
             setTimeout(calculateRoute, 500);
         }
     }
-    
+
     setTimeout(() => {
         card.style.transition = 'none';
         card.style.transform = 'translateX(0) rotate(0)';
         currentTiktokIndex++;
         renderTiktokCard();
-        
+
         setTimeout(() => {
             card.style.transition = 'all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1)';
             card.style.opacity = '1';
@@ -1460,9 +1790,18 @@ function swipeTiktok(direction) {
 
 function toggleMobilePanels() {
     const container = document.getElementById("panels-container");
+    const chatWin = document.getElementById("chat-window");
     if (container) {
+        const isOpening = container.classList.contains("hidden");
         container.classList.toggle("hidden");
         container.classList.toggle("flex");
+        if (chatWin && window.innerWidth < 768) {
+            if (isOpening) {
+                chatWin.classList.add("hidden");
+            } else {
+                chatWin.classList.remove("hidden");
+            }
+        }
     }
 }
 
@@ -1475,16 +1814,16 @@ async function likeTiktokNode() {
     const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
     if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
     const node = tiktokRecommendations[currentTiktokIndex].node;
-    
+
     try {
         const url = `${BACKEND_URL}/map/api_toggle_like?node_id=${node}&session_id=${session_id}`;
         const res = await fetch(url, { method: "POST" });
         const data = await res.json();
-        
+
         if (data.status === 'success') {
             // Cập nhật thống kê ngay lập tức
             loadTiktokNodeStats(node);
-            
+
             // Hiện hiệu ứng tim bay nếu vừa thả tim
             if (data.has_liked) {
                 const burst = document.getElementById('heart-burst');
@@ -1499,7 +1838,7 @@ async function likeTiktokNode() {
         } else {
             showToast("Lỗi khi thả tim", "error");
         }
-    } catch(e) {
+    } catch (e) {
         showToast("Lỗi kết nối khi thả tim", "error");
     }
 }
@@ -1535,7 +1874,7 @@ async function loadTiktokComments(node) {
         const url = `${BACKEND_URL}/map/api_get_comments?node_id=${node}`;
         const res = await fetch(url);
         const data = await res.json();
-        
+
         listEl.innerHTML = "";
         if (data.status === "success" && data.comments.length > 0) {
             data.comments.forEach(c => {
@@ -1553,7 +1892,7 @@ async function loadTiktokComments(node) {
         } else {
             listEl.innerHTML = `<div class="text-center text-slate-400 text-xs mt-4">Chưa có bình luận nào. Hãy là người đầu tiên!</div>`;
         }
-    } catch(e) {
+    } catch (e) {
         listEl.innerHTML = `<div class="text-center text-rose-400 text-xs mt-4">Lỗi khi tải bình luận.</div>`;
     }
 }
@@ -1563,14 +1902,14 @@ async function submitTiktokComment() {
     const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
     if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
     const node = tiktokRecommendations[currentTiktokIndex].node;
-    
+
     const input = document.getElementById("tiktok-comment-input");
     const content = input.value.trim();
     if (!content) {
         showToast("Vui lòng nhập bình luận", "error");
         return;
     }
-    
+
     try {
         const url = `${BACKEND_URL}/map/api_submit_comment?node_id=${node}&content=${encodeURIComponent(content)}&session_id=${session_id}`;
         const res = await fetch(url, { method: "POST" });
@@ -1582,7 +1921,7 @@ async function submitTiktokComment() {
         } else {
             showToast("Lỗi khi gửi bình luận", "error");
         }
-    } catch(e) {
+    } catch (e) {
         showToast("Lỗi kết nối", "error");
     }
 }
@@ -1591,7 +1930,7 @@ function openTiktokRating() {
     if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
     const modal = document.getElementById("tiktok-rating-modal");
     if (modal) modal.classList.remove("hidden");
-    
+
     const stars = document.querySelectorAll(".tiktok-star");
     stars.forEach((s, idx) => {
         if (idx < currentTiktokUserRating) {
@@ -1612,7 +1951,7 @@ async function setTiktokRating(rating) {
     const session_id = (emailInput && emailInput.value) ? emailInput.value : 'default';
     if (tiktokRecommendations.length === 0 || currentTiktokIndex >= tiktokRecommendations.length) return;
     const node = tiktokRecommendations[currentTiktokIndex].node;
-    
+
     const stars = document.querySelectorAll(".tiktok-star");
     stars.forEach((s, idx) => {
         if (idx < rating) {
@@ -1621,7 +1960,7 @@ async function setTiktokRating(rating) {
             s.classList.remove("text-yellow-400");
         }
     });
-    
+
     try {
         const url = `${BACKEND_URL}/map/api_submit_rating?node_id=${node}&rating=${rating}&session_id=${session_id}`;
         const res = await fetch(url, { method: "POST" });
@@ -1632,7 +1971,7 @@ async function setTiktokRating(rating) {
         } else {
             showToast("Lỗi khi đánh giá", "error");
         }
-    } catch(e) {
+    } catch (e) {
         showToast("Lỗi kết nối", "error");
     }
 }

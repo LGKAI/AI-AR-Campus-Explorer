@@ -17,18 +17,34 @@
 }
 
 /* Custom Scrollbar ẩn để tăng cảm giác như native app di động */
-#chat-logs::-webkit-scrollbar {
-    width: 4px;
+#chat-logs,
+.custom-scrollbar,
+#ar-destination-list {
+    scrollbar-width: thin;
+    scrollbar-color: #334155 transparent;
 }
-#chat-logs::-webkit-scrollbar-track {
+
+#chat-logs::-webkit-scrollbar,
+.custom-scrollbar::-webkit-scrollbar,
+#ar-destination-list::-webkit-scrollbar {
+    width: 4px;
+    height: 4px;
+}
+#chat-logs::-webkit-scrollbar-track,
+.custom-scrollbar::-webkit-scrollbar-track,
+#ar-destination-list::-webkit-scrollbar-track {
     background: transparent;
 }
-#chat-logs::-webkit-scrollbar-thumb {
-    background: #475569;
+#chat-logs::-webkit-scrollbar-thumb,
+.custom-scrollbar::-webkit-scrollbar-thumb,
+#ar-destination-list::-webkit-scrollbar-thumb {
+    background: #334155;
     border-radius: 4px;
 }
-#chat-logs::-webkit-scrollbar-thumb:hover {
-    background: #64748b;
+#chat-logs::-webkit-scrollbar-thumb:hover,
+.custom-scrollbar::-webkit-scrollbar-thumb:hover,
+#ar-destination-list::-webkit-scrollbar-thumb:hover {
+    background: #475569;
 }
 
 /* Keyframes cho hiệu ứng mượt khi đổi view */
@@ -46,3 +62,31 @@ input[type="password"]::-ms-reveal,
 input[type="password"]::-ms-clear {
     display: none;
 }
+
+/* Hiệu ứng phát sáng liên tục (sáng lên - tối lại lặp lại) cho Logo HCMUS */
+@keyframes hcmusPulseGlow {
+    0%, 100% {
+        filter: drop-shadow(0 0 10px rgba(59, 130, 246, 0.35)) brightness(0.75);
+        opacity: 0.7;
+        transform: scale(0.97);
+    }
+    50% {
+        filter: drop-shadow(0 0 35px rgba(59, 130, 246, 1)) drop-shadow(0 0 70px rgba(96, 165, 250, 0.8)) brightness(1.35);
+        opacity: 1;
+        transform: scale(1.05);
+    }
+}
+
+.hcmus-logo-glow {
+    animation: hcmusPulseGlow 3s ease-in-out infinite;
+    will-change: filter, transform, opacity;
+}
+
+/* Hỗ trợ tai thỏ / Dynamic Island / thanh điều hướng trên iOS & Android */
+.pt-safe-top {
+    padding-top: max(1rem, env(safe-area-inset-top, 0px));
+}
+
+.pb-safe-bottom {
+    padding-bottom: max(0.75rem, env(safe-area-inset-bottom, 0px));
+}

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="vi">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,70 +8,119 @@
     <link rel="icon" type="image/png" href="\img\logo.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    
+
     <!-- Leaflet map -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 </head>
+
 <body class="bg-slate-900 text-slate-100 h-[100dvh] w-full overflow-hidden font-sans">
 
-    <div id="auth-view" class="hidden relative flex flex-col h-full w-full px-4 py-8 z-20 transition-all duration-500 overflow-y-auto overflow-x-hidden">
+    <div id="auth-view"
+        class="relative flex flex-col h-full w-full px-3 sm:px-4 py-4 sm:py-8 z-20 transition-all duration-500 overflow-y-auto overflow-x-hidden">
         <!-- Hiệu ứng ánh sáng nền (Ambient Glow) -->
-        <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none" style="animation-delay: 2s;"></div>
-        
-        <div class="relative z-10 w-full max-w-[400px] m-auto p-6 bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col">
-            
-            <div class="text-center mb-8 flex flex-col items-center">
-                <img src="img/logo.png" alt="App Logo" class="w-20 h-20 object-contain mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">
-                <h1 class="text-2xl font-bold tracking-wider text-blue-400 uppercase">AI AR Campus Explorer</h1>
+        <div
+            class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none">
+        </div>
+        <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-cyan-600/20 rounded-full mix-blend-screen filter blur-[100px] animate-pulse pointer-events-none"
+            style="animation-delay: 2s;"></div>
+
+        <div
+            class="relative z-10 w-full max-w-[400px] m-auto p-4 sm:p-6 bg-slate-900/60 backdrop-blur-2xl border border-white/10 rounded-2xl sm:rounded-3xl shadow-[0_8px_32px_rgba(0,0,0,0.5)] flex flex-col">
+
+            <div class="text-center mb-5 sm:mb-8 flex flex-col items-center">
+                <img src="img/logo.png" alt="App Logo"
+                    class="w-16 h-16 sm:w-20 sm:h-20 object-contain mb-3 sm:mb-4 drop-shadow-[0_0_15px_rgba(59,130,246,0.8)]">
+                <h1 class="text-xl sm:text-2xl font-bold tracking-wider text-blue-400 uppercase">AI AR Campus Explorer</h1>
                 <p class="text-xs text-slate-400 mt-2">Hệ thống định vị và hỗ trợ sinh viên thông minh</p>
             </div>
 
             <div class="flex bg-slate-950/80 p-1.5 rounded-xl mb-6 border border-white/5">
-                <button id="tab-login" onclick="switchAuthTab('login')" class="flex-1 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">Đăng Nhập</button>
-                <button id="tab-register" onclick="switchAuthTab('register')" class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 transition-all">Đăng Ký</button>
+                <button id="tab-login" onclick="switchAuthTab('login')"
+                    class="flex-1 py-2 text-sm font-semibold rounded-lg bg-blue-600 text-white shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all">Đăng
+                    Nhập</button>
+                <button id="tab-register" onclick="switchAuthTab('register')"
+                    class="flex-1 py-2 text-sm font-semibold rounded-lg text-slate-400 transition-all">Đăng Ký</button>
             </div>
 
-            <div class="mb-4 relative rounded-xl overflow-hidden bg-slate-950 border border-slate-700 aspect-video flex flex-col items-center justify-center group">
+            <div onclick="initializeWebcamSimulator()"
+                class="mb-2 relative rounded-xl overflow-hidden bg-slate-950 border border-slate-700 aspect-video flex flex-col items-center justify-center group cursor-pointer"
+                title="Bấm vào để kích hoạt lại Camera">
                 <video id="webcam" class="w-full h-full object-cover" autoplay muted playsinline></video>
-                <canvas id="face-overlay" class="absolute inset-0 w-full h-full"></canvas>
-                
-                <div class="scanner-line absolute left-0 right-0 h-0.5 bg-cyan-400 opacity-70 shadow-[0_0_8px_#22d3ee]"></div>
-                
-                <div class="absolute bottom-2 left-2 bg-slate-900/80 px-2 py-0.5 rounded text-[10px] text-cyan-400 border border-cyan-500/30 flex items-center gap-1 transition-opacity group-hover:opacity-100">
+                <canvas id="face-overlay" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+                <div class="scanner-line absolute left-0 right-0 h-0.5 bg-cyan-400 opacity-70 shadow-[0_0_8px_#22d3ee]">
+                </div>
+
+                <div
+                    class="absolute bottom-2 left-2 bg-slate-900/80 px-2 py-0.5 rounded text-[10px] text-cyan-400 border border-cyan-500/30 flex items-center gap-1 transition-opacity group-hover:opacity-100">
                     <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse"></span>
                     Nhận diện FaceID
                 </div>
             </div>
 
+            <div class="flex items-center justify-between text-[11px] text-slate-400 mb-4 px-1">
+                <button type="button" onclick="switchCameraDevice()" id="btn-switch-cam"
+                    class="text-cyan-400 hover:text-cyan-300 font-medium flex items-center gap-1 transition-colors hover:underline">
+                    <span>🔄 Đổi Camera</span>
+                </button>
+                <label
+                    class="text-cyan-400 hover:text-cyan-300 cursor-pointer underline flex items-center gap-1 transition-colors">
+                    <span>📷 Chọn ảnh khuôn mặt</span>
+                    <input type="file" id="face-file-input" accept="image/*" class="hidden"
+                        onchange="handleFaceFileUpload(event)">
+                </label>
+            </div>
+
             <form id="form-login" onsubmit="event.preventDefault(); submitLogin(event, 'password')" class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Đăng Nhập</label>
-                    <input type="email" id="login-email" required placeholder="example@domain.com" 
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Đăng
+                        Nhập</label>
+                    <input type="email" id="login-email" required placeholder="example@domain.com"
                         class="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:bg-slate-900 transition-all text-white placeholder-slate-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Mật Khẩu</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Mật
+                        Khẩu</label>
                     <div class="relative">
-                        <input type="password" id="login-password" placeholder="(Bỏ trống nếu dùng FaceID)" 
+                        <input type="password" id="login-password" placeholder="(Bỏ trống nếu dùng FaceID)"
                             class="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl pl-4 pr-12 py-3 text-sm outline-none focus:border-blue-500 focus:bg-slate-900 transition-all text-white placeholder-slate-500">
-                        <button type="button" onclick="togglePasswordVisibility('login-password', 'eye-icon-login')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 focus:outline-none">
-                            <svg id="eye-icon-login" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <button type="button" onclick="togglePasswordVisibility('login-password', 'eye-icon-login')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 focus:outline-none">
+                            <svg id="eye-icon-login" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                
+
                 <div class="flex gap-3 pt-2">
-                    <button type="button" onclick="submitLogin(event, 'face')" class="flex-1 bg-cyan-900/30 hover:bg-cyan-800/40 border border-cyan-500/30 active:scale-[0.98] text-cyan-300 font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all text-xs flex flex-col items-center justify-center gap-1.5">
-                        <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7V5a2 2 0 0 1 2-2h2" /><path d="M17 3h2a2 2 0 0 1 2 2v2" /><path d="M21 17v2a2 2 0 0 1-2 2h-2" /><path d="M7 21H5a2 2 0 0 1-2-2v-2" /><path d="M8 14s1.5 2 4 2 4-2 4-2" /><circle cx="9" cy="9" r="1" /><circle cx="15" cy="9" r="1" /></svg>
+                    <button type="button" onclick="submitLogin(event, 'face')"
+                        class="flex-1 bg-cyan-900/30 hover:bg-cyan-800/40 border border-cyan-500/30 active:scale-[0.98] text-cyan-300 font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(6,182,212,0.15)] transition-all text-xs flex flex-col items-center justify-center gap-1.5">
+                        <svg class="w-5 h-5 text-cyan-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M3 7V5a2 2 0 0 1 2-2h2" />
+                            <path d="M17 3h2a2 2 0 0 1 2 2v2" />
+                            <path d="M21 17v2a2 2 0 0 1-2 2h-2" />
+                            <path d="M7 21H5a2 2 0 0 1-2-2v-2" />
+                            <path d="M8 14s1.5 2 4 2 4-2 4-2" />
+                            <circle cx="9" cy="9" r="1" />
+                            <circle cx="15" cy="9" r="1" />
+                        </svg>
                         FaceID
                     </button>
-                    <button type="button" onclick="submitLogin(event, 'password')" class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all text-xs flex flex-col items-center justify-center gap-1.5">
-                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2" /><path d="M7 11V7a5 5 0 0 1 10 0v4" /><circle cx="12" cy="16" r="1" /></svg>
+                    <button type="button" onclick="submitLogin(event, 'password')"
+                        class="flex-1 bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(37,99,235,0.4)] transition-all text-xs flex flex-col items-center justify-center gap-1.5">
+                        <svg class="w-5 h-5 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                            <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                            <circle cx="12" cy="16" r="1" />
+                        </svg>
                         Mật Khẩu
                     </button>
                 </div>
@@ -78,29 +128,37 @@
 
             <form id="form-register" onsubmit="submitRegister(event)" class="space-y-4 hidden">
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Họ và Tên</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Họ và
+                        Tên</label>
                     <input type="text" id="reg-name" placeholder="Nguyễn Văn A" required
                         class="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:bg-slate-900 transition-all text-white placeholder-slate-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Đăng Ký</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Email Đăng
+                        Ký</label>
                     <input type="email" id="reg-email" placeholder="example@domain.com" required
                         class="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl px-4 py-3 text-sm outline-none focus:border-blue-500 focus:bg-slate-900 transition-all text-white placeholder-slate-500">
                 </div>
                 <div>
-                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Mật Khẩu</label>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1.5 uppercase tracking-wider">Mật
+                        Khẩu</label>
                     <div class="relative">
                         <input type="password" id="reg-password" placeholder="(Tối thiểu 6 ký tự)" required
                             class="w-full bg-slate-950/50 border border-slate-700/50 rounded-xl pl-4 pr-12 py-3 text-sm outline-none focus:border-blue-500 focus:bg-slate-900 transition-all text-white placeholder-slate-500">
-                        <button type="button" onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')" class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 focus:outline-none">
-                            <svg id="eye-icon-reg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        <button type="button" onclick="togglePasswordVisibility('reg-password', 'eye-icon-reg')"
+                            class="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 focus:outline-none">
+                            <svg id="eye-icon-reg" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                             </svg>
                         </button>
                     </div>
                 </div>
-                <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all text-sm mt-2">
+                <button type="submit"
+                    class="w-full bg-emerald-600 hover:bg-emerald-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl shadow-[0_0_15px_rgba(16,185,129,0.4)] transition-all text-sm mt-2">
                     Tạo Tài Khoản
                 </button>
             </form>
@@ -109,37 +167,123 @@
     </div>
 
     <div id="main-view" class="hidden h-full w-full flex-col relative z-10 animate-fade-in">
-        
-        <header class="bg-slate-800/90 backdrop-blur border-b border-slate-700 px-4 py-3 flex items-center justify-between shadow-md z-30">
-            <div class="flex items-center gap-2 md:gap-3">
-                <img src="img/logo.png" alt="Small Logo" class="w-6 h-6 object-contain">
-                <span class="font-bold tracking-wide text-sm text-blue-400 hidden sm:block">AI AR CAMPUS EXPLORER</span>
-            </div>
-            <div class="flex items-center gap-2 sm:gap-3">
-                <button id="user-display" onclick="showUserHistory()" class="text-xs text-slate-300 font-medium bg-slate-950 hover:bg-slate-800 px-3 py-1.5 rounded-lg border border-slate-700 hover:border-blue-500 transition-all cursor-pointer shadow-md">👤 <span class="hidden sm:inline">Sinh viên</span></button>
-                <button onclick="executeLogout()" class="text-xs font-semibold text-rose-400 hover:text-rose-300 bg-rose-550/10 border border-rose-500/20 px-2.5 py-1.5 rounded-lg transition-all" title="Đăng xuất">
-                    <span class="hidden sm:inline">Đăng xuất</span>
-                    <svg class="w-4 h-4 sm:hidden inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+
+        <header
+            class="bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-3 md:px-6 py-2 sm:py-2.5 flex items-center justify-between gap-2 shadow-lg z-30 w-full max-w-full overflow-hidden shrink-0">
+            <!-- Bên trái: Trang chủ (Logo + Tiêu đề đầy đủ) -->
+            <button type="button" onclick="goHome()" id="nav-btn-home"
+                class="flex items-center gap-1.5 sm:gap-2 text-left focus:outline-none group transition-all shrink-0 cursor-pointer"
+                title="Về Trang Chủ">
+                <img src="img/logo.png" alt="Logo"
+                    class="w-7 h-7 sm:w-8 sm:h-8 object-contain group-hover:scale-110 transition-transform shrink-0">
+                <span id="nav-home-title"
+                    class="font-bold tracking-tight sm:tracking-wider text-xs sm:text-sm text-blue-400 drop-shadow-[0_0_10px_rgba(96,165,250,0.7)] group-hover:text-blue-300 transition-colors uppercase whitespace-nowrap inline-block">AI AR CAMPUS EXPLORER</span>
+            </button>
+
+            <!-- Bên phải: [GNN Map - desktop] [AR WebXR - desktop] [Thông tin người dùng] [Đăng xuất] [Menu 3 gạch - mobile] -->
+            <div class="flex items-center gap-1.5 sm:gap-2.5 md:gap-3 shrink-0">
+                <button onclick="toggleMapMode()" id="btn-map"
+                    class="hidden md:flex px-5 md:px-6 py-1.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 transition-all cursor-pointer border border-slate-700/60 bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap shrink-0"
+                    title="Bản đồ chỉ đường GNN">
+                    <svg class="w-4 h-4 text-blue-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                        <line x1="9" y1="3" x2="9" y2="18"></line>
+                        <line x1="15" y1="6" x2="15" y2="21"></line>
+                    </svg>
+                    <span>GNN Map</span>
                 </button>
-                <button onclick="toggleMobilePanels()" class="md:hidden text-slate-300 p-1.5 border border-slate-700 rounded-lg hover:bg-slate-700 transition-all focus:outline-none ml-1">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
+                <button onclick="toggleARMode()" id="btn-ar"
+                    class="hidden md:flex px-5 md:px-6 py-1.5 rounded-xl text-xs sm:text-sm font-semibold items-center gap-2 transition-all cursor-pointer border border-slate-700/60 bg-slate-900/60 text-slate-300 hover:text-white hover:bg-slate-800 whitespace-nowrap shrink-0"
+                    title="Chế độ thực tế tăng cường AR">
+                    <svg class="w-4 h-4 text-indigo-400 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 13V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                        <path d="M9 7v4a3 3 0 0 0 6 0V7" />
+                        <path d="M12 15v3" />
+                    </svg>
+                    <span>AR WebXR</span>
+                </button>
+
+                <div class="h-4 w-px bg-slate-700/60 hidden md:block"></div>
+
+                <button id="user-display" onclick="showUserHistory()"
+                    class="text-xs sm:text-sm text-slate-300 font-medium bg-slate-950/80 hover:bg-slate-800 px-2 sm:px-3 py-1.5 rounded-xl border border-slate-700/80 hover:border-blue-500 transition-all cursor-pointer shadow-sm flex items-center gap-1.5 whitespace-nowrap shrink-0"
+                    title="Thông tin sinh viên">
+                    <span>👤</span><span class="hidden sm:inline max-w-[110px] md:max-w-[150px] truncate">Sinh viên</span>
+                </button>
+                <button onclick="executeLogout()"
+                    class="text-xs sm:text-sm font-semibold text-rose-400 hover:text-rose-300 bg-rose-500/10 border border-rose-500/20 px-2 sm:px-3 py-1.5 rounded-xl transition-all whitespace-nowrap shrink-0 cursor-pointer"
+                    title="Đăng xuất">
+                    <span class="hidden sm:inline">Đăng xuất</span>
+                    <svg class="w-4 h-4 sm:hidden inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1">
+                        </path>
+                    </svg>
+                </button>
+                <button onclick="toggleMobilePanels()" id="btn-mobile-panels"
+                    class="md:hidden text-slate-300 p-1.5 border border-slate-700 rounded-lg hover:bg-slate-700 transition-all focus:outline-none shrink-0 cursor-pointer"
+                    title="Bảng điều khiển & Chế độ">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
                 </button>
             </div>
         </header>
 
         <div id="viewport-container" class="flex-1 w-full bg-slate-950 relative overflow-hidden">
-            
-            <div id="viewport-placeholder" class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 z-10 transition-all">
-                <div class="flex flex-col items-center justify-center mb-8 opacity-60 hover:opacity-100 transition-all duration-500 cursor-default">
-                    <img src="img/hcmus.png" alt="HCMUS Logo" class="w-24 h-24 object-contain mb-4 drop-shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:scale-110 transition-transform duration-500">
-                    <h2 class="text-sm font-bold text-slate-200 uppercase tracking-widest">Trường Đại học Khoa học Tự nhiên</h2>
-                    <h3 class="text-xs font-bold text-blue-400 tracking-wider mt-1">ĐHQG TP.HCM</h3>
-                </div>
-                <h3 class="text-lg font-bold text-slate-100 mt-2">AI AR CAMPUS EXPLORER</h3>
-                <p class="text-sm text-slate-400 max-w-md mt-2 leading-relaxed">Hệ thống Bản đồ Campus và Trợ lý ảo thông minh cho HCMUS.</p>
-                <p class="text-sm text-slate-400 max-w-md mt-2 leading-relaxed">Hãy bật chế độ <span class="text-blue-400 font-semibold">GNN Map</span> hoặc <span class="text-indigo-400 font-semibold">AR WebXR</span> để bắt đầu trải nghiệm!</p>
-            </div>
 
+            <div id="viewport-placeholder"
+                class="absolute inset-0 flex flex-col items-center justify-center text-center p-4 sm:p-6 pb-24 md:pb-6 z-10 transition-all overflow-y-auto">
+                <div class="max-w-xl w-full flex flex-col items-center justify-center my-auto">
+                    <div class="flex flex-col items-center justify-center mb-2 sm:mb-3 cursor-pointer group" onclick="goHome()">
+                        <img src="img/hcmus.png" alt="HCMUS Logo"
+                            class="w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 object-contain mb-2 sm:mb-3 hcmus-logo-glow transition-all duration-500">
+                        <h2
+                            class="text-xs sm:text-sm md:text-base font-bold text-slate-100 uppercase tracking-widest drop-shadow-md">
+                            Trường Đại học Khoa học Tự nhiên</h2>
+                        <h3 class="text-[10px] sm:text-xs font-semibold text-blue-400 tracking-wider mt-0.5 sm:mt-1 uppercase">ĐHQG TP.HCM</h3>
+                    </div>
+
+                    <h1
+                        class="text-lg sm:text-xl md:text-3xl font-extrabold tracking-wider bg-gradient-to-r from-blue-400 via-indigo-300 to-cyan-400 bg-clip-text text-transparent mt-1 sm:mt-2 mb-1 sm:mb-2 drop-shadow-[0_0_20px_rgba(59,130,246,0.5)]">
+                        AI AR CAMPUS EXPLORER
+                    </h1>
+
+                    <p class="text-xs md:text-sm text-slate-400 max-w-md leading-relaxed mb-4 sm:mb-6 px-2">
+                        Hệ thống Bản đồ Campus thông minh kết hợp Hệ thống gợi ý (GNN) và Thực tế ảo tăng cường (AR
+                        WebXR).
+                    </p>
+
+                    <!-- Nút điều hướng nhanh ngay trên trang chủ -->
+                    <div class="flex flex-wrap items-center justify-center gap-2.5 sm:gap-3 w-full px-2">
+                        <button onclick="activateMapMode()"
+                            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-xl bg-blue-600/30 hover:bg-blue-600 border border-blue-500/50 text-blue-200 hover:text-white font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(59,130,246,0.25)] hover:scale-105 active:scale-95 group cursor-pointer whitespace-nowrap">
+                            <svg class="w-4 h-4 text-blue-400 group-hover:text-white transition-colors shrink-0"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                                <line x1="9" y1="3" x2="9" y2="18"></line>
+                                <line x1="15" y1="6" x2="15" y2="21"></line>
+                            </svg>
+                            <span>Khám phá GNN Map</span>
+                        </button>
+                        <button onclick="activateARMode()"
+                            class="flex-1 sm:flex-none px-4 sm:px-5 py-2.5 rounded-xl bg-indigo-600/30 hover:bg-indigo-600 border border-indigo-500/50 text-indigo-200 hover:text-white font-semibold text-xs md:text-sm transition-all flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(99,102,241,0.25)] hover:scale-105 active:scale-95 group cursor-pointer whitespace-nowrap">
+                            <svg class="w-4 h-4 text-indigo-400 group-hover:text-white transition-colors shrink-0"
+                                viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M3 13V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                <path d="M9 7v4a3 3 0 0 0 6 0V7" />
+                                <path d="M12 15v3" />
+                            </svg>
+                            <span>Trải nghiệm AR WebXR</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
             <div class="absolute inset-0 hidden cursor-grab active:cursor-grabbing z-0" id="canvas-container">
                 <canvas id="campus-map-canvas" class="absolute inset-0 w-full h-full z-10"></canvas>
                 <div class="w-full h-full opacity-20 base-grid-pattern absolute inset-0 z-0 pointer-events-none"></div>
@@ -152,169 +296,289 @@
             <div id="ar-layer" class="absolute inset-0 hidden pointer-events-auto z-[40] overflow-hidden bg-slate-900">
                 <!-- 1. Leaflet Map View -->
                 <div id="local-map-container" class="absolute inset-0"></div>
-                
+
                 <!-- Nút Launch AR -->
-                <div id="ar-launch-overlay" class="absolute bottom-12 left-1/2 -translate-x-1/2 z-[1000]">
-                    <button id="btn-launch-ar" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-8 rounded-full shadow-[0_0_20px_rgba(79,70,229,0.5)] transition-all flex items-center gap-2 border border-indigo-400">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                        AR CAMERA
+                <div id="ar-launch-overlay" class="absolute bottom-24 sm:bottom-28 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto">
+                    <button id="btn-launch-ar"
+                        class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-3 px-7 sm:px-8 rounded-full shadow-[0_0_25px_rgba(79,70,229,0.6)] hover:shadow-[0_0_35px_rgba(99,102,241,0.8)] transition-all flex items-center justify-center gap-2 border border-indigo-400 active:scale-95 text-xs sm:text-sm cursor-pointer whitespace-nowrap max-w-[90vw]">
+                        <svg class="w-5 h-5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
+                        <span>AR CAMERA</span>
                     </button>
                 </div>
 
                 <!-- 2. AR Camera View (Hidden initially) -->
-                <video id="ar-video" autoplay playsinline muted class="absolute inset-0 w-full h-full object-cover hidden z-10"></video>
+                <video id="ar-video" autoplay playsinline muted
+                    class="absolute inset-0 w-full h-full object-cover hidden z-10"></video>
                 <canvas id="ar-canvas" class="absolute inset-0 w-full h-full hidden z-20 pointer-events-auto"></canvas>
 
                 <!-- AR HUD (Top) -->
-                <div id="ar-top-hud" class="absolute top-0 left-0 right-0 hidden p-4 pt-safe-top flex justify-between items-start z-30 pointer-events-none">
-                    <div id="ar-gps-pill" class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
-                        <span>📍 Lấy GPS...</span>
+                <!-- AR HUD (Top) -->
+                <div id="ar-top-hud"
+                    class="absolute top-0 left-0 right-0 hidden p-3 pt-safe-top sm:p-4 flex justify-between items-start z-30 pointer-events-none">
+                    <!-- Bên trái: GPS pill và La bàn nằm ngay dưới -->
+                    <div class="flex flex-col gap-2 items-start pointer-events-auto">
+                        <div id="ar-gps-pill"
+                            class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
+                            <span>📍 Lấy GPS...</span>
+                        </div>
+                        <div id="ar-compass-pill"
+                            class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
+                            <span>🧭 --°</span>
+                        </div>
                     </div>
-                    <div id="ar-compass-pill" class="bg-slate-900/80 backdrop-blur-md border border-slate-600 px-3 py-1.5 rounded-full text-xs text-white font-mono shadow-lg flex items-center gap-1.5">
-                        <span>🧭 --°</span>
-                    </div>
-                </div>
 
-                <!-- AR Close Panel -->
-                <div id="ar-bottom-panel" class="absolute top-[80px] right-4 hidden z-[100] pointer-events-none">
-                    <div class="pointer-events-auto">
-                        <button id="btn-close-ar" class="bg-slate-900/80 hover:bg-red-500 text-white font-bold p-2.5 rounded-2xl backdrop-blur-md border border-slate-700 hover:border-red-500 shadow-xl transition-all flex items-center justify-center group" title="Đóng Camera AR">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <!-- Bên phải: Nút X (Đóng Camera AR) chuyển lên góc trên phải (chỗ cũ của la bàn) -->
+                    <div id="ar-bottom-panel" class="pointer-events-auto">
+                        <button id="btn-close-ar"
+                            class="bg-slate-900/80 hover:bg-red-500 text-white font-bold p-2.5 rounded-full backdrop-blur-md border border-slate-700 hover:border-red-500 shadow-xl transition-all flex items-center justify-center group cursor-pointer"
+                            title="Đóng Camera AR">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M6 18L18 6M6 6l12 12"></path>
+                            </svg>
                         </button>
                     </div>
                 </div>
 
                 <!-- AR Destination Selection (Shown when selectedDestination is null) -->
-                <div id="ar-destination-selector" class="absolute bottom-6 left-0 right-0 z-30 pointer-events-none hidden">
-                    <div class="pointer-events-auto px-4 pb-4 bg-gradient-to-t from-slate-950 via-slate-900/80 to-transparent pt-12">
-                        <h3 class="text-white font-bold text-base mb-1 drop-shadow-lg">Bạn muốn đến đâu? 📍</h3>
-                        <p class="text-slate-300 text-[11px] mb-3 drop-shadow-md">Chọn một toà nhà bên dưới để bắt đầu chỉ đường</p>
-                        <div id="ar-destination-list" class="flex overflow-x-auto gap-3 pb-2 custom-scrollbar snap-x snap-mandatory">
+                <div id="ar-destination-selector"
+                    class="absolute bottom-0 left-0 right-0 z-30 pointer-events-none hidden">
+                    <div
+                        class="pointer-events-auto px-4 pb-safe-bottom bg-gradient-to-t from-slate-950 via-slate-950/85 to-transparent pt-6">
+                        <h3 class="text-white font-bold text-sm mb-0.5 drop-shadow-lg">Bạn muốn đến đâu? 📍</h3>
+                        <p class="text-slate-300 text-[11px] mb-2 drop-shadow-md">Chọn một toà nhà bên dưới để bắt đầu
+                            chỉ đường</p>
+                        <div id="ar-destination-list"
+                            class="flex overflow-x-auto gap-2.5 pb-0 custom-scrollbar snap-x snap-mandatory">
                             <!-- Chips will be generated here -->
                         </div>
                     </div>
                 </div>
 
                 <!-- AR Selected Destination Card (Shown when selectedDestination is set) -->
-                <div id="ar-selected-card" class="absolute bottom-6 left-4 right-4 z-30 pointer-events-none hidden">
-                    <div class="pointer-events-auto bg-slate-900/90 backdrop-blur-xl rounded-2xl p-4 border border-slate-700 flex justify-between items-center shadow-2xl">
+                <div id="ar-selected-card" class="absolute bottom-[max(0.75rem,env(safe-area-inset-bottom,0px))] left-3 right-3 sm:left-4 sm:right-4 z-30 pointer-events-none hidden">
+                    <div
+                        class="pointer-events-auto bg-slate-900/90 backdrop-blur-xl rounded-2xl p-3 border border-slate-700 flex justify-between items-center shadow-2xl">
                         <div class="flex items-center gap-3">
-                            <div id="ar-card-icon" class="bg-blue-600 w-11 h-11 rounded-xl flex items-center justify-center text-white text-xl shadow-inner">P</div>
+                            <div id="ar-card-icon"
+                                class="bg-blue-600 w-10 h-10 rounded-xl flex items-center justify-center text-white text-lg shadow-inner">
+                                P</div>
                             <div>
                                 <h3 id="ar-card-name" class="text-white font-bold text-sm">Bãi giữ xe</h3>
                                 <p id="ar-card-dist" class="text-cyan-400 text-xs font-medium mt-0.5">📍 -- m</p>
                             </div>
                         </div>
-                        <button onclick="clearARDestination()" class="text-slate-400 text-[11px] font-medium hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-all border border-slate-700">× Đóng</button>
+                        <button onclick="clearARDestination()"
+                            class="text-slate-400 text-[11px] font-medium hover:text-white bg-slate-800 hover:bg-slate-700 px-3 py-1.5 rounded-lg transition-all border border-slate-700 cursor-pointer">×
+                            Đóng</button>
                     </div>
                 </div>
             </div>
 
-            <div id="panels-container" class="hidden flex-col gap-6 fixed inset-0 z-[60] bg-slate-950/98 overflow-y-auto p-4 pt-16 md:flex-none md:block md:absolute md:inset-0 md:z-10 md:pointer-events-none md:overflow-hidden md:bg-transparent md:p-0">
-                
-                <button onclick="toggleMobilePanels()" class="md:hidden absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full border border-slate-700 shadow-xl z-50">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                </button>
-                <h3 class="md:hidden text-white font-bold text-center mb-2 uppercase tracking-widest text-lg">Bảng Điều Khiển</h3>
+            <div id="panels-container"
+                class="hidden flex-col gap-6 fixed inset-0 z-[120] bg-slate-950/98 overflow-y-auto p-4 pt-16 pb-32 pb-safe-bottom md:flex-none md:block md:absolute md:inset-0 md:z-10 md:pointer-events-none md:overflow-hidden md:bg-transparent md:p-0">
 
-                <div id="gnn-panel" class="hidden relative w-full mx-auto md:absolute md:top-4 md:left-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20 space-y-3">
+                <button onclick="toggleMobilePanels()"
+                    class="md:hidden absolute top-4 right-4 text-slate-400 hover:text-white bg-slate-800 p-2 rounded-full border border-slate-700 shadow-xl z-50 cursor-pointer">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                        </path>
+                    </svg>
+                </button>
+                <h3 class="md:hidden text-white font-bold text-center mb-1 uppercase tracking-widest text-base sm:text-lg">Bảng Điều Khiển</h3>
+
+                <!-- Mobile Navigation Card (Chuyển chế độ GNN, AR, Trang chủ khi bấm menu 3 gạch) -->
+                <div class="md:hidden bg-slate-900/90 border border-slate-700/80 rounded-2xl p-3.5 sm:p-4 shadow-2xl backdrop-blur-md pointer-events-auto space-y-2.5">
+                    <div class="text-[11px] font-semibold text-slate-400 uppercase tracking-wider flex items-center justify-between mb-1">
+                        <span>Chuyển chế độ nhanh</span>
+                        <span class="text-[10px] text-blue-400 font-mono bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/20">Menu điều hướng</span>
+                    </div>
+                    <div class="grid grid-cols-1 gap-2">
+                        <button type="button" onclick="goHome(); toggleMobilePanels();" id="mobile-btn-home"
+                            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 transition-all font-medium text-xs sm:text-sm group cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20 shrink-0">
+                                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                                    </svg>
+                                </span>
+                                <div class="text-left">
+                                    <div class="font-semibold text-white">🏠 Trang Chủ</div>
+                                    <div class="text-[10px] text-slate-400">Giới thiệu tổng quan hệ thống</div>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-500 group-hover:text-blue-400">➔</span>
+                        </button>
+
+                        <button type="button" onclick="activateMapMode(); toggleMobilePanels();" id="mobile-btn-map"
+                            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 transition-all font-medium text-xs sm:text-sm group cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="p-2 rounded-lg bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20 shrink-0">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon>
+                                        <line x1="9" y1="3" x2="9" y2="18"></line>
+                                        <line x1="15" y1="6" x2="15" y2="21"></line>
+                                    </svg>
+                                </span>
+                                <div class="text-left">
+                                    <div class="font-semibold text-white">🗺️ Bản Đồ GNN (Routing)</div>
+                                    <div class="text-[10px] text-slate-400">Dẫn đường tối ưu mạng nơ-ron đồ thị</div>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-500 group-hover:text-blue-400">➔</span>
+                        </button>
+
+                        <button type="button" onclick="activateARMode(); toggleMobilePanels();" id="mobile-btn-ar"
+                            class="w-full flex items-center justify-between px-3.5 py-2.5 rounded-xl border border-slate-700 bg-slate-800/80 hover:bg-slate-800 text-slate-200 transition-all font-medium text-xs sm:text-sm group cursor-pointer">
+                            <div class="flex items-center gap-3">
+                                <span class="p-2 rounded-lg bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 group-hover:bg-indigo-500/20 shrink-0">
+                                    <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <path d="M3 13V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                                        <path d="M9 7v4a3 3 0 0 0 6 0V7" />
+                                        <path d="M12 15v3" />
+                                    </svg>
+                                </span>
+                                <div class="text-left">
+                                    <div class="font-semibold text-white">🥽 AR WebXR (Camera)</div>
+                                    <div class="text-[10px] text-slate-400">Chỉ đường không gian 3D qua Camera</div>
+                                </div>
+                            </div>
+                            <span class="text-xs text-slate-500 group-hover:text-indigo-400">➔</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="gnn-panel"
+                    class="hidden relative w-full mx-auto md:absolute md:top-4 md:left-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20 space-y-3">
                     <h4 class="text-xs font-bold tracking-wider text-blue-400 uppercase flex items-center gap-2 mb-4">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7">
+                            </path>
+                        </svg>
                         GNN Routing System
                     </h4>
-                    
+
                     <div class="space-y-3">
                         <div>
-                            <select id="route-start" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-blue-500">
+                            <select id="route-start"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-blue-500">
                                 <option value="">-- Điểm xuất phát --</option>
                             </select>
                         </div>
                         <div>
-                            <select id="route-waypoint" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-indigo-500">
+                            <select id="route-waypoint"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-indigo-500">
                                 <option value="">-- Điểm dừng (tuỳ chọn) --</option>
                             </select>
                         </div>
                         <div>
-                            <select id="route-end" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-emerald-500">
+                            <select id="route-end"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-xs text-white outline-none focus:border-emerald-500">
                                 <option value="">-- Điểm đến --</option>
                             </select>
                         </div>
                         <div class="flex flex-col gap-2">
-                            <select id="route-weather" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-[11px] text-white outline-none focus:border-blue-500">
+                            <select id="route-weather"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-[11px] text-white outline-none focus:border-blue-500">
                                 <option value="normal">☁️ Bình thường</option>
                                 <option value="sunny">☀️ Nắng nóng</option>
                                 <option value="rainy">🌧️ Mưa rào</option>
                             </select>
-                            <select id="route-preference" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-[11px] text-white outline-none focus:border-blue-500">
+                            <select id="route-preference"
+                                class="w-full bg-slate-950 border border-slate-700 rounded-lg p-2.5 text-[11px] text-white outline-none focus:border-blue-500">
                                 <option value="fastest">⚡ Nhanh nhất</option>
                                 <option value="covered">☂️ Có mái che</option>
                                 <option value="wheelchair">♿ Cho xe lăn (bằng phẳng)</option>
                             </select>
                         </div>
-                        
-                        <button onclick="calculateRoute()" class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition-all flex justify-center items-center gap-2">
+
+                        <button onclick="calculateRoute()"
+                            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-bold py-2.5 rounded-lg text-xs transition-all flex justify-center items-center gap-2">
                             Tính toán lộ trình
                         </button>
                     </div>
 
                     <div id="route-result" class="hidden mt-4 pt-3 border-t border-slate-700">
                         <p id="route-distance" class="text-[11px] text-yellow-400 font-bold mb-1"></p>
-                        <div id="route-path-text" class="text-[10px] text-emerald-400 font-mono leading-relaxed max-h-24 overflow-y-auto"></div>
+                        <div id="route-path-text"
+                            class="text-[10px] text-emerald-400 font-mono leading-relaxed max-h-24 overflow-y-auto">
+                        </div>
                     </div>
                 </div>
 
-                <div id="ai-panel" class="hidden relative w-full mx-auto md:absolute md:top-4 md:right-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20 flex flex-col max-h-[600px] md:max-h-[calc(100%-260px)]">
+                <div id="ai-panel"
+                    class="hidden relative w-full mx-auto md:absolute md:top-4 md:right-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20 flex flex-col max-h-[600px] md:max-h-[calc(100%-260px)]">
                     <h4 class="text-xs font-bold tracking-wider text-purple-400 uppercase flex items-center gap-2 mb-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z">
+                            </path>
+                        </svg>
                         Hồ sơ AI & Đề xuất
                     </h4>
-                    
+
                     <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
-                        <button onclick="fetchAIRecommendations()" class="w-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-300 py-2 rounded-lg transition-all mb-2 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                        <button onclick="fetchAIRecommendations()"
+                            class="w-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-300 py-2 rounded-lg transition-all mb-2 flex items-center justify-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+                            </svg>
                             Lấy đề xuất địa điểm
                         </button>
-                        <button type="button" onclick="event.preventDefault(); openTiktokExplore()" class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-300 py-2 rounded-lg transition-all flex items-center justify-center gap-2 font-bold">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v5.37c-.01 2.21-.6 4.41-1.83 6.24-1.22 1.83-3.05 3.16-5.18 3.75-2.13.59-4.42.42-6.42-.48-2.01-.89-3.64-2.45-4.6-4.38C-2.4 15.63-2.6 13.34-1.8 11.3c.79-2.03 2.36-3.67 4.31-4.5 1.95-.83 4.2-.82 6.13.02 1.93.83 3.49 2.44 4.31 4.4.08.19.14.39.18.59V.02z"/></svg>
+                        <button type="button" onclick="event.preventDefault(); openTiktokExplore()"
+                            class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-300 py-2 rounded-lg transition-all flex items-center justify-center gap-2 font-bold">
+                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v5.37c-.01 2.21-.6 4.41-1.83 6.24-1.22 1.83-3.05 3.16-5.18 3.75-2.13.59-4.42.42-6.42-.48-2.01-.89-3.64-2.45-4.6-4.38C-2.4 15.63-2.6 13.34-1.8 11.3c.79-2.03 2.36-3.67 4.31-4.5 1.95-.83 4.2-.82 6.13.02 1.93.83 3.49 2.44 4.31 4.4.08.19.14.39.18.59V.02z" />
+                            </svg>
                             Khám phá (Tiktok Swipe)
                         </button>
-                        
+
                         <div id="ai-recs-box" class="space-y-2 hidden">
                             <p class="text-[10px] text-slate-400 uppercase">Gợi ý cho bạn:</p>
                             <ul id="ai-recs-list" class="space-y-1 text-slate-200 list-disc pl-4"></ul>
                         </div>
 
-                        <div class="border-t border-slate-700 pt-3">
-                            <p class="text-[10px] text-slate-400 uppercase mb-2">Intent Semantic (Từ khóa AI)</p>
-                            <div id="ai-intent-tags" class="flex flex-wrap gap-1">
-                                <span class="bg-slate-800 text-slate-300 px-2 py-1 rounded text-[9px]">Chưa có dữ liệu học</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="mt-4 pt-3 border-t border-slate-700">
-                        <button onclick="trainModels()" id="btn-train" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold py-2 rounded-lg text-xs transition-all">
-                            🔬 Huấn luyện lại Mạng PyTorch
-                        </button>
                     </div>
                 </div>
 
-                <div id="gps-panel" class="hidden relative w-full mx-auto md:absolute md:bottom-4 md:right-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20">
+                <div id="gps-panel"
+                    class="hidden relative w-full mx-auto md:absolute md:bottom-4 md:right-4 md:w-64 md:mx-0 pointer-events-auto bg-slate-900/95 backdrop-blur-md border border-slate-700 p-4 rounded-xl shadow-2xl z-20">
                     <h4 class="text-xs font-bold tracking-wider text-rose-400 uppercase flex items-center gap-2 mb-3">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         Định vị GPS thời gian thực
                     </h4>
                     <div class="space-y-2 text-[10px] text-slate-300 mb-3">
-                        <div class="flex justify-between"><span class="text-slate-500">Tọa độ GPS:</span> <span id="gps-coords" class="font-mono">Chưa xác định</span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Tòa gần nhất:</span> <span id="gps-nearest" class="font-bold text-emerald-400">Chưa Snap</span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Độ dài còn lại:</span> <span id="gps-dist">N/A</span></div>
-                        <div class="flex justify-between"><span class="text-slate-500">Thời gian ước lượng:</span> <span id="gps-time">N/A</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Tọa độ GPS:</span> <span
+                                id="gps-coords" class="font-mono">Chưa xác định</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Tòa gần nhất:</span> <span
+                                id="gps-nearest" class="font-bold text-emerald-400">Chưa Snap</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Độ dài còn lại:</span> <span
+                                id="gps-dist">N/A</span></div>
+                        <div class="flex justify-between"><span class="text-slate-500">Thời gian ước lượng:</span> <span
+                                id="gps-time">N/A</span></div>
                     </div>
-                    <div class="space-y-2">
-                        <button onclick="startGPSTracking(false)" class="w-full bg-slate-800 border border-slate-600 hover:bg-slate-700 text-white font-bold py-2 rounded-lg text-[11px] transition-all flex justify-center items-center gap-2">
+                    <div class="space-y-2 pt-1">
+                        <button onclick="startGPSTracking(false)"
+                            class="w-full bg-slate-800 border border-slate-600 hover:bg-slate-700 active:scale-[0.98] text-white font-bold py-2.5 rounded-lg text-xs transition-all flex justify-center items-center gap-2 cursor-pointer shadow-sm">
                             📍 Bật GPS thiết bị thực tế
                         </button>
-                        <button onclick="startGPSTracking(true)" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-2 rounded-lg text-[11px] transition-all flex justify-center items-center gap-2">
+                        <button onclick="startGPSTracking(true)"
+                            class="w-full bg-cyan-600 hover:bg-cyan-500 active:scale-[0.98] text-white font-bold py-2.5 rounded-lg text-xs transition-all flex justify-center items-center gap-2 cursor-pointer shadow-[0_0_15px_rgba(6,182,212,0.35)]">
                             🏃 Chạy mô phỏng
                         </button>
                     </div>
@@ -322,248 +586,365 @@
 
             </div>
 
-            <div id="chat-window" class="fixed bottom-4 left-4 w-[calc(100%-2rem)] md:w-[400px] h-[450px] md:h-[500px] pointer-events-auto bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700 shadow-2xl z-[100] flex flex-col overflow-hidden transition-all duration-300">
-                <div class="bg-slate-800/80 px-5 py-3 border-b border-slate-700 flex items-center justify-between cursor-pointer" onclick="minimizeChat()">
-                        <div class="flex items-center gap-3">
-                            <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/20">
-                                <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M12 8V4H8" />
-                                    <rect width="16" height="12" x="4" y="8" rx="2" />
-                                    <path d="M2 14h2" />
-                                    <path d="M20 14h2" />
-                                    <path d="M15 13v2" />
-                                    <path d="M9 13v2" />
-                                </svg>
-                                <span class="absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
-                                <span class="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-full"></span>
-                            </div>
-                            <span class="text-sm font-bold tracking-wide uppercase text-slate-200">Trợ lý ảo RAG Chatbot</span>
-                        </div>
-                        <button class="text-slate-400 hover:text-white p-1.5 rounded-lg transition-colors focus:outline-none">
-                            <svg id="chat-toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+            <div id="chat-window"
+                class="fixed bottom-3 left-3 w-[calc(100%-1.5rem)] sm:bottom-4 sm:left-4 sm:w-[calc(100%-2rem)] md:w-[400px] h-[56px] md:h-[500px] pointer-events-auto bg-slate-900/95 backdrop-blur-xl rounded-2xl border border-slate-700 shadow-2xl z-[100] flex flex-col overflow-hidden transition-all duration-300">
+                <div class="bg-slate-800/80 px-5 py-3 border-b border-slate-700 flex items-center justify-between cursor-pointer"
+                    onclick="minimizeChat()">
+                    <div class="flex items-center gap-3">
+                        <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-600/20">
+                            <svg class="w-5 h-5 text-blue-400" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M12 8V4H8" />
+                                <rect width="16" height="12" x="4" y="8" rx="2" />
+                                <path d="M2 14h2" />
+                                <path d="M20 14h2" />
+                                <path d="M15 13v2" />
+                                <path d="M9 13v2" />
                             </svg>
-                        </button>
-                    </div>
-                    <div id="chat-logs" class="flex-1 p-5 overflow-y-auto space-y-4 text-base flex flex-col custom-scrollbar bg-slate-900/50">
-                        <div class="bg-slate-800 border border-slate-700 text-slate-200 p-3.5 rounded-2xl rounded-tl-sm max-w-[85%] self-start leading-relaxed shadow-sm">
-                            Xin chào! Tôi sẽ giải đáp các thắc mắc của bạn về ngôi trường HCMUS xinh đẹp này. Hãy đặt câu hỏi cho tôi nhé!
+                            <span
+                                class="absolute top-0 right-0 w-2 h-2 bg-emerald-400 rounded-full animate-ping"></span>
+                            <span class="absolute top-0 right-0 w-2 h-2 bg-emerald-500 rounded-full"></span>
                         </div>
+                        <span class="text-sm font-bold tracking-wide uppercase text-slate-200">Trợ lý ảo RAG
+                            Chatbot</span>
                     </div>
-                    <!-- Chat Input Area -->
-                    <div class="p-3 bg-slate-800/80 border-t border-slate-700 flex items-center gap-2">
-                        <button onclick="toggleVoiceInput()" id="btn-voice" class="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl transition-all text-slate-300 hover:text-blue-400 focus:outline-none" title="Nhập bằng giọng nói">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-                                <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                        </button>
-                        <input type="text" id="chat-input" onkeypress="checkChatEnter(event)" placeholder="Nhắn tin cho RAG Chatbot..." 
-                            class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-all text-white placeholder-slate-500">
-                        <button onclick="transmitChatMessage()" class="p-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl shadow-md transition-all flex items-center justify-center focus:outline-none">
-                            <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path></svg>
-                        </button>
+                    <button
+                        class="text-slate-400 hover:text-white p-1.5 rounded-lg transition-colors focus:outline-none">
+                        <svg id="chat-toggle-icon" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2"
+                            viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 12h-15" />
+                        </svg>
+                    </button>
+                </div>
+                <div id="chat-logs"
+                    class="flex-1 p-5 overflow-y-auto space-y-4 text-base flex flex-col custom-scrollbar bg-slate-900/50">
+                    <div
+                        class="bg-slate-800 border border-slate-700 text-slate-200 p-3.5 rounded-2xl rounded-tl-sm max-w-[85%] self-start leading-relaxed shadow-sm">
+                        Xin chào! Tôi sẽ giải đáp các thắc mắc của bạn về ngôi trường HCMUS xinh đẹp này. Hãy đặt câu
+                        hỏi cho tôi nhé!
                     </div>
+                </div>
+                <!-- Chat Input Area -->
+                <div class="p-3 bg-slate-800/80 border-t border-slate-700 flex items-center gap-2">
+                    <button onclick="toggleVoiceInput()" id="btn-voice"
+                        class="p-2.5 bg-slate-700 hover:bg-slate-600 rounded-xl transition-all text-slate-300 hover:text-blue-400 focus:outline-none"
+                        title="Nhập bằng giọng nói">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                            stroke-linejoin="round" viewBox="0 0 24 24">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="23"></line>
+                            <line x1="8" y1="23" x2="16" y2="23"></line>
+                        </svg>
+                    </button>
+                    <input type="text" id="chat-input" onkeypress="checkChatEnter(event)"
+                        placeholder="Nhắn tin cho RAG Chatbot..."
+                        class="flex-1 bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-sm outline-none focus:border-blue-500 transition-all text-white placeholder-slate-500">
+                    <button onclick="transmitChatMessage()"
+                        class="p-2.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white rounded-xl shadow-md transition-all flex items-center justify-center focus:outline-none">
+                        <svg class="w-5 h-5 transform rotate-90" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
+                        </svg>
+                    </button>
+                </div>
             </div>
 
 
 
         </div>
-        <div id="bottom-nav-buttons" class="fixed bottom-[84px] left-4 md:bottom-4 md:left-[430px] flex flex-row gap-3 z-[90]">
-            <button onclick="toggleMapMode()" id="btn-map" class="p-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 hover:border-blue-500 rounded-2xl shadow-xl transition-all group relative flex items-center justify-center" title="Bản đồ cơ sở">
-                <svg class="w-6 h-6 text-slate-300 group-hover:text-blue-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M14.12 3.88 16 2v14l-4 2-4-2-4 2V4l4-2 4 2z" />
-                    <path d="M8 2v14" />
-                    <path d="M16 2v14" />
-                </svg>
-                <span class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-950 text-xs font-bold tracking-wide text-blue-400 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap border border-slate-700 shadow-lg">GNN Map</span>
-            </button>
-            <button onclick="toggleARMode()" id="btn-ar" class="p-3 bg-slate-900/90 backdrop-blur-md border border-slate-700 hover:border-indigo-500 rounded-2xl shadow-xl transition-all group relative flex items-center justify-center" title="Chế độ thực tế ảo tăng cường">
-                <svg class="w-6 h-6 text-slate-300 group-hover:text-indigo-400 transition-colors" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M3 13V9a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
-                    <path d="M9 7v4a3 3 0 0 0 6 0V7" />
-                    <path d="M12 15v3" />
-                </svg>
-                <span class="absolute bottom-full mb-3 left-1/2 -translate-x-1/2 bg-slate-950 text-xs font-bold tracking-wide text-indigo-400 px-3 py-1.5 rounded-lg opacity-0 group-hover:opacity-100 transition-all pointer-events-none whitespace-nowrap border border-slate-700 shadow-lg">AR WebXR</span>
-            </button>
-        </div>
+
 
     </div>
 
-    <div id="toast" class="fixed top-5 right-5 z-50 bg-slate-950 border border-slate-700 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold translate-x-[150%] transition-all duration-300 flex items-center gap-2"></div>
+    <div id="toast"
+        class="fixed top-5 right-5 z-50 bg-slate-950 border border-slate-700 px-4 py-2.5 rounded-xl shadow-2xl text-xs font-semibold translate-x-[150%] transition-all duration-300 flex items-center gap-2">
+    </div>
 
     <!-- User History Modal -->
-    <div id="history-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-        <div class="bg-slate-900 border border-slate-700 p-6 rounded-2xl shadow-2xl w-full max-w-sm animate-fade-in relative">
-            <button onclick="document.getElementById('history-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="history-modal"
+        class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+        <div
+            class="bg-slate-900 border border-slate-700 p-5 sm:p-6 mx-3 rounded-2xl shadow-2xl w-full max-w-sm animate-fade-in relative">
+            <button onclick="document.getElementById('history-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
             </button>
             <h3 class="text-base font-bold text-blue-400 mb-4 flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
                 Lịch sử ghé thăm
             </h3>
-            
+
             <div id="history-list" class="space-y-3 max-h-64 overflow-y-auto pr-2 custom-scrollbar">
                 <!-- Dữ liệu lịch sử sẽ được load vào đây -->
             </div>
             <div class="mt-5 border-t border-slate-700 pt-4 flex justify-between items-center">
                 <p class="text-[10px] text-slate-400">AI tự động học từ lịch sử này.</p>
-                <button onclick="clearUserHistory()" class="text-[10px] bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded hover:bg-rose-500/30 transition-all font-bold">Xóa lịch sử</button>
+                <button onclick="clearUserHistory()"
+                    class="text-[10px] bg-rose-500/20 text-rose-400 px-3 py-1.5 rounded hover:bg-rose-500/30 transition-all font-bold">Xóa
+                    lịch sử</button>
             </div>
         </div>
     </div>
 
     <!-- Tiktok Swipe Explore Modal -->
-    <div id="tiktok-modal" class="hidden fixed inset-0 z-[60] bg-black/95 flex items-center justify-center backdrop-blur-xl">
-        <button type="button" onclick="closeTiktokExplore()" class="absolute top-6 left-6 text-white/50 hover:text-white transition-colors z-50 p-2 bg-white/10 rounded-full">
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="tiktok-modal"
+        class="hidden fixed inset-0 z-[60] bg-black/95 flex items-center justify-center backdrop-blur-xl">
+        <button type="button" onclick="closeTiktokExplore()"
+            class="absolute top-6 left-6 text-white/50 hover:text-white transition-colors z-50 p-2 bg-white/10 rounded-full">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
         </button>
 
         <!-- Container Thẻ vuốt -->
-        <div id="tiktok-card-container" class="relative w-[95vw] max-w-[800px] h-[60vh] md:h-[70vh] bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-800 flex flex-col transition-all duration-300">
+        <div id="tiktok-card-container"
+            class="relative w-[95vw] max-w-[800px] h-[60vh] md:h-[70vh] bg-slate-900 rounded-[2rem] overflow-hidden shadow-2xl border border-slate-800 flex flex-col transition-all duration-300">
             <!-- Ảnh nền -->
-            <div id="tiktok-img-wrapper" class="absolute inset-0 bg-slate-800 flex items-center justify-center overflow-hidden">
-                <img id="tiktok-img" src="" class="w-full h-full object-cover transition-transform duration-700 opacity-0" alt="Location Image">
+            <div id="tiktok-img-wrapper"
+                class="absolute inset-0 bg-slate-800 flex items-center justify-center overflow-hidden">
+                <img id="tiktok-img" src=""
+                    class="w-full h-full object-cover transition-transform duration-700 opacity-0" alt="Location Image">
                 <div class="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent"></div>
             </div>
 
             <!-- Empty State (Khi không có gợi ý) -->
-            <div id="tiktok-empty-state" class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-md">
-                <svg class="w-16 h-16 text-slate-500 mb-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div id="tiktok-empty-state"
+                class="hidden absolute inset-0 z-50 flex flex-col items-center justify-center text-center p-6 bg-slate-900/90 backdrop-blur-md">
+                <svg class="w-16 h-16 text-slate-500 mb-4" fill="none" stroke="currentColor" stroke-width="1.5"
+                    viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z">
+                    </path>
+                </svg>
                 <h3 class="text-xl font-bold text-white mb-2">Chưa có gợi ý nào</h3>
-                <p class="text-sm text-slate-400 mb-6 max-w-sm">Có thể do hiện tại đã quá khuya hoặc các khu vực đang đóng cửa. Vui lòng quay lại sau nhé!</p>
-                <button type="button" onclick="closeTiktokExplore()" class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">Quay lại Bản đồ</button>
+                <p class="text-sm text-slate-400 mb-6 max-w-sm">Có thể do hiện tại đã quá khuya hoặc các khu vực đang
+                    đóng cửa. Vui lòng quay lại sau nhé!</p>
+                <button type="button" onclick="closeTiktokExplore()"
+                    class="bg-blue-600 hover:bg-blue-500 text-white font-bold py-3 px-8 rounded-xl transition-all shadow-[0_0_15px_rgba(37,99,235,0.4)]">Quay
+                    lại Bản đồ</button>
             </div>
 
             <!-- Content -->
-            <div class="absolute bottom-0 left-0 right-0 p-6 z-10 flex flex-col gap-2">
-                <div class="flex items-center gap-2 mb-2">
-                    <span id="tiktok-badge" class="bg-blue-600 text-white text-[12px] font-bold px-3 py-1 rounded-md uppercase tracking-wider">Đề xuất</span>
-                    <span id="tiktok-score" class="bg-purple-600 text-white text-[12px] font-bold px-3 py-1 rounded-md uppercase tracking-wider">Độ phù hợp: 95%</span>
+            <div class="absolute bottom-0 left-0 right-0 p-4 sm:p-6 z-10 flex flex-col gap-1.5 sm:gap-2">
+                <div class="flex items-center gap-2 mb-1">
+                    <span id="tiktok-badge"
+                        class="bg-blue-600 text-white text-[11px] sm:text-[12px] font-bold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md uppercase tracking-wider">Đề
+                        xuất</span>
+                    <span id="tiktok-score"
+                        class="bg-purple-600 text-white text-[11px] sm:text-[12px] font-bold px-2.5 py-0.5 sm:px-3 sm:py-1 rounded-md uppercase tracking-wider">Độ
+                        phù hợp: 95%</span>
                 </div>
-                <h2 id="tiktok-title" class="text-4xl md:text-5xl font-bold text-white drop-shadow-lg mb-1">Tên địa điểm</h2>
-                <p id="tiktok-tagline" class="text-slate-200 text-base md:text-lg drop-shadow-md font-medium max-w-2xl">Mô tả ngắn gọn về địa điểm này.</p>
-                
+                <h2 id="tiktok-title" class="text-2xl sm:text-3xl md:text-5xl font-bold text-white drop-shadow-lg mb-0.5 sm:mb-1 line-clamp-2">Tên địa điểm
+                </h2>
+                <p id="tiktok-tagline" class="text-slate-200 text-xs sm:text-sm md:text-lg drop-shadow-md font-medium max-w-2xl line-clamp-2">
+                    Mô tả ngắn gọn về địa điểm này.</p>
+
                 <div id="tiktok-amenities" class="flex flex-wrap gap-1.5 mt-3">
                     <!-- Tags tiện ích -->
                 </div>
 
                 <div class="flex items-center gap-4 mt-6">
-                    <button type="button" onclick="swipeTiktok('left')" class="flex-1 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    <button type="button" onclick="swipeTiktok('left')"
+                        class="flex-1 bg-white/10 hover:bg-white/20 backdrop-blur border border-white/20 text-white font-bold py-3.5 rounded-2xl transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                         Bỏ qua
                     </button>
-                    <button type="button" onclick="swipeTiktok('right')" class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3.5 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <button type="button" onclick="swipeTiktok('right')"
+                        class="flex-1 bg-emerald-500 hover:bg-emerald-400 text-white font-bold py-3.5 rounded-2xl shadow-[0_0_20px_rgba(16,185,129,0.4)] transition-all flex items-center justify-center gap-2">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z">
+                            </path>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                        </svg>
                         Đến đây
                     </button>
                 </div>
             </div>
-            
+
             <!-- Action Side Bar cho Tiktok -->
             <div class="absolute right-4 bottom-32 z-20 flex flex-col gap-5 items-center">
                 <!-- Nút Yêu thích (Tym) -->
-                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); likeTiktokNode()" class="flex flex-col items-center group">
-                    <div id="tiktok-like-btn" class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg relative overflow-hidden">
+                <button type="button" onclick="event.preventDefault(); event.stopPropagation(); likeTiktokNode()"
+                    class="flex flex-col items-center group">
+                    <div id="tiktok-like-btn"
+                        class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg relative overflow-hidden">
                         <!-- Hiệu ứng tym bay -->
                         <div id="heart-burst" class="absolute inset-0 pointer-events-none"></div>
-                        <svg class="w-6 h-6 transition-transform group-hover:scale-110 group-active:scale-90" fill="currentColor" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+                        <svg class="w-6 h-6 transition-transform group-hover:scale-110 group-active:scale-90"
+                            fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z">
+                            </path>
+                        </svg>
                     </div>
-                    <span id="tiktok-likes-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Tym</span>
+                    <span id="tiktok-likes-count"
+                        class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Tym</span>
                 </button>
-                
+
                 <!-- Bình luận -->
-                <button type="button" onclick="event.stopPropagation(); openTiktokComments()" class="flex flex-col items-center group">
-                    <div class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>
+                <button type="button" onclick="event.stopPropagation(); openTiktokComments()"
+                    class="flex flex-col items-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                        </svg>
                     </div>
-                    <span id="tiktok-comments-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">B.Luận</span>
+                    <span id="tiktok-comments-count"
+                        class="text-white text-[12px] font-bold mt-1 drop-shadow-md">B.Luận</span>
                 </button>
 
                 <!-- Đánh giá -->
-                <button type="button" onclick="event.stopPropagation(); openTiktokRating()" class="flex flex-col items-center group">
-                    <div class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
-                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>
+                <button type="button" onclick="event.stopPropagation(); openTiktokRating()"
+                    class="flex flex-col items-center group">
+                    <div
+                        class="w-12 h-12 rounded-full bg-slate-800/80 backdrop-blur border border-white/10 flex items-center justify-center text-white group-hover:bg-slate-700 transition-all shadow-lg">
+                        <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
+                            <path
+                                d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                        </svg>
                     </div>
-                    <span id="tiktok-ratings-count" class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Đ.Giá</span>
+                    <span id="tiktok-ratings-count"
+                        class="text-white text-[12px] font-bold mt-1 drop-shadow-md">Đ.Giá</span>
                 </button>
             </div>
 
             <!-- Tiktok Comments Modal -->
-            <div id="tiktok-comments-modal" onclick="event.stopPropagation()" class="hidden absolute inset-0 z-[70] bg-slate-900/95 backdrop-blur-md flex-col transition-all duration-300">
+            <div id="tiktok-comments-modal" onclick="event.stopPropagation()"
+                class="hidden absolute inset-0 z-[70] bg-slate-900/95 backdrop-blur-md flex-col transition-all duration-300">
                 <div class="p-4 border-b border-slate-700 flex justify-between items-center bg-slate-800">
                     <h3 class="text-lg font-bold text-white">Bình luận</h3>
                     <button type="button" onclick="closeTiktokComments()" class="text-slate-400 hover:text-white p-2">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
                     </button>
                 </div>
                 <div id="tiktok-comments-list" class="flex-1 p-4 overflow-y-auto space-y-4 text-sm custom-scrollbar">
                     <!-- comments go here -->
                 </div>
                 <div class="p-4 border-t border-slate-700 bg-slate-800 flex gap-2">
-                    <input type="text" id="tiktok-comment-input" onkeypress="if(event.key === 'Enter') submitTiktokComment()" placeholder="Thêm bình luận..." class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 text-white">
-                    <button type="button" onclick="submitTiktokComment()" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold transition-all">Gửi</button>
+                    <input type="text" id="tiktok-comment-input"
+                        onkeypress="if(event.key === 'Enter') submitTiktokComment()" placeholder="Thêm bình luận..."
+                        class="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2 text-sm outline-none focus:border-blue-500 text-white">
+                    <button type="button" onclick="submitTiktokComment()"
+                        class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-xl font-bold transition-all">Gửi</button>
                 </div>
             </div>
 
             <!-- Tiktok Rating Modal -->
-            <div id="tiktok-rating-modal" class="hidden absolute inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center">
-                <div class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm flex flex-col items-center">
+            <div id="tiktok-rating-modal"
+                class="hidden absolute inset-0 z-[70] bg-black/80 backdrop-blur-sm flex items-center justify-center">
+                <div
+                    class="bg-slate-800 border border-slate-700 p-6 rounded-2xl shadow-2xl w-[90%] max-w-sm flex flex-col items-center">
                     <h3 class="text-lg font-bold text-white mb-4">Đánh giá địa điểm này</h3>
                     <div class="flex gap-2 mb-6" id="tiktok-stars-container">
-                        <button type="button" onclick="setTiktokRating(1)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                        <button type="button" onclick="setTiktokRating(2)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                        <button type="button" onclick="setTiktokRating(3)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                        <button type="button" onclick="setTiktokRating(4)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
-                        <button type="button" onclick="setTiktokRating(5)" class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg></button>
+                        <button type="button" onclick="setTiktokRating(1)"
+                            class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg
+                                class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg></button>
+                        <button type="button" onclick="setTiktokRating(2)"
+                            class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg
+                                class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg></button>
+                        <button type="button" onclick="setTiktokRating(3)"
+                            class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg
+                                class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg></button>
+                        <button type="button" onclick="setTiktokRating(4)"
+                            class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg
+                                class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg></button>
+                        <button type="button" onclick="setTiktokRating(5)"
+                            class="tiktok-star text-slate-500 hover:text-yellow-400 transition-colors"><svg
+                                class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+                                <path
+                                    d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                            </svg></button>
                     </div>
                     <div class="flex gap-4 w-full">
-                        <button type="button" onclick="closeTiktokRating()" class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-xl font-bold transition-all">Hủy</button>
+                        <button type="button" onclick="closeTiktokRating()"
+                            class="flex-1 bg-slate-700 hover:bg-slate-600 text-white py-2 rounded-xl font-bold transition-all">Hủy</button>
                     </div>
                 </div>
             </div>
-            
+
             <!-- Trạng thái loading -->
-            <div id="tiktok-loading" class="absolute inset-0 bg-slate-900 z-20 flex flex-col items-center justify-center">
+            <div id="tiktok-loading"
+                class="absolute inset-0 bg-slate-900 z-20 flex flex-col items-center justify-center">
                 <div class="w-10 h-10 border-4 border-slate-700 border-t-pink-500 rounded-full animate-spin"></div>
                 <p class="text-slate-400 mt-4 text-sm font-medium animate-pulse">Đang tìm kiếm gợi ý cho bạn...</p>
             </div>
         </div>
-        
+
         <!-- Nút hướng dẫn bên phải -->
-        <div class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 text-white/50 hidden md:flex">
-            <button type="button" onclick="event.preventDefault(); swipeTiktok('left')" class="p-4 bg-white/5 hover:bg-white/10 rounded-full hover:text-white transition-all">
-                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+        <div
+            class="absolute right-8 top-1/2 -translate-y-1/2 flex flex-col items-center gap-4 text-white/50 hidden md:flex">
+            <button type="button" onclick="event.preventDefault(); swipeTiktok('left')"
+                class="p-4 bg-white/5 hover:bg-white/10 rounded-full hover:text-white transition-all">
+                <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path>
+                </svg>
             </button>
             <span class="text-xs font-bold tracking-widest rotate-90 my-8">VUỐT LÊN / BỎ QUA</span>
         </div>
     </div>
 
     <!-- Node Image Modal -->
-    <div id="node-image-modal" class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/80 backdrop-blur-md">
-        <div class="bg-slate-900 border border-blue-500/50 p-6 rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.3)] w-full max-w-xl animate-fade-in relative flex flex-col items-center">
-            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-20">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+    <div id="node-image-modal"
+        class="hidden fixed inset-0 z-[1000] flex items-center justify-center bg-black/80 backdrop-blur-md">
+        <div
+            class="bg-slate-900 border border-blue-500/50 p-4 sm:p-6 mx-3 my-auto rounded-2xl sm:rounded-3xl shadow-[0_0_50px_rgba(59,130,246,0.3)] w-full max-w-xl max-h-[92vh] overflow-y-auto animate-fade-in relative flex flex-col items-center">
+            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')"
+                class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors z-20">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
             </button>
-            <h3 id="node-image-title" class="text-xl font-bold text-blue-400 mb-2 uppercase tracking-wider">TÒA NHÀ X</h3>
+            <h3 id="node-image-title" class="text-xl font-bold text-blue-400 mb-2 uppercase tracking-wider">TÒA NHÀ X
+            </h3>
             <p class="text-xs text-slate-400 mb-6">Hình ảnh thực tế địa điểm</p>
-            
-            <div class="w-full aspect-video bg-slate-950 rounded-xl border border-slate-700 relative overflow-hidden flex items-center justify-center group perspective-1000">
-                
+
+            <div
+                class="w-full aspect-video bg-slate-950 rounded-xl border border-slate-700 relative overflow-hidden flex items-center justify-center group perspective-1000">
+
                 <!-- Hình ảnh minh họa hoặc Ảnh thực tế -->
-                <div class="absolute inset-0 z-10 transform transition-transform duration-1000 group-hover:scale-110 flex items-center justify-center">
-                    <div id="node-image-icon" class="text-9xl drop-shadow-[0_0_30px_rgba(59,130,246,0.8)] filter">🏢</div>
+                <div
+                    class="absolute inset-0 z-10 transform transition-transform duration-1000 group-hover:scale-110 flex items-center justify-center">
+                    <div id="node-image-icon" class="text-9xl drop-shadow-[0_0_30px_rgba(59,130,246,0.8)] filter">🏢
+                    </div>
                     <img id="node-image-img" src="" class="hidden w-full h-full object-cover z-20">
                 </div>
-                
-                <div class="absolute bottom-4 left-4 z-30 bg-blue-900/50 text-blue-200 text-[10px] px-2 py-1 rounded border border-blue-500/50 backdrop-blur-md">
+
+                <div
+                    class="absolute bottom-4 left-4 z-30 bg-blue-900/50 text-blue-200 text-[10px] px-2 py-1 rounded border border-blue-500/50 backdrop-blur-md">
                     GNN Map Visualization
                 </div>
             </div>
-            
-            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')" class="mt-6 w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]">
+
+            <button onclick="document.getElementById('node-image-modal').classList.add('hidden')"
+                class="mt-6 w-full bg-blue-600 hover:bg-blue-500 active:scale-[0.98] text-white font-bold py-3 rounded-xl transition-all shadow-[0_0_20px_rgba(59,130,246,0.4)]">
                 Đóng
             </button>
         </div>
@@ -572,4 +953,5 @@
     <script src="local_map/js/ar-integration.js"></script>
     <script src="script.js"></script>
 </body>
+
 </html>
