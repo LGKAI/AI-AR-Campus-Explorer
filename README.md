@@ -35,7 +35,7 @@ Hệ thống kết hợp nhiều công nghệ AI tiên tiến nhằm mang đến
 
 ### 3. Frontend & Trải nghiệm Người dùng
 - **HTML5, Vanilla CSS & TailwindCSS:** Thiết kế giao diện hiện đại theo phong cách Glassmorphism và Cyber-glow.
-- **WebXR API & Leaflet.js:** Bản đồ 2D tương tác kết hợp AR Camera 3D Overlay.
+- **WebXR API & Leaflet.js:** Bản đồ 2D tương tác kết hợp AR Camera Navigation Overlay.
 - **Web Speech API:** Nhận diện giọng nói (Voice-to-Text) để trò chuyện trực tiếp với Chatbot.
 - **Hỗ trợ Safe Area:** Sử dụng `env(safe-area-inset-top)` và `env(safe-area-inset-bottom)` bảo đảm hiển thị tràn viền hoàn mỹ trên iOS & Android.
 
@@ -132,9 +132,9 @@ source/
 #### Cách 2: Chạy trên điện thoại di động qua Netlify
 1. Mã nguồn đã được cấu hình sẵn domain Ngrok cố định trong `frontend/script.js`.
 2. Kéo thả thư mục `frontend` lên **[Netlify Drop](https://app.netlify.com/drop)** (hoặc liên kết repository GitHub để Netlify tự động deploy).
-3. Mở đường link Netlify trên trình duyệt điện thoại (Safari / Chrome).
+3. Mở đường link Netlify trên trình duyệt điện thoại (https://ai-ar-campus-explorer.netlify.app).
 4. Trải nghiệm đầy đủ các tính năng:
    - Đăng nhập FaceID qua Camera điện thoại.
-   - Trải nghiệm chỉ đường thực tế ảo qua AR Camera WebXR.
+   - Trải nghiệm chỉ đường thực tế tăng cường qua AR Camera WebXR.
    - Hỏi đáp bằng giọng nói với Trợ lý ảo RAG Chatbot.
    - Thử nghiệm tìm đường GNN và chạy mô phỏng di chuyển GPS.

@@ -823,7 +823,10 @@ window.addEventListener('resize', resizeCanvas);
 
 // Hàm lấy danh sách điểm từ API của Khoa
 async function fetchCampusNodes() {
-    if (campusNodesLoaded) return;
+    if (campusNodesLoaded) {
+        resizeCanvas();
+        return;
+    }
     try {
         const nodesRes = await fetch(`${BACKEND_URL}/map/api_get_graph`);
 
@@ -1355,7 +1358,7 @@ function goHome() {
     if (mapLayer) mapLayer.classList.add("hidden");
     if (arLayer) arLayer.classList.add("hidden");
     if (canvasCont) canvasCont.classList.add("hidden");
-    if (placeholder) placeholder.classList.remove("opacity-0", "pointer-events-none");
+    if (placeholder) placeholder.classList.remove("opacity-0", "pointer-events-none", "hidden");
     if (viewport) {
         viewport.classList.remove("bg-black");
         viewport.classList.add("bg-slate-950");
@@ -1386,7 +1389,7 @@ function activateMapMode() {
     if (arLayer) arLayer.classList.add("hidden");
     if (mapLayer) mapLayer.classList.remove("hidden");
     if (canvasCont) canvasCont.classList.remove("hidden");
-    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none");
+    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none", "hidden");
     if (viewport) {
         viewport.classList.remove("bg-black");
         viewport.classList.add("bg-slate-950");
@@ -1402,6 +1405,9 @@ function activateMapMode() {
     updateNavState('map');
     minimizeChat('minimize');
     fetchCampusNodes();
+
+    // Đo lại kích thước canvas và vẽ đồ thị toà nhà ngay lập tức
+    setTimeout(resizeCanvas, 50);
 }
 
 // Kích hoạt chế độ AR WebXR
@@ -1414,7 +1420,7 @@ function activateARMode() {
 
     if (mapLayer) mapLayer.classList.add("hidden");
     if (canvasCont) canvasCont.classList.add("hidden");
-    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none");
+    if (placeholder) placeholder.classList.add("opacity-0", "pointer-events-none", "hidden");
     if (arLayer) arLayer.classList.remove("hidden");
     if (viewport) {
         viewport.classList.remove("bg-slate-950");

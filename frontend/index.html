@@ -253,7 +253,7 @@
                     </h1>
 
                     <p class="text-xs md:text-sm text-slate-400 max-w-md leading-relaxed mb-4 sm:mb-6 px-2">
-                        Hệ thống Bản đồ Campus thông minh kết hợp Hệ thống gợi ý (GNN) và Thực tế ảo tăng cường (AR
+                        Hệ thống Bản đồ Campus thông minh kết hợp Hệ thống gợi ý (GNN) và Thực tế tăng cường (AR
                         WebXR).
                     </p>
 
@@ -409,7 +409,7 @@
                                     </svg>
                                 </span>
                                 <div class="text-left">
-                                    <div class="font-semibold text-white">🏠 Trang Chủ</div>
+                                    <div class="font-semibold text-white">Trang Chủ</div>
                                     <div class="text-[10px] text-slate-400">Giới thiệu tổng quan hệ thống</div>
                                 </div>
                             </div>
@@ -427,7 +427,7 @@
                                     </svg>
                                 </span>
                                 <div class="text-left">
-                                    <div class="font-semibold text-white">🗺️ Bản Đồ GNN (Routing)</div>
+                                    <div class="font-semibold text-white">Bản Đồ GNN (Routing)</div>
                                     <div class="text-[10px] text-slate-400">Dẫn đường tối ưu mạng nơ-ron đồ thị</div>
                                 </div>
                             </div>
@@ -445,8 +445,8 @@
                                     </svg>
                                 </span>
                                 <div class="text-left">
-                                    <div class="font-semibold text-white">🥽 AR WebXR (Camera)</div>
-                                    <div class="text-[10px] text-slate-400">Chỉ đường không gian 3D qua Camera</div>
+                                    <div class="font-semibold text-white">AR WebXR (Camera)</div>
+                                    <div class="text-[10px] text-slate-400">Chỉ đường AR qua Camera thời gian thực</div>
                                 </div>
                             </div>
                             <span class="text-xs text-slate-500 group-hover:text-indigo-400">➔</span>
@@ -526,20 +526,14 @@
 
                     <div class="flex-1 overflow-y-auto space-y-4 pr-1 text-xs">
                         <button onclick="fetchAIRecommendations()"
-                            class="w-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-300 py-2 rounded-lg transition-all mb-2 flex items-center justify-center gap-2">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            Lấy đề xuất địa điểm
+                            class="w-full bg-purple-600/20 border border-purple-500/50 hover:bg-purple-600/40 text-purple-200 py-2.5 rounded-lg transition-all mb-2 flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                            <span class="text-sm">✨</span>
+                            <span>Lấy đề xuất địa điểm</span>
                         </button>
                         <button type="button" onclick="event.preventDefault(); openTiktokExplore()"
-                            class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-300 py-2 rounded-lg transition-all flex items-center justify-center gap-2 font-bold">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-                                <path
-                                    d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.95v5.37c-.01 2.21-.6 4.41-1.83 6.24-1.22 1.83-3.05 3.16-5.18 3.75-2.13.59-4.42.42-6.42-.48-2.01-.89-3.64-2.45-4.6-4.38C-2.4 15.63-2.6 13.34-1.8 11.3c.79-2.03 2.36-3.67 4.31-4.5 1.95-.83 4.2-.82 6.13.02 1.93.83 3.49 2.44 4.31 4.4.08.19.14.39.18.59V.02z" />
-                            </svg>
-                            Khám phá (Tiktok Swipe)
+                            class="w-full bg-pink-600/20 border border-pink-500/50 hover:bg-pink-600/40 text-pink-200 py-2.5 rounded-lg transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm">
+                            <span class="text-sm">🎴</span>
+                            <span>Khám phá (Tiktok Swipe)</span>
                         </button>
 
                         <div id="ai-recs-box" class="space-y-2 hidden">
